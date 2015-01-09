@@ -1,4 +1,10 @@
 # Byte-compiled / optimized / DLL files
+*.log
+*.swp
+*.pdb
+.project
+.pydevproject
+.settings
 __pycache__/
 *.py[cod]
 
