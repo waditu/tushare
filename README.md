@@ -1,11 +1,12 @@
 TuShare
 ----
+![](https://pypip.in/v/tushare/badge.png)
 
 股票、财经数据获取接口包
 
  TuShare is a utility for crawling historical data of China stocks
 
-> 数据来源于各大财经网站，如遇访问异常请及时更新cnstock或自行查找并修改数据接口地址。
+> 数据来源于各大财经网站，如遇访问异常请及时更新tushare或自行查找并修改数据接口地址。
 
 > 使用cnstock的优点是：**调用简单**、直接返回pandas **DataFrame对象**
 
