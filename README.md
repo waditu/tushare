@@ -1,6 +1,6 @@
 TuShare
 ----
-[![](https://pypip.in/v/tushare/badge.png)](https://pypi.python.org/pypi/tushare/0.1.0)
+[![](https://pypip.in/v/tushare/badge.png)](https://pypi.python.org/pypi/tushare/0.1.2)
 
 
 股票、财经数据获取接口包
@@ -146,6 +146,12 @@ Quick Start
  
 Change Logs
 ---
+
+0.1.1 2015/01/11
+===
+
+
+- 增加了tick数据的获取
 
 0.1.0 2014/12/01
 ===
