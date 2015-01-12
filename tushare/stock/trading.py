@@ -10,6 +10,7 @@ from tushare.stock import cons as ct
 from pandas.io.common import urlopen
 from pandas.util.testing import _network_error_classes
 import re
+from StringIO import StringIO
 
 def get_hist_data(code=None, start=None, end=None, retry_count=3,
                    pause=0.001):
@@ -84,6 +85,41 @@ def _parsing_dayprice_json(pageNum=0):
     #删除停牌的股票
     df = df.ix[df.volume>0]
     return df
+
+def get_tick_data(code=None, date=None, retry_count=3,pause=0.001):
+    """
+        获取分笔数据
+    Parameters
+     ------
+        code:string
+                  股票代码 e.g. 600848
+        date:string
+                  日期 format：YYYY-MM-DD
+        retry_count : int, 默认 3
+                  如遇网络等问题重复执行的次数 Number of times to retry query request.
+        pause : int, 默认 0
+                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+     return
+     -------
+        DataFrame 当日所有股票交易数据(DataFrame)
+              属性:成交时间、成交价格、价格变动，成交手、成交金额(元)，买卖类型
+    """
+    if code is None or len(code)!=6 or date is None:
+        return None
+    symbol = code_to_symbol(code)
+    url = ct.TICK_PRICE_URL % (date,symbol)
+    for _ in range(retry_count):
+        time.sleep(pause)
+        try:
+            re = urllib2.Request(url)
+            lines = urllib2.urlopen(re,timeout=10).read()
+            lines = lines.decode('GBK')      
+        except _network_error_classes:
+            pass
+        else:
+            df = pd.read_table(StringIO(lines),names=ct.TICK_COLUMNS,skiprows=[0]) 
+            return df
+    raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
     
 def get_today_all():
     """
