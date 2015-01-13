@@ -1,8 +1,11 @@
 language: python
 python:
-    - 2.7
+  - 2.7
+branches:
+  only:
+    - master
 install:
-	- pip install -r requirements.txt
-    - python setup.py install
+  - pip install -r requirements.txt
+  - python setup.py install
 script:
-    - python test_unittest.py
+  - python test_unittest.py
