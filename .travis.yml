@@ -2,16 +2,20 @@ language: python
 
 python:
   - 2.7
+  
+before_install:
+- wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
+- chmod +x miniconda.sh
+- ./miniconda.sh -b
+- export PATH=/home/travis/miniconda/bin:$PATH
+- conda update --yes conda
 
 install:
-  - pip install coverage coveralls
-  - pip install numpy>=1.6.1
-  - pip install scipy
-  - pip install pandas>=0.14.0
-  - pip install matplotlib>=1.1.0
-
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy pandas matplotlib
+  
+before_script:
+  - python setup.py install
+  
 script:
-  - coverage run -a test_unittest.py
-  - coverage report
+  - python test_unittest.py
 
-after_success: coveralls
