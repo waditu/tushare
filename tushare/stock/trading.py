@@ -94,7 +94,7 @@ def get_tick_data(code=None, date=None, retry_count=3,pause=0.001):
     """
         获取分笔数据
     Parameters
-     ------
+    ------
         code:string
                   股票代码 e.g. 600848
         date:string
@@ -138,6 +138,71 @@ def get_today_all():
         for i in range(2,ct.DAY_PRICE_PAGES):
             newdf = _parsing_dayprice_json(i)
             df = df.append(newdf,ignore_index=True)
+    return df
+
+def get_realtime_quotes(codes=None):
+    """
+        获取实时交易数据 getting real time quotes data
+       用于跟踪交易情况（本次执行的结果-上一次执行的数据）
+    Parameters
+    ------
+        code : string, array-like object (list, tuple, Series), or DataFrame
+        Single stock symbol (ticker), array-like object of symbols or
+        DataFrame with index containing stock symbols.
+        
+    return
+    -------
+        DataFrame 实时交易数据
+              属性:0：name，股票名字
+            1：open，今日开盘价
+            2：stmt，昨日收盘价(settlement)
+            3：trade，当前价格
+            4：high，今日最高价
+            5：low，今日最低价
+            6：bid，竞买价，即“买一”报价
+            7：ask，竞卖价，即“卖一”报价
+            8：volumn，成交量 maybe you need do volumn/100
+            9：amount，成交金额（元  rmb yuan）
+            10：b1_v，委买一（笔数）
+            11：b1_p，委买一（价格）
+            12：b2_v，“买二”
+            13：b2_p，“买二”
+            14：b3_v，“买三”
+            15：b3_p，“买三”
+            16：b4_v，“买四”
+            17：b4_p，“买四”
+            18：b5_v，“买五”
+            19：b5_p，“买五”
+            20：a1_v，委卖一（笔数）
+            21：a1_p，委卖一（价格）
+            ...
+            30：date，日期；
+            31：time，时间；
+    """
+    code_list = ''
+    if len(codes)==6 and codes.isdigit():
+        code_list = code_to_symbol(codes)
+    elif type(codes) is list or type(codes) is set or type(codes) is tuple or type(codes) is pd.Series:
+        for code in codes:
+            if len(code)==6 and code.isdigit():
+                code_list += code_to_symbol(code) +','
+    else:
+        raise SyntaxError('code input error')
+        
+    code_list = code_list[:-1] if len(code_list)>8 else code_list 
+    request = urllib2.Request(ct.LIVE_DATA_URL%code_list)
+    text = urllib2.urlopen(request,timeout=10).read()
+    text = text.decode('GBK')
+    reg = re.compile(r'\="(.*?)\";')
+    data = reg.findall(text)
+    data_list = []
+    for row in data:
+        data_list.append([str for str in row.split(',')])
+    df = pd.DataFrame(data_list,columns=ct.LIVE_DATA_COLS)
+    df = df.drop('s',axis=1)
+    ls = [cls for cls in df.columns if '_v' in cls]
+    for txt in ls:
+        df[txt] = df[txt].map(lambda x:x[:-2])
     return df
 
 def code_to_symbol(code):
