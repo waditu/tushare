@@ -6,7 +6,7 @@ python:
 install:
   - pip install coverage coveralls
   - pip install numpy>=1.6.1
-  - pip install scipy>=0.13.3
+  - pip install scipy
   - pip install pandas>=0.14.0
   - pip install matplotlib>=1.1.0
 
