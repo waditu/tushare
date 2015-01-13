@@ -7,12 +7,13 @@ TuShare
 
  TuShare is a utility for crawling historical data of China stocks
 
-> 数据来源于各大财经网站，如遇访问异常请及时更新tushare或自行查找并修改数据接口地址。
+> 数据来源于各大财经网站，如遇访问异常请及时更新TuShare或自行查找并修改数据接口地址。
 
-> 使用cnstock的优点是：**调用简单**、直接返回pandas **DataFrame对象**
+> 使用TuShare的优点是：**调用简单**、直接返回pandas **DataFrame对象**
 
 Dependencies
 =========
+python 2.7
 
 [pandas](http://pandas.pydata.org/ "pandas")
 

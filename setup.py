@@ -1,7 +1,6 @@
 from distutils.core import setup
 import codecs
 import os
-import sys
 
 def read(fname):
     return codecs.open(os.path.join(os.path.dirname(__file__), fname)).read()

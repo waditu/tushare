@@ -1,8 +1,10 @@
 # -*- coding:utf-8 -*- 
-'''
-Created on 2013/07/31
+"""
+Created on 2014/07/31
 @author: Jimmy Liu
-'''
+@group : waditu
+@contact: jimmysoa@sina.cn
+"""
 
 DAY_PRICE_COLUMNS = ['date','open','high','close','low','amount','price_change','p_change','ma5','ma10','ma20','v_ma5','v_ma10','v_ma20','turnover']
 TICK_COLUMNS = ['time','price','change','volume','amount','type']

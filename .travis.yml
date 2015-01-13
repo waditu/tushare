@@ -1,0 +1,8 @@
+language: python
+python:
+    - 2.7
+install:
+	- pip install ipython pandas numpy tornado pyzmq jinja2 matplotlib
+    - python setup.py install
+script:
+    - python test_unittest.py

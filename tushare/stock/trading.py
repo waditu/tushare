@@ -1,6 +1,10 @@
 # -*- coding:utf-8 -*- 
 """
-交易数据接口
+交易数据接口 
+Created on 2014/07/31
+@author: Jimmy Liu
+@group : waditu
+@contact: jimmysoa@sina.cn
 """
 import time
 import json
