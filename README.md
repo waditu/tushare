@@ -1,7 +1,7 @@
 TuShare
 ----
 [![](https://pypip.in/v/tushare/badge.png)](https://pypi.python.org/pypi/tushare/0.1.2)
-
+![](https://api.travis-ci.org/waditu/tushare.png?branch=master)
 
 股票、财经数据获取接口包
 
