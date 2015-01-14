@@ -7,7 +7,7 @@ def read(fname):
 
 setup(
     name='tushare',
-    version='0.1.2',
+    version='0.1.3',
     description='TuShare is a utility for crawling historical data of China stocks',
 #     long_description=read("README.md"),
     author='Jimmy Liu',

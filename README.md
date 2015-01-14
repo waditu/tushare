@@ -1,13 +1,13 @@
 TuShare
 ----
-[![](https://pypip.in/v/tushare/badge.png)](https://pypi.python.org/pypi/tushare/0.1.2)
 ![](https://api.travis-ci.org/waditu/tushare.png?branch=master)
+[![](https://pypip.in/v/tushare/badge.png)](https://pypi.python.org/pypi/tushare/0.1.3)
 
 股票、财经数据获取接口包
 
- TuShare is a utility for crawling historical data of China stocks
+ TuShare is a utility for crawling historical data of China stocks.
 
-> 数据来源于各大财经网站，如遇访问异常请及时更新TuShare或自行查找并修改数据接口地址。
+> 数据来源于各大财经网站，如遇访问异常请及时更新TuShare或自行查找并修改数据接口地址
 
 > 使用TuShare的优点是：**调用简单**、直接返回pandas **DataFrame对象**
 
@@ -121,7 +121,7 @@ Quick Start
 	9     323469835        9.61735  
 	10     25768152       19.51090  
 
-**Example 2.** 获取历史分笔数据
+**Example 3.** 获取历史分笔数据
 
     In [1]: import tushare.stock.trading as td
 	In [2]: df = td.get_tick_data('600848','2014-01-09')
@@ -144,13 +144,38 @@ Quick Start
 	9    14:58:25   6.05  -0.01      20   12100   卖盘
 	10   14:58:05   6.06     --       5    3030   买盘
 
+**Example 4.** 获取实时交易数据(Realtime Quotes Data)
+
+    In [1]:import tushare.stock.trading as td
+	In [2]:td.get_realtime_quotes('000581') #Single stock symbol
+
+结果显示：
+>名称、开盘价、昨价、现价、最高、最低、买入价、卖出价、成交量、成交金额...more in docs
+
+	Out[2]:
+	  name      open pre_close  price   high    low    bid    ask    volume  \  
+	0 威孚高科  31.50     31.38  30.25  31.63  30.08  30.25  30.27  10148935 
+	  amount      ...        a2_p a3_v   a3_p a4_v   a4_p a5_v   a5_p  \
+	0 314310351.22      ...       30.29    2  30.30  234  30.31   19  30.32 \
+	  date      	time     code  
+	0  2015-01-14  14:30:46  000581  
+	  
+请求多个股票方法（一次最好不要超过30个）：
+    
+	In [3]:td.get_realtime_quotes(['600848','000980','000981']) #symbols from a list
+	In [4]:td.get_realtime_quotes(df['code'].tail(10)) #from a Series
+
+
  
 Change Logs
 ---
+0.1.3 2015/01/13
+===
+- 增加了实时交易数据的获取
+- Done for crawling Realtime Quotes data
 
 0.1.1 2015/01/11
 ===
-
 
 - 增加了tick数据的获取
 
