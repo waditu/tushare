@@ -8,8 +8,8 @@ def read(fname):
 setup(
     name='tushare',
     version='0.1.3',
-    description='TuShare is a utility for crawling historical data of China stocks',
-#     long_description=read("README.md"),
+    description='TuShare is a utility for crawling historical and Realtime Quotes data of China stocks',
+    long_description=read("READM.rst"),
     author='Jimmy Liu',
     author_email='jimmysoa@sina.cn',
     license='BSD',
