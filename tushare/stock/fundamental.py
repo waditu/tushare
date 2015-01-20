@@ -13,7 +13,7 @@ import urllib2
 
 def get_stock_basics(file_path=ct.ALL_STOCK_BASICS_FILE):
     """
-        获取个股基本情况
+        获取沪深上市公司基本情况
     Parameters
     --------
     file_path:a file path string,default as 'data/all.csv' in the package
@@ -32,7 +32,7 @@ def get_stock_basics(file_path=ct.ALL_STOCK_BASICS_FILE):
                liquidAssets,流动资产
                fixedAssets,固定资产
                reserved,公积金
-               reservedPerShare,每股公积
+               reservedPerShare,每股公积金
                eps,每股收益
                bvps,每股净资
                pb,市净率
