@@ -61,7 +61,7 @@ def get_hist_data(code=None, start=None, end=None, retry_count=3,
             return df
     raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
 
-def _parsing_dayprice_json(pageNum=0):
+def _parsing_dayprice_json(pageNum=1):
     """
            处理当日行情分页数据，格式为json
      Parameters
@@ -71,6 +71,7 @@ def _parsing_dayprice_json(pageNum=0):
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
     """
+    print 'getting page %s ...'%pageNum
     url = ct.SINA_DAY_PRICE_URL%pageNum
     request = urllib2.Request(url)
     text = urllib2.urlopen(request,timeout=10).read()
@@ -90,7 +91,7 @@ def _parsing_dayprice_json(pageNum=0):
     df = df.ix[df.volume>0]
     return df
 
-def get_tick_data(code=None, date=None, retry_count=3,pause=0.001):
+def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
     """
         获取分笔数据
     Parameters

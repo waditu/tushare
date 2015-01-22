@@ -18,11 +18,9 @@ LIVE_DATA_COLS = ['name','open','pre_close','price','high','low','bid','ask','vo
                'b1_v','b1_p','b2_v','b2_p','b3_v','b3_p','b4_v','b4_p','b5_v','b5_p',
                'a1_v','a1_p','a2_v','a2_p','a3_v','a3_p','a4_v','a4_p','a5_v','a5_p','date','time','s']
 S_ALL_URL = 'http://qd.baidupcs.com/file/fbe04e7078534b760661785ad70c27a9?bkt=p2-qd-104&fid=722398329-250528-322845645363958&time=1421658506&sign=FDTAXERLBH-DCb740ccc5511e5e8fedcff06b081203-5VmkuJGofGeR3oJK2j7THCjYUjw%3D&to=qb&fm=Qin,B,U,nc&newver=1&newfm=1&flow_ver=3&sl=81723466&expires=8h&rt=sh&r=503386760&mlogid=4000075416&vuk=722398329&vbdid=1465029029&fin=all.csv&fn=all.csv'
-#业绩报告
-REPORT_URL = 'http://vip.stock.finance.sina.com.cn/q/go.php/vFinanceAnalyze/kind/mainindex/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%S&num=60'
-#业绩预告
+REPORT_URL = 'http://vip.stock.finance.sina.com.cn/q/go.php/vFinanceAnalyze/kind/mainindex/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
 FORECAST_URL = 'http://vip.stock.finance.sina.com.cn/q/go.php/vFinanceAnalyze/kind/performance/index.phtml?s_i=&s_a=&s_c=&s_type=&reportdate=%s&quarter=%s&p=%s&num=60'
-
+REPORT_COLS = ['code','name','eps','eps_yoy','bvps','roe','epcf','net_profits','profits_yoy','distrib','report_date']
 def data_path():
     import os
     import inspect
