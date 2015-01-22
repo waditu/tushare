@@ -21,6 +21,8 @@ S_ALL_URL = 'http://qd.baidupcs.com/file/fbe04e7078534b760661785ad70c27a9?bkt=p2
 REPORT_URL = 'http://vip.stock.finance.sina.com.cn/q/go.php/vFinanceAnalyze/kind/mainindex/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
 FORECAST_URL = 'http://vip.stock.finance.sina.com.cn/q/go.php/vFinanceAnalyze/kind/performance/index.phtml?s_i=&s_a=&s_c=&s_type=&reportdate=%s&quarter=%s&p=%s&num=60'
 REPORT_COLS = ['code','name','eps','eps_yoy','bvps','roe','epcf','net_profits','profits_yoy','distrib','report_date']
+FORECAST_COLS = ['code','name','type','report_date','pre_eps','range']
+
 def data_path():
     import os
     import inspect
