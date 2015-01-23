@@ -8,7 +8,6 @@ Created on 2015/01/18
 """
 import pandas as pd
 from tushare.stock import cons as ct
-import urllib2
 import lxml.html
 import re
 
@@ -166,6 +165,7 @@ def _get_forecast_data(year,quarter,pageNo,dataArr):
         pass
 
 if __name__ == '__main__':
-    print get_forecast_data(2014,4)
+#     print get_forecast_data(2013,4)
+    print get_stock_basics()
 
     

@@ -47,5 +47,6 @@ setup(
     classifiers=['Development Status :: 4 - Beta',
     'Programming Language :: Python :: 2.7',
     'License :: OSI Approved :: BSD License'],
-    packages=['tushare','tushare.stock'],
+    packages=['tushare','tushare.stock','tushare.data'],
+    package_data={'': ['*.csv']},
 )

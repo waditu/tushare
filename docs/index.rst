@@ -67,7 +67,7 @@ QQ:52799046**
 
 ::
 
-                 open    high   close     low     amount    p_change  ma5 \
+                 open    high   close     low     volume    p_change  ma5 \
     date                                                                     
     2012-01-11   6.880   7.380   7.060   6.880   14129.96     2.62   7.060   
     2012-01-12   7.050   7.100   6.980   6.900    7895.19    -1.13   7.020   
