@@ -267,7 +267,64 @@ def _get_operation_data(year,quarter,pageNo,dataArr):
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
         if len(nextPage)>0:
             pageNo = re.findall(r'\d+',nextPage[0])[0]
-            return _get_operation_data(year,quarter,pageNo,dataArr)
+            return _get_growth_data(year,quarter,pageNo,dataArr)
+        else:
+            return dataArr
+    except:
+        pass
+    
+def get_growth_data(year,quarter):
+    """
+        获取成长能力数据
+    Parameters
+    --------
+    year:int 年度 e.g:2014
+    quarter:int 季度 :1、2、3、4，只能输入这4个季度
+       说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
+       
+    Return
+    --------
+    DataFrame
+        code,代码
+        name,名称
+        mbrg,主营业务收入增长率(%)
+        nprg,净利润增长率(%)
+        nav,净资产增长率
+        targ,总资产增长率
+        epsg,每股收益增长率
+        seg,股东权益增长率
+    """
+    if _check_input(year,quarter) is True:
+        data =  _get_growth_data(year,quarter,1,[])
+        df = pd.DataFrame(data,columns=ct.GROWTH_COLS)
+        return df
+
+def _get_growth_data(year,quarter,pageNo,dataArr):
+    url = ct.GROWTH_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+    print 'getting page %s ...'%pageNo
+    try:
+        html = lxml.html.parse(url)
+        xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
+        for trs in xtrs:
+            code = trs.xpath('td[1]/a/text()')[0]
+            name = trs.xpath('td[2]/a/text()')[0]
+            mbrg = trs.xpath('td[3]/text()')[0]
+            mbrg = '0' if mbrg == '--' else mbrg
+            nprg = trs.xpath('td[4]/text()')[0] 
+            nprg = '0' if nprg == '--' else nprg
+            nav = trs.xpath('td[5]/text()')[0] 
+            nav = '0' if nav == '--' else nav
+            targ = trs.xpath('td[6]/text()')[0] 
+            targ = '0' if targ == '--' else targ
+            epsg = trs.xpath('td[7]/text()')[0] 
+            epsg = '0' if epsg == '--' else epsg
+            seg = trs.xpath('td[8]/text()')[0] 
+            seg = '0' if seg == '--' else seg
+            dataArr.append([code,name,mbrg,nprg,nav,targ,epsg,seg])
+        nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
+        if len(nextPage)>0:
+            pageNo = re.findall(r'\d+',nextPage[0])[0]
+            return _get_growth_data(year,quarter,pageNo,dataArr)
         else:
             return dataArr
     except:
@@ -284,7 +341,8 @@ def _check_input(year,quarter):
 if __name__ == '__main__':
 #     print get_report_data(2013,4)
 #     print get_profit_data(1999,2)
-    print get_operation_data(1999,2)
+#     print get_operation_data(1999,2)
+    print get_growth_data(2014,2)
 #     print get_stock_basics()
 
     
