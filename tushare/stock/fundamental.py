@@ -66,11 +66,7 @@ def get_report_data(year,quarter):
         distrib,分配方案
         report_date,发布日期
     """
-    if type(year) is str:
-        raise TypeError('请输入数字，格式：YYYY')
-    elif quarter is None or type(quarter) is str or quarter not in [1,2,3,4]:
-        raise TypeError('季度输入错误，请输入1、2、3或4')
-    else:
+    if _check_input(year,quarter) is True:
         data =  _get_report_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.REPORT_COLS)
         return df
@@ -130,11 +126,7 @@ def get_forecast_data(year,quarter):
         distrib,分配方案
         report_date,发布日期
     """
-    if type(year) is str:
-        raise TypeError('请输入数字，格式：YYYY')
-    elif quarter is None or type(quarter) is str or quarter not in [1,2,3,4]:
-        raise TypeError('季度输入错误，请输入1、2、3或4')
-    else:
+    if _check_input(year,quarter) is True:
         data =  _get_forecast_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.FORECAST_COLS)
         return df
@@ -186,11 +178,7 @@ def get_profit_data(year,quarter):
         business_income,营业收入(百万元)
         bips,每股主营业务收入(元)
     """
-    if type(year) is str:
-        raise TypeError('请输入数字，格式：YYYY')
-    elif quarter is None or type(quarter) is str or quarter not in [1,2,3,4]:
-        raise TypeError('季度输入错误，请输入1、2、3或4')
-    else:
+    if _check_input(year,quarter) is True:
         data =  _get_profit_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.PROFIT_COLS)
         return df
@@ -207,11 +195,17 @@ def _get_profit_data(year,quarter,pageNo,dataArr):
             roe = trs.xpath('td[3]/text()')[0]
             roe = '0' if roe == '--' else roe
             net_profit_ratio = trs.xpath('td[4]/text()')[0] 
+            net_profit_ratio = '0' if net_profit_ratio == '--' else net_profit_ratio
             gross_profit_rate = trs.xpath('td[5]/text()')[0] 
+            gross_profit_rate = '0' if gross_profit_rate == '--' else gross_profit_rate
             net_profits = trs.xpath('td[6]/text()')[0] 
+            net_profits = '0' if net_profits == '--' else net_profits
             eps = trs.xpath('td[7]/text()')[0] 
+            eps = '0' if eps == '--' else eps
             business_income = trs.xpath('td[8]/text()')[0] 
+            business_income = '0' if business_income == '--' else business_income
             bips = trs.xpath('td[9]/text()')[0] 
+            bips = '0' if bips == '--' else bips
             dataArr.append([code,name,roe,net_profit_ratio,gross_profit_rate,net_profits,eps,business_income,bips])
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
         if len(nextPage)>0:
@@ -222,9 +216,75 @@ def _get_profit_data(year,quarter,pageNo,dataArr):
     except:
         pass
 
+def get_operation_data(year,quarter):
+    """
+        获取营运能力数据
+    Parameters
+    --------
+    year:int 年度 e.g:2014
+    quarter:int 季度 :1、2、3、4，只能输入这4个季度
+       说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
+       
+    Return
+    --------
+    DataFrame
+        code,代码
+        name,名称
+        arturnover,应收账款周转率(次)
+        arturndays,应收账款周转天数(天)
+        inventory_turnover,存货周转率(次)
+        inventory_days,存货周转天数(天)
+        currentasset_turnover,流动资产周转率(次)
+        currentasset_days,流动资产周转天数(天)
+    """
+    if _check_input(year,quarter) is True:
+        data =  _get_operation_data(year,quarter,1,[])
+        df = pd.DataFrame(data,columns=ct.OPERATION_COLS)
+        return df
+
+def _get_operation_data(year,quarter,pageNo,dataArr):
+    url = ct.OPERATION_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+    print 'getting page %s ...'%pageNo
+    try:
+        html = lxml.html.parse(url)
+        xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
+        for trs in xtrs:
+            code = trs.xpath('td[1]/a/text()')[0]
+            name = trs.xpath('td[2]/a/text()')[0]
+            arturnover = trs.xpath('td[3]/text()')[0]
+            arturnover = '0' if arturnover == '--' else arturnover
+            arturndays = trs.xpath('td[4]/text()')[0] 
+            arturndays = '0' if arturndays == '--' else arturndays
+            inventory_turnover = trs.xpath('td[5]/text()')[0] 
+            inventory_turnover = '0' if inventory_turnover == '--' else inventory_turnover
+            inventory_days = trs.xpath('td[6]/text()')[0] 
+            inventory_days = '0' if inventory_days == '--' else inventory_days
+            currentasset_turnover = trs.xpath('td[7]/text()')[0] 
+            currentasset_turnover = '0' if currentasset_turnover == '--' else currentasset_turnover
+            currentasset_days = trs.xpath('td[8]/text()')[0] 
+            currentasset_days = '0' if currentasset_days == '--' else currentasset_days
+            dataArr.append([code, name,arturnover,arturndays,inventory_turnover,inventory_days,currentasset_turnover,currentasset_days])
+        nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
+        if len(nextPage)>0:
+            pageNo = re.findall(r'\d+',nextPage[0])[0]
+            return _get_operation_data(year,quarter,pageNo,dataArr)
+        else:
+            return dataArr
+    except:
+        pass
+    
+def _check_input(year,quarter):
+    if type(year) is str or year < 1989 :
+        raise TypeError('年度输入错误：请输入1989年以后的年份数字，格式：YYYY')
+    elif quarter is None or type(quarter) is str or quarter not in [1,2,3,4]:
+        raise TypeError('季度输入错误：请输入1、2、3或4数字')
+    else:
+        return True
+
 if __name__ == '__main__':
 #     print get_report_data(2013,4)
-    print get_profit_data(2014,2)
+#     print get_profit_data(1999,2)
+    print get_operation_data(1999,2)
 #     print get_stock_basics()
 
     

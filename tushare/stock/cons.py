@@ -22,6 +22,7 @@ DAY_TRADING_COLUMNS = ['code','symbol','name','changepercent','trade','open','hi
 REPORT_COLS = ['code','name','eps','eps_yoy','bvps','roe','epcf','net_profits','profits_yoy','distrib','report_date']
 FORECAST_COLS = ['code','name','type','report_date','pre_eps','range']
 PROFIT_COLS = ['code','name','roe','net_profit_ratio','gross_profit_rate','net_profits','eps','business_income','bips']
+OPERATION_COLS = ['code', 'name','arturnover','arturndays','inventory_turnover','inventory_days','currentasset_turnover','currentasset_days']
 DAY_PRICE_COLUMNS = ['date','open','high','close','low','volume','price_change','p_change',
                      'ma5','ma10','ma20','v_ma5','v_ma10','v_ma20','turnover']
 LIVE_DATA_COLS = ['name','open','pre_close','price','high','low','bid','ask','volume','amount',
@@ -34,4 +35,5 @@ SINA_DAY_PRICE_URL = '%svip.stock.finance.%s/quotes_service/api/json_v2.php/Mark
 REPORT_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/mainindex/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
 FORECAST_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/performance/index.phtml?s_i=&s_a=&s_c=&s_type=&reportdate=%s&quarter=%s&p=%s&num=60'
 PROFIT_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/profit/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
+OPERATION_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/operation/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
 ALL_STOCK_BASICS_FILE = '%s/tushare/data/all.csv'%data_path()
