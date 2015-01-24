@@ -21,6 +21,7 @@ TICK_COLUMNS = ['time','price','change','volume','amount','type']
 DAY_TRADING_COLUMNS = ['code','symbol','name','changepercent','trade','open','high','low','settlement','volume','turnoverratio']
 REPORT_COLS = ['code','name','eps','eps_yoy','bvps','roe','epcf','net_profits','profits_yoy','distrib','report_date']
 FORECAST_COLS = ['code','name','type','report_date','pre_eps','range']
+PROFIT_COLS = ['code','name','roe','net_profit_ratio','gross_profit_rate','net_profits','eps','business_income','bips']
 DAY_PRICE_COLUMNS = ['date','open','high','close','low','volume','price_change','p_change',
                      'ma5','ma10','ma20','v_ma5','v_ma10','v_ma20','turnover']
 LIVE_DATA_COLS = ['name','open','pre_close','price','high','low','bid','ask','volume','amount',

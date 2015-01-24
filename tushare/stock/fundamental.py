@@ -164,8 +164,67 @@ def _get_forecast_data(year,quarter,pageNo,dataArr):
     except:
         pass
 
+def get_profit_data(year,quarter):
+    """
+        获取盈利能力数据
+    Parameters
+    --------
+    year:int 年度 e.g:2014
+    quarter:int 季度 :1、2、3、4，只能输入这4个季度
+       说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
+       
+    Return
+    --------
+    DataFrame
+        code,代码
+        name,名称
+        roe,净资产收益率(%)
+        net_profit_ratio,净利率(%)
+        gross_profit_rate,毛利率(%)
+        net_profits,净利润(万元)
+        eps,每股收益
+        business_income,营业收入(百万元)
+        bips,每股主营业务收入(元)
+    """
+    if type(year) is str:
+        raise TypeError('请输入数字，格式：YYYY')
+    elif quarter is None or type(quarter) is str or quarter not in [1,2,3,4]:
+        raise TypeError('季度输入错误，请输入1、2、3或4')
+    else:
+        data =  _get_profit_data(year,quarter,1,[])
+        df = pd.DataFrame(data,columns=ct.PROFIT_COLS)
+        return df
+
+def _get_profit_data(year,quarter,pageNo,dataArr):
+    url = ct.PROFIT_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+    print 'getting page %s ...'%pageNo
+    try:
+        html = lxml.html.parse(url)
+        xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
+        for trs in xtrs:
+            code = trs.xpath('td[1]/a/text()')[0]
+            name = trs.xpath('td[2]/a/text()')[0]
+            roe = trs.xpath('td[3]/text()')[0]
+            roe = '0' if roe == '--' else roe
+            net_profit_ratio = trs.xpath('td[4]/text()')[0] 
+            gross_profit_rate = trs.xpath('td[5]/text()')[0] 
+            net_profits = trs.xpath('td[6]/text()')[0] 
+            eps = trs.xpath('td[7]/text()')[0] 
+            business_income = trs.xpath('td[8]/text()')[0] 
+            bips = trs.xpath('td[9]/text()')[0] 
+            dataArr.append([code,name,roe,net_profit_ratio,gross_profit_rate,net_profits,eps,business_income,bips])
+        nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
+        if len(nextPage)>0:
+            pageNo = re.findall(r'\d+',nextPage[0])[0]
+            return _get_profit_data(year,quarter,pageNo,dataArr)
+        else:
+            return dataArr
+    except:
+        pass
+
 if __name__ == '__main__':
-    print get_report_data(2013,4)
+#     print get_report_data(2013,4)
+    print get_profit_data(2014,2)
 #     print get_stock_basics()
 
     
