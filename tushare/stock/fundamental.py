@@ -76,7 +76,7 @@ def get_report_data(year,quarter):
         return df
 
 def _get_report_data(year,quarter,pageNo,dataArr):
-    url = ct.REPORT_URL%(year,quarter,pageNo)
+    url = ct.REPORT_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
     print 'getting page %s ...'%pageNo
     try:
         html = lxml.html.parse(url)
@@ -140,7 +140,7 @@ def get_forecast_data(year,quarter):
         return df
 
 def _get_forecast_data(year,quarter,pageNo,dataArr):
-    url = ct.FORECAST_URL%(year,quarter,pageNo)
+    url = ct.FORECAST_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
     print 'getting page %s ...'%pageNo
     try:
         html = lxml.html.parse(url)
@@ -165,7 +165,7 @@ def _get_forecast_data(year,quarter,pageNo,dataArr):
         pass
 
 if __name__ == '__main__':
-#     print get_forecast_data(2013,4)
-    print get_stock_basics()
+    print get_report_data(2013,4)
+#     print get_stock_basics()
 
     

@@ -40,7 +40,7 @@ def get_hist_data(code=None, start=None, end=None, retry_count=3,
     if code is None or len(code)!=6:
         return None
     symbol = code_to_symbol(code)
-    url = ct.DAY_PRICE_URL%symbol
+    url = ct.DAY_PRICE_URL%(ct.P_TYPE['http'],ct.DOMAINS['ifeng'],symbol)
     for _ in range(retry_count):
         time.sleep(pause)
         try:
@@ -72,7 +72,7 @@ def _parsing_dayprice_json(pageNum=1):
         DataFrame 当日所有股票交易数据(DataFrame)
     """
     print 'getting page %s ...'%pageNum
-    url = ct.SINA_DAY_PRICE_URL%pageNum
+    url = ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],pageNum)
     request = urllib2.Request(url)
     text = urllib2.urlopen(request,timeout=10).read()
     if text == 'null':
@@ -112,7 +112,7 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
     if code is None or len(code)!=6 or date is None:
         return None
     symbol = code_to_symbol(code)
-    url = ct.TICK_PRICE_URL % (date,symbol)
+    url = ct.TICK_PRICE_URL % (ct.P_TYPE['http'],ct.DOMAINS['sina'],date,symbol)
     for _ in range(retry_count):
         time.sleep(pause)
         try:
@@ -189,7 +189,7 @@ def get_realtime_quotes(symbols=None):
         raise SyntaxError('code input error')
         
     symbols_list = symbols_list[:-1] if len(symbols_list)>8 else symbols_list 
-    request = urllib2.Request(ct.LIVE_DATA_URL%symbols_list)
+    request = urllib2.Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'],ct.DOMAINS['sinahq'],symbols_list))
     text = urllib2.urlopen(request,timeout=10).read()
     text = text.decode('GBK')
     reg = re.compile(r'\="(.*?)\";')
