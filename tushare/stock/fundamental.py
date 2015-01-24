@@ -329,7 +329,118 @@ def _get_growth_data(year,quarter,pageNo,dataArr):
             return dataArr
     except:
         pass
-    
+
+def get_debtpaying_data(year,quarter):
+    """
+        获取偿债能力数据
+    Parameters
+    --------
+    year:int 年度 e.g:2014
+    quarter:int 季度 :1、2、3、4，只能输入这4个季度
+       说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
+       
+    Return
+    --------
+    DataFrame
+        code,代码
+        name,名称
+        currentratio,流动比率
+        quickratio,速动比率
+        cashratio,现金比率
+        icratio,利息支付倍数
+        sheqratio,股东权益比率
+        adratio,股东权益增长率
+    """
+    if _check_input(year,quarter) is True:
+        data =  _get_debtpaying_data(year,quarter,1,[])
+        df = pd.DataFrame(data,columns=ct.DEBTPAYING_COLS)
+        return df
+
+def _get_debtpaying_data(year,quarter,pageNo,dataArr):
+    url = ct.DEBTPAYING_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+    print 'getting page %s ...'%pageNo
+    try:
+        html = lxml.html.parse(url)
+        xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
+        for trs in xtrs:
+            code = trs.xpath('td[1]/a/text()')[0]
+            name = trs.xpath('td[2]/a/text()')[0]
+            currentratio = trs.xpath('td[3]/text()')[0]
+            currentratio = '0' if currentratio == '--' else currentratio
+            quickratio = trs.xpath('td[4]/text()')[0] 
+            quickratio = '0' if quickratio == '--' else quickratio
+            cashratio = trs.xpath('td[5]/text()')[0] 
+            cashratio = '0' if cashratio == '--' else cashratio
+            icratio = trs.xpath('td[6]/text()')[0] 
+            icratio = '0' if icratio == '--' else icratio
+            sheqratio = trs.xpath('td[7]/text()')[0] 
+            sheqratio = '0' if sheqratio == '--' else sheqratio
+            adratio = trs.xpath('td[8]/text()')[0] 
+            adratio = '0' if adratio == '--' else adratio
+            dataArr.append([code,name,currentratio,quickratio,cashratio,icratio,sheqratio,adratio])
+        nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
+        if len(nextPage)>0:
+            pageNo = re.findall(r'\d+',nextPage[0])[0]
+            return _get_debtpaying_data(year,quarter,pageNo,dataArr)
+        else:
+            return dataArr
+    except:
+        pass
+ 
+def get_cashflow_data(year,quarter):
+    """
+        获取现金流量数据
+    Parameters
+    --------
+    year:int 年度 e.g:2014
+    quarter:int 季度 :1、2、3、4，只能输入这4个季度
+       说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
+       
+    Return
+    --------
+    DataFrame
+        code,代码
+        name,名称
+        cf_sales,经营现金净流量对销售收入比率
+        rateofreturn,资产的经营现金流量回报率
+        cf_nm,经营现金净流量与净利润的比率
+        cf_liabilities,经营现金净流量对负债比率
+        cashflowratio,现金流量比率
+    """
+    if _check_input(year,quarter) is True:
+        data =  _get_cashflow_data(year,quarter,1,[])
+        df = pd.DataFrame(data,columns=ct.CASHFLOW_COLS)
+        return df
+
+def _get_cashflow_data(year,quarter,pageNo,dataArr):
+    url = ct.CASHFLOW_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+    print 'getting page %s ...'%pageNo
+    try:
+        html = lxml.html.parse(url)
+        xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
+        for trs in xtrs:
+            code = trs.xpath('td[1]/a/text()')[0]
+            name = trs.xpath('td[2]/a/text()')[0]
+            cf_sales = trs.xpath('td[3]/text()')[0]
+            cf_sales = '0' if cf_sales == '--' else cf_sales
+            rateofreturn = trs.xpath('td[4]/text()')[0] 
+            rateofreturn = '0' if rateofreturn == '--' else rateofreturn
+            cf_nm = trs.xpath('td[5]/text()')[0] 
+            cf_nm = '0' if cf_nm == '--' else cf_nm
+            cf_liabilities = trs.xpath('td[6]/text()')[0] 
+            cf_liabilities = '0' if cf_liabilities == '--' else cf_liabilities
+            cashflowratio = trs.xpath('td[7]/text()')[0] 
+            cashflowratio = '0' if cashflowratio == '--' else cashflowratio
+            dataArr.append([code,name,cf_sales,rateofreturn,cf_nm,cf_liabilities,cashflowratio])
+        nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
+        if len(nextPage)>0:
+            pageNo = re.findall(r'\d+',nextPage[0])[0]
+            return _get_cashflow_data(year,quarter,pageNo,dataArr)
+        else:
+            return dataArr
+    except:
+        pass
+       
 def _check_input(year,quarter):
     if type(year) is str or year < 1989 :
         raise TypeError('年度输入错误：请输入1989年以后的年份数字，格式：YYYY')
@@ -342,7 +453,9 @@ if __name__ == '__main__':
 #     print get_report_data(2013,4)
 #     print get_profit_data(1999,2)
 #     print get_operation_data(1999,2)
-    print get_growth_data(2014,2)
+#     print get_growth_data(2014,2)
+#     print get_debtpaying_data(2014,2)    
+    print get_cashflow_data(2014,2)
 #     print get_stock_basics()
 
     

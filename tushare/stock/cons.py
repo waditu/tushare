@@ -24,6 +24,8 @@ FORECAST_COLS = ['code','name','type','report_date','pre_eps','range']
 PROFIT_COLS = ['code','name','roe','net_profit_ratio','gross_profit_rate','net_profits','eps','business_income','bips']
 OPERATION_COLS = ['code', 'name','arturnover','arturndays','inventory_turnover','inventory_days','currentasset_turnover','currentasset_days']
 GROWTH_COLS = ['code','name','mbrg','nprg','nav','targ','epsg','seg']
+DEBTPAYING_COLS = ['code','name','currentratio','quickratio','cashratio','icratio','sheqratio','adratio']
+CASHFLOW_COLS = ['code','name','cf_sales','rateofreturn','cf_nm','cf_liabilities','cashflowratio']
 DAY_PRICE_COLUMNS = ['date','open','high','close','low','volume','price_change','p_change',
                      'ma5','ma10','ma20','v_ma5','v_ma10','v_ma20','turnover']
 LIVE_DATA_COLS = ['name','open','pre_close','price','high','low','bid','ask','volume','amount',
@@ -38,4 +40,6 @@ FORECAST_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/performance
 PROFIT_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/profit/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
 OPERATION_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/operation/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
 GROWTH_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/grow/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
+DEBTPAYING_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/debtpaying/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
+CASHFLOW_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/cashflow/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
 ALL_STOCK_BASICS_FILE = '%s/tushare/data/all.csv'%data_path()
