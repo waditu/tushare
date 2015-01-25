@@ -43,7 +43,7 @@ Quick Start
 
 > 日期 ，开盘价， 最高价， 收盘价， 最低价， 成交量， 价格变动 ，涨跌幅，5日均价，10日均价，20日均价，5日均量，10日均量，20日均量，换手率
 
-    			 open    high   close     low     amount    p_change  ma5 \
+    			 open    high   close     low     volume    p_change  ma5 \
 	date                                                                     
 	2012-01-11   6.880   7.380   7.060   6.880   14129.96     2.62   7.060   
 	2012-01-12   7.050   7.100   6.980   6.900    7895.19    -1.13   7.020   
@@ -69,7 +69,7 @@ Quick Start
 	
 	In [5]: td.get_hist_data('600848','2015-01-05','2015-01-09')
 	Out[5]:
-				open    high   close     low    amount p_change     ma5    ma10 \  
+				open    high   close     low    volume   p_change     ma5    ma10 \  
 	date                                                                            
 	2015-01-05  11.160  11.390  11.260  10.890  46383.57     1.26  11.156  11.212   
 	2015-01-06  11.130  11.660  11.610  11.030  59199.93     3.11  11.182  11.155   
