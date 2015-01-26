@@ -31,6 +31,11 @@ tushare
 - 方式2：下载到本地 python setup.py install
 
 
+Upgrade
+=======
+
+	pip install tushare --upgrade
+
 Quick Start
 ======
 **Example 1.** 获取个股历史交易数据（包括均线数据）：
@@ -177,7 +182,7 @@ Change Logs
 =====
 
 - 增加了基本面数据的获取
-- 发布一版使用手册，开通TuShare docs网站
+- 发布一版使用手册，开通[TuShare docs](http://tushare.waditu.com)网站
 
 0.1.3 2015/01/13
 ===
