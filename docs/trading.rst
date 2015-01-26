@@ -14,16 +14,16 @@
 -  历史分笔数据
 -  实时分笔数据
 
-历史行情数据
-------------
+历史行情
+--------
 
 获取个股历史交易数据（包括均线数据）
 
 ::
 
-    In[1]:import tushare.stock.trading as td
+    import tushare.stock.trading as td
 
-    In[2]:td.get_hist_data('600848') #一次性获取全部数据
+    td.get_hist_data('600848') #一次性获取全部数据
 
 结果显示：
 
@@ -58,8 +58,8 @@
 
 ::
 
-    In [5]: td.get_hist_data('600848','2015-01-05','2015-01-09')
-    Out[5]:
+    td.get_hist_data('600848','2015-01-05','2015-01-09')
+
                 open    high   close     low    amount p_change     ma5    ma10 \  
     date                                                                            
     2015-01-05  11.160  11.390  11.260  10.890  46383.57     1.26  11.156  11.212   
@@ -75,16 +75,16 @@
     2015-01-08  11.647  57268.99  61376.00  105823.50     1.95  
     2015-01-09  11.682  58792.43  60665.93  107924.27     1.54  
 
-实时行情数据
-------------
+实时行情
+--------
 
-一次性获取最近一个日交易日所有股票的交易数据（结果显示速度取决于网速）
+一次性获取当前交易所有股票的行情数据（如果是节假日，即为上一交易日，结果显示速度取决于网速）
 
 ::
 
-    In[4]:import tushare.stock.trading as td
+    import tushare.stock.trading as td
 
-    In[5]:td.get_today_all()
+    td.get_today_all()
 
 结果显示：
 
@@ -117,20 +117,22 @@
     9     323469835        9.61735  
     10     25768152       19.51090  
 
-历史分笔数据
-------------
+历史分笔
+--------
 
 ::
 
-    In [1]: import tushare.stock.trading as td
-    In [2]: df = td.get_tick_data('600848','2014-01-09')
-    In [3]: df.head(10)
+    import tushare.stock.trading as td
 
-结果显示： >成交时间、成交价格、价格变动，成交手、成交金额(元)，买卖类型
+    df = td.get_tick_data('600848','2014-01-09')
+    df.head(10)
+
+结果显示：
+
+    成交时间、成交价格、价格变动，成交手、成交金额(元)，买卖类型
 
 ::
 
-    Out[3]: 
          time       price change  volume  amount  type
     0    15:00:00   6.05     --       8    4840   卖盘
     1    14:59:55   6.05     --      50   30250   卖盘
@@ -144,30 +146,59 @@
     9    14:58:25   6.05  -0.01      20   12100   卖盘
     10   14:58:05   6.06     --       5    3030   买盘
 
-实时分笔数据
-------------
-
-In [1]:import tushare.stock.trading as td In
-[2]:td.get\_realtime\_quotes('000581') #Single stock symbol
-
-结果显示：
->名称、开盘价、昨价、现价、最高、最低、买入价、卖出价、成交量、成交金额...more
-in docs
+实时分笔
+--------
 
 ::
 
-    Out[2]:
-      name      open pre_close  price   high    low    bid    ask    volume  \  
-    0 威孚高科  31.50     31.38  30.25  31.63  30.08  30.25  30.27  10148935 
-      amount      ...        a2_p a3_v   a3_p a4_v   a4_p a5_v   a5_p  \
-    0 314310351.22      ...       30.29    2  30.30  234  30.31   19  30.32 \
-      date          time     code  
-    0  2015-01-14  14:30:46  000581  
+    import tushare.stock.trading as td
+
+    df = td.get_realtime_quotes('000581') #Single stock symbol
+    df[['code','name','price','bid','ask','volume','amount','time']]
+
+结果显示：
+
+::
+
+       code    name     price  bid    ask    volume   amount        time
+    0  000581  威孚高科  31.15  31.14  31.15  8183020  253494991.16  11:30:36
+
+结果属性：
+
+::
+
+    0：name，股票名字
+    1：open，今日开盘价
+    2：pre_close，昨日收盘价
+    3：price，当前价格
+    4：high，今日最高价
+    5：low，今日最低价
+    6：bid，竞买价，即“买一”报价
+    7：ask，竞卖价，即“卖一”报价
+    8：volumn，成交量 maybe you need do volumn/100
+    9：amount，成交金额（元 CNY）
+    10：b1_v，委买一（笔数 bid volume）
+    11：b1_p，委买一（价格 bid price）
+    12：b2_v，“买二”
+    13：b2_p，“买二”
+    14：b3_v，“买三”
+    15：b3_p，“买三”
+    16：b4_v，“买四”
+    17：b4_p，“买四”
+    18：b5_v，“买五”
+    19：b5_p，“买五”
+    20：a1_v，委卖一（笔数 ask volume）
+    21：a1_p，委卖一（价格 ask price）
+    ...
+    30：date，日期；
+    31：time，时间；
       
 
 请求多个股票方法（一次最好不要超过30个）：
 
 ::
 
-    In [3]:td.get_realtime_quotes(['600848','000980','000981']) #symbols from a list
-    In [4]:td.get_realtime_quotes(df['code'].tail(10)) #from a Series
+    #symbols from a list
+    td.get_realtime_quotes(['600848','000980','000981']) 
+    #from a Series
+    td.get_realtime_quotes(df['code'].tail(10))
