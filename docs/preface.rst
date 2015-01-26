@@ -34,3 +34,8 @@ QQ:52799046**
 -  方式1：pip install tushare
 -  方式2：\ `下载到本地 <https://github.com/waditu/tushare>`__ python
    setup.py install
+
+版本升级
+--------
+
+-  pip install tushare --upgrade
