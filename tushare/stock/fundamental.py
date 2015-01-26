@@ -116,15 +116,11 @@ def get_forecast_data(year,quarter):
     DataFrame
         code,代码
         name,名称
-        type,业绩变动类型
-        eps_yoy,每股收益同比(%)
-        bvps,每股净资产
-        roe,净资产收益率(%)
-        epcf,每股现金流量(元)
-        net_profits,净利润(万元)
-        profits_yoy,净利润同比(%)
-        distrib,分配方案
+        type,业绩变动类型【预增、预亏等】
         report_date,发布日期
+        pre_eps,上年同期每股收益
+        range,业绩变动范围
+        
     """
     if _check_input(year,quarter) is True:
         data =  _get_forecast_data(year,quarter,1,[])
@@ -448,14 +444,5 @@ def _check_input(year,quarter):
         raise TypeError('季度输入错误：请输入1、2、3或4数字')
     else:
         return True
-
-if __name__ == '__main__':
-#     print get_report_data(2013,4)
-#     print get_profit_data(1999,2)
-#     print get_operation_data(1999,2)
-#     print get_growth_data(2014,2)
-#     print get_debtpaying_data(2014,2)    
-    print get_cashflow_data(2014,2)
-#     print get_stock_basics()
 
     
