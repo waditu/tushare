@@ -6,7 +6,7 @@ def read(fname):
     return codecs.open(os.path.join(os.path.dirname(__file__), fname)).read()
 
 long_desc = """
-tushare
+TuShare
 ===============
 
 .. image:: https://api.travis-ci.org/waditu/tushare.png?branch=master
@@ -30,19 +30,25 @@ Installation
 --------------
 
     pip install tushare
+    
+Upgrade
+---------------
+
+    pip install tushare --upgrade
+    
 """
 
 
 setup(
     name='tushare',
-    version='0.1.4',
+    version='0.1.5',
     description='TuShare is a utility for crawling historical and Realtime Quotes data of China stocks',
 #     long_description=read("READM.rst"),
     long_description = long_desc,
     author='Jimmy Liu',
     author_email='jimmysoa@sina.cn',
     license='BSD',
-    url='https://github.com/waditu/tushare',
+    url='http://tushare.waditu.com',
     keywords='china stock data',
     classifiers=['Development Status :: 4 - Beta',
     'Programming Language :: Python :: 2.7',

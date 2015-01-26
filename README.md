@@ -1,11 +1,11 @@
 TuShare
 ----
 ![](https://api.travis-ci.org/waditu/tushare.png?branch=master)
-[![](https://pypip.in/v/tushare/badge.png)](https://pypi.python.org/pypi/tushare/0.1.3)
+[![](https://pypip.in/v/tushare/badge.png)](https://pypi.python.org/pypi/tushare/0.1.5)
 
 股票、财经数据获取接口包
 
- TuShare is a utility for crawling historical data of China stocks.
+ TuShare is a utility for crawling historical and Realtime Quotes data of China stocks.
 
 > 数据来源于各大财经网站，如遇访问异常请及时更新TuShare或自行查找并修改数据接口地址
 
@@ -166,9 +166,19 @@ Quick Start
 	In [4]:td.get_realtime_quotes(df['code'].tail(10)) #from a Series
 
 
+更多文档
+========
+[http://tushare.waditu.com/](http://tushare.waditu.com/ "TuShare Docs")
  
 Change Logs
 ---
+
+0.1.5 2015/01/26
+=====
+
+- 增加了基本面数据的获取
+- 发布一版使用手册，开通TuShare docs网站
+
 0.1.3 2015/01/13
 ===
 - 增加了实时交易数据的获取
@@ -183,6 +193,4 @@ Change Logs
 ===
 
 - 创建第一个版本
-
-
 - 实现个股历史数据的获取

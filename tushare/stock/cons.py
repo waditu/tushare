@@ -13,7 +13,7 @@ def data_path():
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
 
-VERSION = '0.1.3'
+VERSION = '0.1.5'
 P_TYPE = {'http':'http://','ftp':'ftp://'}
 DAY_PRICE_PAGES = 38
 DOMAINS = {'sina':'sina.com.cn','sinahq':'sinajs.cn','ifeng':'ifeng.com'}
