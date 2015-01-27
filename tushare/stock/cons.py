@@ -13,7 +13,7 @@ def data_path():
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
 
-VERSION = '0.1.5'
+VERSION = '0.1.6'
 K_LABELS = ['D','W','M']
 K_MIN_LABELS = ['5','15','30','60']
 K_TYPE = {'D':'akdaily','W':'akweekly','M':'akmonthly'}
