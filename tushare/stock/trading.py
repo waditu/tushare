@@ -191,14 +191,11 @@ def get_realtime_quotes(symbols=None):
             31：time，时间；
     """
     symbols_list = ''
-    if len(symbols)==6 and symbols.isdigit():
-        symbols_list = code_to_symbol(symbols)
-    elif type(symbols) is list or type(symbols) is set or type(symbols) is tuple or type(symbols) is pd.Series:
+    if type(symbols) is list or type(symbols) is set or type(symbols) is tuple or type(symbols) is pd.Series:
         for code in symbols:
-            if len(code)==6 and code.isdigit():
-                symbols_list += code_to_symbol(code) +','
+            symbols_list += code_to_symbol(code) +','
     else:
-        raise SyntaxError('code input error')
+        symbols_list = code_to_symbol(symbols)
         
     symbols_list = symbols_list[:-1] if len(symbols_list)>8 else symbols_list 
     request = urllib2.Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'],ct.DOMAINS['sinahq'],random(),symbols_list))
@@ -210,7 +207,9 @@ def get_realtime_quotes(symbols=None):
     syms = regSym.findall(text)
     data_list = []
     for row in data:
-        data_list.append([astr for astr in row.split(',')])
+        if len(row)>1:
+            data_list.append([astr for astr in row.split(',')])
+    print len(data_list),data_list
     df = pd.DataFrame(data_list,columns=ct.LIVE_DATA_COLS)
     df = df.drop('s',axis=1)
     df['code'] = syms
@@ -232,5 +231,7 @@ def code_to_symbol(code):
     if code in ct.INDEX_LABELS:
         return ct.INDEX_LIST[code]
     else:
-        symbol = 'sh'+code if code[:1]=='6' else 'sz'+code
-        return symbol
+        if len(code) != 6 :
+            return ''
+        else:
+            return 'sh'+code if code[:1]=='6' else 'sz'+code
