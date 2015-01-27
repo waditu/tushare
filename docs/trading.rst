@@ -17,22 +17,50 @@
 历史行情
 --------
 
-获取个股历史交易数据（包括均线数据）
+获取个股历史交易数据（包括均线数据），可以通过参数设置获取日k线、周k线、月k线，以及5分钟、15分钟、30分钟和60分钟k线数据。
+
+参数说明：
+
+-  **code**\ ：股票代码，即6位数字代码，或者指数代码（sh=上证指数
+   sz=深圳成指 hs300=沪深300指数 sz50=上证50 zxb=中小板 cyb=创业板）
+-  **start**\ ：开始日期，格式YYYY-MM-DD
+-  **end**\ ：结束日期，格式YYYY-MM-DD
+-  **ktype**\ ：数据类型，D=日k线 W=周 M=月 5=5分钟 15=15分钟 30=30分钟
+   60=60分钟，默认为D
+-  **retry\_count**\ ：当网络异常后重试次数，默认为3
+-  **pause**:重试时停顿秒数，默认为0
+
+返回值说明：
+
+-  **date**\ ：日期
+-  **open**\ ：开盘价
+-  **high**\ ：最高价
+-  **close**\ ：收盘价
+-  **low**\ ：最低价
+-  **volume**\ ：成交量
+-  **price\_change**\ ：价格变动
+-  **p\_change**\ ：涨跌幅
+-  **ma5**\ ：5日均价
+-  **ma10**\ ：10日均价
+-  **ma20**:20日均价
+-  **v\_ma5**:5日均量
+-  **v\_ma10**:10日均量
+-  **v\_ma20**:20日均量
+-  **turnover**:换手率[注：指数无此项]
+
+调用方法：
 
 ::
 
     import tushare.stock.trading as td
 
-    td.get_hist_data('600848') #一次性获取全部数据
+    td.get_hist_data('600848') #一次性获取全部日k线数据
 
 结果显示：
 
-    日期 ，开盘价， 最高价， 收盘价， 最低价， 成交量， 价格变动
-    ，涨跌幅，5日均价，10日均价，20日均价，5日均量，10日均量，20日均量，换手率
-
 ::
 
-                 open    high   close     low     amount    p_change  ma5 \
+                 open    high   close     low     volume    p_change  ma5 \
     date                                                                     
     2012-01-11   6.880   7.380   7.060   6.880   14129.96     2.62   7.060   
     2012-01-12   7.050   7.100   6.980   6.900    7895.19    -1.13   7.020   
@@ -58,9 +86,9 @@
 
 ::
 
-    td.get_hist_data('600848','2015-01-05','2015-01-09')
+    td.get_hist_data('600848',start='2015-01-05',end='2015-01-09')
 
-                open    high   close     low    amount p_change     ma5    ma10 \  
+                open    high   close     low    volume     p_change     ma5    ma10 \  
     date                                                                            
     2015-01-05  11.160  11.390  11.260  10.890  46383.57     1.26  11.156  11.212   
     2015-01-06  11.130  11.660  11.610  11.030  59199.93     3.11  11.182  11.155   
@@ -75,6 +103,23 @@
     2015-01-08  11.647  57268.99  61376.00  105823.50     1.95  
     2015-01-09  11.682  58792.43  60665.93  107924.27     1.54  
 
+其他：
+
+::
+
+    td.get_hist_data('600848'，ktype='W') #获取周k线数据
+    td.get_hist_data('600848'，ktype='M') #获取月k线数据
+    td.get_hist_data('600848'，ktype='5') #获取5分钟k线数据
+    td.get_hist_data('600848'，ktype='15') #获取15分钟k线数据
+    td.get_hist_data('600848'，ktype='30') #获取30分钟k线数据
+    td.get_hist_data('600848'，ktype='60') #获取60分钟k线数据
+    td.get_hist_data('sh'）#获取上证指数k线数据，其它参数与个股一致，下同
+    td.get_hist_data('sz'）#获取深圳成指k线数据
+    td.get_hist_data('hs300'）#获取沪深300指数k线数据
+    td.get_hist_data('sz50'）#获取上证50指数k线数据
+    td.get_hist_data('zxb'）#获取中小板指数k线数据
+    td.get_hist_data('cyb'）#获取创业板指数k线数据
+
 实时行情
 --------
 
@@ -86,9 +131,20 @@
 
     td.get_today_all()
 
-结果显示：
+返回值说明：
 
-    代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率
+-  **code**\ ：代码
+-  **name**:名称
+-  **changepercent**:涨跌幅
+-  **trade**:现价
+-  **open**:开盘价
+-  **high**:最高价
+-  **low**:最低价
+-  **settlement**:最日收盘价
+-  **volume**:成交量
+-  **turnoverratio**:换手率
+
+结果显示：
 
 ::
 
@@ -127,9 +183,16 @@
     df = td.get_tick_data('600848','2014-01-09')
     df.head(10)
 
-结果显示：
+返回值说明：
 
-    成交时间、成交价格、价格变动，成交手、成交金额(元)，买卖类型
+-  **time**\ ：时间
+-  **price**\ ：成交价格
+-  **change**\ ：价格变动
+-  **volume**\ ：成交手
+-  **amount**\ ：成交金额(元)
+-  **type**\ ：买卖类型【买盘、卖盘、中性盘】
+
+结果显示：
 
 ::
 
@@ -151,6 +214,14 @@
 
 获取实时分笔数据，可以实时取得股票当前报价和成交信息，其中一种场景是，写一个python定时程序来调用本接口（可两三秒执行一次，性能与行情软件基本一致），然后通过DataFrame的矩阵计算实现交易监控，可实时监测交易量和价格的变化。
 
+参数说明：
+
+-  **symbols**\ ：6位数字股票代码，或者指数代码（sh=上证指数 sz=深圳成指
+   hs300=沪深300指数 sz50=上证50 zxb=中小板 cyb=创业板）
+   可输入的类型：str、list、set或者pandas的Series对象
+
+调用方法：
+
 ::
 
     import tushare.stock.trading as td
@@ -165,7 +236,7 @@
        code    name     price  bid    ask    volume   amount        time
     0  000581  威孚高科  31.15  31.14  31.15  8183020  253494991.16  11:30:36
 
-结果属性：
+返回值说明：
 
 ::
 
@@ -203,4 +274,15 @@
     #symbols from a list
     td.get_realtime_quotes(['600848','000980','000981']) 
     #from a Series
-    td.get_realtime_quotes(df['code'].tail(10))
+    td.get_realtime_quotes(df['code'].tail(10))  #一次获取10个股票的实时分笔数据
+
+获取实时指数：
+
+::
+
+    #上证指数
+    td.get_realtime_quotes('sh') 
+    #上证指数 深圳成指 沪深300指数 上证50 中小板 创业板
+    td.get_realtime_quotes(['sh','sz','hs300','sz50','zxb','cyb'])  
+    #或者混搭
+    td.get_realtime_quotes(['sh','600848'])
