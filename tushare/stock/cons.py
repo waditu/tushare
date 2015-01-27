@@ -34,7 +34,7 @@ LIVE_DATA_COLS = ['name','open','pre_close','price','high','low','bid','ask','vo
                'a1_v','a1_p','a2_v','a2_p','a3_v','a3_p','a4_v','a4_p','a5_v','a5_p','date','time','s']
 TICK_PRICE_URL = '%smarket.finance.%s/downxls.php?date=%s&symbol=%s'
 DAY_PRICE_URL = '%sapi.finance.%s/%s/?code=%s&type=last'
-LIVE_DATA_URL = '%shq.%s/list=%s'
+LIVE_DATA_URL = '%shq.%s/rn=%s&list=%s'
 DAY_PRICE_MIN_URL = '%sapi.finance.%s/akmin?scode=%s&type=%s'
 SINA_DAY_PRICE_URL = '%svip.stock.finance.%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?num=80&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page&page=%s'
 REPORT_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/mainindex/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'

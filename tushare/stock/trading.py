@@ -196,7 +196,7 @@ def get_realtime_quotes(symbols=None):
         raise SyntaxError('code input error')
         
     symbols_list = symbols_list[:-1] if len(symbols_list)>8 else symbols_list 
-    request = urllib2.Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'],ct.DOMAINS['sinahq'],symbols_list))
+    request = urllib2.Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'],ct.DOMAINS['sinahq'],random(),symbols_list))
     text = urllib2.urlopen(request,timeout=10).read()
     text = text.decode('GBK')
     reg = re.compile(r'\="(.*?)\";')
