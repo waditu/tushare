@@ -176,7 +176,12 @@ Quick Start
 [http://tushare.waditu.com/](http://tushare.waditu.com/ "TuShare Docs")
  
 Change Logs
----
+------
+
+0.1.6 2015/01/27
+========
+- 增加了重点指数的历史和实时行情
+- 更新docs
 
 0.1.5 2015/01/26
 =====
