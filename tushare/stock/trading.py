@@ -37,13 +37,11 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
       DataFrame
           属性:日期 ，开盘价， 最高价， 收盘价， 最低价， 成交量， 价格变动 ，涨跌幅，5日均价，10日均价，20日均价，5日均量，10日均量，20日均量，换手率
     """
-    if code is None or len(code)!=6:
-        return None
     symbol = code_to_symbol(code)
     url = ''
-    if ktype.upper() in ['D','W','M']:
+    if ktype.upper() in ct.K_LABELS:
         url = ct.DAY_PRICE_URL%(ct.P_TYPE['http'],ct.DOMAINS['ifeng'],ct.K_TYPE[ktype.upper()],symbol)
-    elif ktype in ['5','15','30','60']:
+    elif ktype in ct.K_MIN_LABELS:
         url = ct.DAY_PRICE_MIN_URL%(ct.P_TYPE['http'],ct.DOMAINS['ifeng'],symbol,ktype)
     else:
         raise TypeError('ktype input error.')
@@ -57,7 +55,12 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
             pass
         else:
             js = json.loads(lines)
-            df = pd.DataFrame(js['record'],columns=ct.DAY_PRICE_COLUMNS)
+            cols = []
+            if (code in ct.INDEX_LABELS) & (ktype.upper() in ct.K_LABELS):
+                cols = ct.INX_DAY_PRICE_COLUMNS
+            else:
+                cols = ct.DAY_PRICE_COLUMNS
+            df = pd.DataFrame(js['record'],columns=cols)
             if ktype.upper() in ['D','W','M']:
                 df = df.applymap(lambda x: x.replace(u',', u''))
             df = df.set_index(['date']) 
@@ -65,6 +68,8 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
                 df = df.ix[df.index>=start]
             if end is not None:
                 df = df.ix[df.index<=end]
+            if (code in ct.INDEX_LABELS) & (ktype in ct.K_MIN_LABELS):
+                df = df.drop('turnover',axis=1)
             return df
     raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
 
@@ -224,5 +229,8 @@ def code_to_symbol(code):
     """
         生成symbol代码标志
     """
-    symbol = 'sh'+code if code[:1]=='6' else 'sz'+code
-    return symbol
+    if code in ct.INDEX_LABELS:
+        return ct.INDEX_LIST[code]
+    else:
+        symbol = 'sh'+code if code[:1]=='6' else 'sz'+code
+        return symbol

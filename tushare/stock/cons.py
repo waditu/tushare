@@ -14,7 +14,11 @@ def data_path():
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
 
 VERSION = '0.1.5'
+K_LABELS = ['D','W','M']
+K_MIN_LABELS = ['5','15','30','60']
 K_TYPE = {'D':'akdaily','W':'akweekly','M':'akmonthly'}
+INDEX_LABELS = ['sh','sz','hs300','sz50','cyb','zxb']
+INDEX_LIST = {'sh':'sh000001','sz':'sz399001','hs300':'sz399300','sz50':'sh000016','cyb':'sz399005','zxb':'sz399006'}
 P_TYPE = {'http':'http://','ftp':'ftp://'}
 DAY_PRICE_PAGES = 38
 DOMAINS = {'sina':'sina.com.cn','sinahq':'sinajs.cn','ifeng':'ifeng.com'}
@@ -29,6 +33,8 @@ DEBTPAYING_COLS = ['code','name','currentratio','quickratio','cashratio','icrati
 CASHFLOW_COLS = ['code','name','cf_sales','rateofreturn','cf_nm','cf_liabilities','cashflowratio']
 DAY_PRICE_COLUMNS = ['date','open','high','close','low','volume','price_change','p_change',
                      'ma5','ma10','ma20','v_ma5','v_ma10','v_ma20','turnover']
+INX_DAY_PRICE_COLUMNS = ['date','open','high','close','low','volume','price_change','p_change',
+                     'ma5','ma10','ma20','v_ma5','v_ma10','v_ma20']
 LIVE_DATA_COLS = ['name','open','pre_close','price','high','low','bid','ask','volume','amount',
                'b1_v','b1_p','b2_v','b2_p','b3_v','b3_p','b4_v','b4_p','b5_v','b5_p',
                'a1_v','a1_p','a2_v','a2_p','a3_v','a3_p','a4_v','a4_p','a5_v','a5_p','date','time','s']
