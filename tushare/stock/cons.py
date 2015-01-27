@@ -14,6 +14,7 @@ def data_path():
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
 
 VERSION = '0.1.5'
+K_TYPE = {'D':'akdaily','W':'akweekly','M':'akmonthly'}
 P_TYPE = {'http':'http://','ftp':'ftp://'}
 DAY_PRICE_PAGES = 38
 DOMAINS = {'sina':'sina.com.cn','sinahq':'sinajs.cn','ifeng':'ifeng.com'}
@@ -32,8 +33,9 @@ LIVE_DATA_COLS = ['name','open','pre_close','price','high','low','bid','ask','vo
                'b1_v','b1_p','b2_v','b2_p','b3_v','b3_p','b4_v','b4_p','b5_v','b5_p',
                'a1_v','a1_p','a2_v','a2_p','a3_v','a3_p','a4_v','a4_p','a5_v','a5_p','date','time','s']
 TICK_PRICE_URL = '%smarket.finance.%s/downxls.php?date=%s&symbol=%s'
-DAY_PRICE_URL = '%sapi.finance.%s/akdaily/?code=%s&type=last'
+DAY_PRICE_URL = '%sapi.finance.%s/%s/?code=%s&type=last'
 LIVE_DATA_URL = '%shq.%s/list=%s'
+DAY_PRICE_MIN_URL = '%sapi.finance.%s/akmin?scode=%s&type=%s'
 SINA_DAY_PRICE_URL = '%svip.stock.finance.%s/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?num=80&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page&page=%s'
 REPORT_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/mainindex/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
 FORECAST_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/performance/index.phtml?s_i=&s_a=&s_c=&s_type=&reportdate=%s&quarter=%s&p=%s&num=60'

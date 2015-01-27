@@ -16,7 +16,7 @@ from pandas.util.testing import _network_error_classes
 import re
 from StringIO import StringIO
 
-def get_hist_data(code=None, start=None, end=None, retry_count=3,
+def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
                    pause=0.001):
     """
         获取个股历史交易记录
@@ -40,7 +40,14 @@ def get_hist_data(code=None, start=None, end=None, retry_count=3,
     if code is None or len(code)!=6:
         return None
     symbol = code_to_symbol(code)
-    url = ct.DAY_PRICE_URL%(ct.P_TYPE['http'],ct.DOMAINS['ifeng'],symbol)
+    url = ''
+    if ktype.upper() in ['D','W','M']:
+        url = ct.DAY_PRICE_URL%(ct.P_TYPE['http'],ct.DOMAINS['ifeng'],ct.K_TYPE[ktype.upper()],symbol)
+    elif ktype in ['5','15','30','60']:
+        url = ct.DAY_PRICE_MIN_URL%(ct.P_TYPE['http'],ct.DOMAINS['ifeng'],symbol,ktype)
+    else:
+        raise TypeError('ktype input error.')
+    
     for _ in range(retry_count):
         time.sleep(pause)
         try:
@@ -51,8 +58,8 @@ def get_hist_data(code=None, start=None, end=None, retry_count=3,
         else:
             js = json.loads(lines)
             df = pd.DataFrame(js['record'],columns=ct.DAY_PRICE_COLUMNS)
-            df = df.applymap(lambda x: x.replace(u',', u''))#删除千位分隔符,
-            df = df.drop('price_change',axis=1)
+            if ktype.upper() in ['D','W','M']:
+                df = df.applymap(lambda x: x.replace(u',', u''))
             df = df.set_index(['date']) 
             if start is not None:
                 df = df.ix[df.index>=start]
@@ -206,6 +213,12 @@ def get_realtime_quotes(symbols=None):
     for txt in ls:
         df[txt] = df[txt].map(lambda x:x[:-2])
     return df
+
+def random(n=13):
+    from random import randint
+    start = 10**(n-1)
+    end = (10**n)-1
+    return str(randint(start, end))
 
 def code_to_symbol(code):
     """
