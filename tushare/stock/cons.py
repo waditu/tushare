@@ -5,7 +5,7 @@ Created on 2014/07/31
 @group : waditu
 @contact: jimmysoa@sina.cn
 """
-
+@property
 def data_path():
     import os
     import inspect
@@ -50,4 +50,4 @@ OPERATION_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/operation/
 GROWTH_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/grow/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
 DEBTPAYING_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/debtpaying/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
 CASHFLOW_URL = '%svip.stock.finance.%s/q/go.php/vFinanceAnalyze/kind/cashflow/index.phtml?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=60'
-ALL_STOCK_BASICS_FILE = '%s/tushare/data/all.csv'%data_path()
+ALL_STOCK_BASICS_FILE = '%s/tushare/data/all.csv'%data_path

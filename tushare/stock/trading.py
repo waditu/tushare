@@ -209,7 +209,6 @@ def get_realtime_quotes(symbols=None):
     for row in data:
         if len(row)>1:
             data_list.append([astr for astr in row.split(',')])
-    print len(data_list),data_list
     df = pd.DataFrame(data_list,columns=ct.LIVE_DATA_COLS)
     df = df.drop('s',axis=1)
     df['code'] = syms
