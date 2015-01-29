@@ -18,7 +18,7 @@ class TestTrading(unittest.TestCase):
     
     def test_histData(self):
         self.set_data()
-        td.get_hist_data(self.code, self.start, self.end)
+        td.get_hist_data(self.code, start=self.start, end=self.end)
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']
