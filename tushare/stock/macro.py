@@ -34,7 +34,7 @@ def get_gdp_year():
         lbdy :批发零售贸易及餐饮业(亿元)
     """
     rdint = vs.random()
-    url = vs.NATION_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,0,rdint)
+    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],0,70,rdint)
     request = urllib2.Request(url)
     text = urllib2.urlopen(request,timeout=10).read()
 
@@ -65,7 +65,7 @@ def get_gdp_quarter():
         ti_yoy :第三产业增加值同比增长(%)
     """
     rdint = vs.random()
-    url = vs.NATION_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,1,rdint)
+    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],1,250,rdint)
     request = urllib2.Request(url)
     text = urllib2.urlopen(request,timeout=10).read()
 
@@ -96,7 +96,7 @@ def get_gdp_for():
         goods_rate :货物和服务净出口拉动(百分点)
     """
     rdint = vs.random()
-    url = vs.NATION_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,4,rdint)
+    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],4,80,rdint)
     request = urllib2.Request(url)
     text = urllib2.urlopen(request,timeout=10).read()
 
@@ -124,7 +124,7 @@ def get_gdp_pull():
         ti :第三产业拉动率(%)
     """
     rdint = vs.random()
-    url = vs.NATION_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,5,rdint)
+    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],5,60,rdint)
     request = urllib2.Request(url)
     text = urllib2.urlopen(request,timeout=10).read()
 
@@ -152,7 +152,7 @@ def get_gdp_contrib():
         ti :第三产业献率(%)
     """
     rdint = vs.random()
-    url = vs.NATION_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,6,rdint)
+    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],6,60,rdint)
     request = urllib2.Request(url)
     text = urllib2.urlopen(request,timeout=10).read()
 
@@ -166,6 +166,54 @@ def get_gdp_contrib():
     df[df==0] = np.NaN
     return df
 
+def get_cpi():
+    """
+        获取居民消费价格指数数据
+    Return
+    --------
+    DataFrame
+        month :统计月份
+        cpi :价格指数
+    """
+    rdint = vs.random()
+    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[1],0,600,rdint)
+    request = urllib2.Request(url)
+    text = urllib2.urlopen(request,timeout=10).read()
+
+    regSym = re.compile(r'\,count:(.*?)\}')
+    datastr = regSym.findall(text)
+    datastr = datastr[0]
+    datastr = datastr.split('data:')[1]
+#     datastr = datastr.replace('"','').replace('null','0')
+    js = json.loads(datastr)
+    df = pd.DataFrame(js,columns=vs.CPI_COLS)
+    df['cpi'] = df['cpi'].astype(float)
+    return df
+
+# def get_ppi():
+#     """
+#         获取工业品出厂价格指数数据
+#     Return
+#     --------
+#     DataFrame
+#         month :统计月份
+#         ppi :价格指数
+#     """
+#     rdint = vs.random()
+#     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[1],0,600,rdint)
+#     request = urllib2.Request(url)
+#     text = urllib2.urlopen(request,timeout=10).read()
+# 
+#     regSym = re.compile(r'\,count:(.*?)\}')
+#     datastr = regSym.findall(text)
+#     datastr = datastr[0]
+#     datastr = datastr.split('data:')[1]
+# #     datastr = datastr.replace('"','').replace('null','0')
+#     js = json.loads(datastr)
+#     df = pd.DataFrame(js,columns=vs.CPI_COLS)
+#     df['value'] = df['value'].astype(float)
+#     return df
+
 if __name__ == '__main__':
-    print get_gdp_contrib()
+    print get_gdp_quarter()
 
