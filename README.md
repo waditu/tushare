@@ -72,7 +72,7 @@ Quick Start
 
 设定历史数据的时间：      
 	
-	In [5]: td.get_hist_data('600848','2015-01-05','2015-01-09')
+	In [5]: td.get_hist_data('600848',start='2015-01-05',end='2015-01-09')
 	Out[5]:
 				open    high   close     low    volume   p_change     ma5    ma10 \  
 	date                                                                            
