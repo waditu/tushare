@@ -14,7 +14,7 @@ class TestTrading(unittest.TestCase):
     
     def test_tickData(self):
         self.set_data()
-        td.get_tick_data(self.code, self.start)
+        td.get_tick_data(self.code, date=self.start)
     
     def test_histData(self):
         self.set_data()
