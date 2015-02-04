@@ -7,13 +7,13 @@
 数据存储
 ========
 
-*数据存储*\ 模块主要是引导用户将数据保存在本地磁盘或数据库服务器上，便于后期做量化分析和回测使用，在以文件格式保存在电脑磁盘的方式上，主要是调用pandas本身自带的方法，此处会罗列常用的参数和说明，另外，也会通过实例，展示文件数据追加或保存的python代码。在存入DataBase方面，TuShare提供了简单的处理方式。
+*数据存储*\ 模块主要是引导用户将数据保存在本地磁盘或数据库服务器上，便于后期的量化分析和回测使用，在以文件格式保存在电脑磁盘的方式上，调用的是pandas本身自带的方法，此处会罗列常用的参数和说明，另外，也会通过实例，展示操作的方法。在存入DataBase方面，也提供了简单的处理方式，本文将给出简单的python代码。
 
 -  保存为csv格式
 -  保存为Excel格式
 -  保存为HDF5文件格式
 -  保存为JSON格式
--  存入关系型数据库
+-  存入MySQL等关系型数据库
 -  存入NoSQL数据库
 
 csv文件
@@ -129,6 +129,17 @@ pandas利用PyTables包将数据保存为HDF5格式的文件。需要确认的�
     df = ts.get_hist_data('000875')
     df.to_hdf('c:/day/hdf.h5','000875')
 
+方法2：
+
+::
+
+    import tushare as ts
+
+    df = ts.get_hist_data('000875')
+    store = HDFStore('c:/day/store.h5')
+    store['000875'] = df
+    store.close()
+
 JSON文件
 --------
 
@@ -151,3 +162,62 @@ pandas生成Json格式的文件或字符串。
 
     #或者直接使用
     print df.to_json(orient='records')
+
+MySQL数据库
+-----------
+
+pandas提供了将数据便捷存入关系型数据库的方法，在新版的pandas中，主要是已sqlalchemy方式与数据建立连接，支持MySQL、Postgresql、Oracle、MS
+SQLServer、SQLite等主流数据库。本例以MySQL数据库为代表，展示将获取到的股票数据存入数据库的方法,其他类型数据库请参考sqlalchemy官网文档的create\_engine部分。
+
+常用参数说明：
+
+-  **name**:表名，pandas会自动创建表结构
+-  **con**\ ：数据库连接，最好是用sqlalchemy创建engine的方式来替代con
+-  **flavor**:数据库类型 {‘sqlite’, ‘mysql’},
+   默认‘sqlite’，如果是engine此项可忽略
+-  **schema**:指定数据库的schema，默认即可
+-  **if\_exists**:如果表名已存在的处理方式 {‘fail’, ‘replace’,
+   ‘append’},默认‘fail’
+-  **index**:将pandas的Index作为一列存入数据库，默认是True
+-  **index\_label**:Index的列名
+-  **chunksize**:分批存入数据库，默认是None，即一次性全部写人数据库
+-  **dtype**:设定columns在数据库里的数据类型，默认是None
+
+调用方法：
+
+::
+
+    from sqlalchemy import create_engine
+    import tushare as ts
+
+    df = ts.get_tick_data('600848', date='2014-12-22')
+    engine = create_engine('mysql://user:passwd@127.0.0.1/db_name?charset=utf8')
+
+    #存入数据库
+    df.to_sql('tick_data',engine)
+
+    #追加数据到现有表
+    #df.to_sql('tick_data',engine,if_exists='append')
+
+.. figure:: _static/mysql_d.png
+   :alt: 
+
+MongoDB
+-------
+
+pandas目前没有提供直接存入MongoDB的方法，不过依然很简单，而且方式很多，用户可根据自身的业务特点选择存储的结构方式。
+
+使用方法：
+
+::
+
+    import pymongo
+    import json
+
+    conn = pymongo.Connection('127.0.0.1', port=27017)
+    df = ts.get_tick_data('600848',date='2014-12-22')
+
+    conn.db.tickdata.insert(json.loads(df.to_json(orient='records')))
+
+.. figure:: _static/mongodb_d.png
+   :alt:
