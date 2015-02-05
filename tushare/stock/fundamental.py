@@ -11,7 +11,7 @@ from tushare.stock import cons as ct
 import lxml.html
 import re
 
-def get_stock_basics(file_path=ct.ALL_STOCK_BASICS_FILE):
+def get_stock_basics(file_path=None):
     """
         获取沪深上市公司基本情况
     Parameters
@@ -38,6 +38,7 @@ def get_stock_basics(file_path=ct.ALL_STOCK_BASICS_FILE):
                pb,市净率
                timeToMarket,上市日期
     """
+    file_path = file_path if file_path else ct.ALL_STOCK_BASICS_FILE%_data_path()
     df = pd.read_csv(file_path,dtype={'code':'object'},encoding='GBK')
     df = df.set_index('code')
     return df
@@ -71,8 +72,10 @@ def get_report_data(year,quarter):
         df = pd.DataFrame(data,columns=ct.REPORT_COLS)
         return df
 
-def _get_report_data(year,quarter,pageNo,dataArr):
-    url = ct.REPORT_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+
+def _get_report_data(year, quarter, pageNo, dataArr):
+    url = ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
+                         year, quarter, pageNo, ct.PAGE_NUM[1])
     print 'getting page %s ...'%pageNo
     try:
         html = lxml.html.parse(url)
@@ -127,8 +130,10 @@ def get_forecast_data(year,quarter):
         df = pd.DataFrame(data,columns=ct.FORECAST_COLS)
         return df
 
-def _get_forecast_data(year,quarter,pageNo,dataArr):
-    url = ct.FORECAST_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+
+def _get_forecast_data(year, quarter, pageNo, dataArr):
+    url = ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                           quarter, pageNo, ct.PAGE_NUM[1])
     print 'getting page %s ...'%pageNo
     try:
         html = lxml.html.parse(url)
@@ -179,8 +184,10 @@ def get_profit_data(year,quarter):
         df = pd.DataFrame(data,columns=ct.PROFIT_COLS)
         return df
 
-def _get_profit_data(year,quarter,pageNo,dataArr):
-    url = ct.PROFIT_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+
+def _get_profit_data(year, quarter, pageNo, dataArr):
+    url = ct.PROFIT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                         quarter, pageNo, ct.PAGE_NUM[1])
     print 'getting page %s ...'%pageNo
     try:
         html = lxml.html.parse(url)
@@ -238,8 +245,10 @@ def get_operation_data(year,quarter):
         df = pd.DataFrame(data,columns=ct.OPERATION_COLS)
         return df
 
-def _get_operation_data(year,quarter,pageNo,dataArr):
-    url = ct.OPERATION_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+
+def _get_operation_data(year, quarter, pageNo, dataArr):
+    url = ct.OPERATION_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                            quarter, pageNo, ct.PAGE_NUM[1])
     print 'getting page %s ...'%pageNo
     try:
         html = lxml.html.parse(url)
@@ -295,8 +304,10 @@ def get_growth_data(year,quarter):
         df = pd.DataFrame(data,columns=ct.GROWTH_COLS)
         return df
 
-def _get_growth_data(year,quarter,pageNo,dataArr):
-    url = ct.GROWTH_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+
+def _get_growth_data(year, quarter, pageNo, dataArr):
+    url = ct.GROWTH_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                         quarter, pageNo, ct.PAGE_NUM[1])
     print 'getting page %s ...'%pageNo
     try:
         html = lxml.html.parse(url)
@@ -352,8 +363,10 @@ def get_debtpaying_data(year,quarter):
         df = pd.DataFrame(data,columns=ct.DEBTPAYING_COLS)
         return df
 
-def _get_debtpaying_data(year,quarter,pageNo,dataArr):
-    url = ct.DEBTPAYING_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+
+def _get_debtpaying_data(year, quarter, pageNo, dataArr):
+    url = ct.DEBTPAYING_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                             quarter, pageNo, ct.PAGE_NUM[1])
     print 'getting page %s ...'%pageNo
     try:
         html = lxml.html.parse(url)
@@ -408,8 +421,10 @@ def get_cashflow_data(year,quarter):
         df = pd.DataFrame(data,columns=ct.CASHFLOW_COLS)
         return df
 
-def _get_cashflow_data(year,quarter,pageNo,dataArr):
-    url = ct.CASHFLOW_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],year,quarter,pageNo)
+
+def _get_cashflow_data(year, quarter, pageNo, dataArr):
+    url = ct.CASHFLOW_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                           quarter, pageNo, ct.PAGE_NUM[1])
     print 'getting page %s ...'%pageNo
     try:
         html = lxml.html.parse(url)
@@ -445,4 +460,9 @@ def _check_input(year,quarter):
     else:
         return True
 
-    
+def _data_path():
+    import os
+    import inspect
+    caller_file = inspect.stack()[1][1]  
+    pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
+    return os.path.abspath(os.path.join(pardir, os.path.pardir))

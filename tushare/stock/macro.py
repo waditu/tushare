@@ -15,6 +15,7 @@ import urllib2
 import re
 import json
 
+
 def get_gdp_year():
     """
         获取年度国内生产总值数据
@@ -34,20 +35,22 @@ def get_gdp_year():
         lbdy :批发零售贸易及餐饮业(亿元)
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],0,70,rdint)
+    url = vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'], rdint, vs.MACRO_TYPE[0],
+                        0, 70, rdint)
     request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
+    text = urllib2.urlopen(request, timeout=10).read()
 
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
-    datastr = datastr.replace('"','').replace('null','0')
+    datastr = datastr.replace('"', '').replace('null','0')
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.GDP_YEAR_COLS)
+    df = pd.DataFrame(js, columns=vs.GDP_YEAR_COLS)
     df[df==0] = np.NaN
     return df
-    
+
+  
 def get_gdp_quarter():
     """
         获取季度国内生产总值数据
@@ -65,7 +68,8 @@ def get_gdp_quarter():
         ti_yoy :第三产业增加值同比增长(%)
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],1,250,rdint)
+    url = vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'], rdint, vs.MACRO_TYPE[0],
+                        1, 250, rdint)
     request = urllib2.Request(url)
     text = urllib2.urlopen(request,timeout=10).read()
 
@@ -73,9 +77,9 @@ def get_gdp_quarter():
     datastr = regSym.findall(text)
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
-    datastr = datastr.replace('"','').replace('null','0')
+    datastr = datastr.replace('"', '').replace('null', '0')
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.GDP_QUARTER_COLS)
+    df = pd.DataFrame(js, columns=vs.GDP_QUARTER_COLS)
     df['quarter'] = df['quarter'].astype(object)
     df[df==0] = np.NaN
     return df

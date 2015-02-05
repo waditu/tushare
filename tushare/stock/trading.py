@@ -84,7 +84,7 @@ def _parsing_dayprice_json(pageNum=1):
         DataFrame 当日所有股票交易数据(DataFrame)
     """
     print 'getting page %s ...'%pageNum
-    url = ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'],ct.DOMAINS['sina'],pageNum)
+    url = ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],ct.PAGES['jv'],pageNum)
     request = urllib2.Request(url)
     text = urllib2.urlopen(request,timeout=10).read()
     if text == 'null':
@@ -124,7 +124,8 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
     if code is None or len(code)!=6 or date is None:
         return None
     symbol = code_to_symbol(code)
-    url = ct.TICK_PRICE_URL % (ct.P_TYPE['http'],ct.DOMAINS['sina'],date,symbol)
+    url = ct.TICK_PRICE_URL % (ct.P_TYPE['http'], ct.DOMAINS['sf'], ct.PAGES['dl'],
+                                date, symbol)
     for _ in range(retry_count):
         time.sleep(pause)
         try:
@@ -148,7 +149,7 @@ def get_today_all():
     """
     df = _parsing_dayprice_json(1)
     if df is not None:
-        for i in range(2,ct.DAY_PRICE_PAGES):
+        for i in range(2,ct.PAGE_NUM[0]):
             newdf = _parsing_dayprice_json(i)
             df = df.append(newdf,ignore_index=True)
     return df
