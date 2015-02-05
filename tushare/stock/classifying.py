@@ -19,6 +19,15 @@ import tushare.stock.fundamental as fd
 
 
 def get_industry_classifyed():
+    """
+        获取行业分类数据
+    Return
+    --------
+    DataFrame
+        code :股票代码
+        name :股票名称
+        c_name :行业名称
+    """
     df = _get_type_data(ct.SINA_INDUSTRY_INDEX_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['ids']))
     data = []
     for row in df.values:
@@ -30,6 +39,15 @@ def get_industry_classifyed():
         
 
 def get_concept_classifyed():
+    """
+        获取概念分类数据
+    Return
+    --------
+    DataFrame
+        code :股票代码
+        name :股票名称
+        c_name :概念名称
+    """
     df = _get_type_data(ct.SINA_CONCEPTS_INDEX_URL%(ct.P_TYPE['http'], ct.DOMAINS['sf'], ct.PAGES['cpt']))
     data = []
     for row in df.values:
@@ -41,6 +59,15 @@ def get_concept_classifyed():
 
 
 def get_area_classifyed():
+    """
+        获取地域分类数据
+    Return
+    --------
+    DataFrame
+        code :股票代码
+        name :股票名称
+        area :地域名称
+    """
     df = fd.get_stock_basics()
     df = df[['name','area']]
     df.reset_index(level=0, inplace=True)
@@ -49,6 +76,14 @@ def get_area_classifyed():
 
 
 def get_gem_classifyed():
+    """
+        获取创业板股票
+    Return
+    --------
+    DataFrame
+        code :股票代码
+        name :股票名称
+    """
     df = fd.get_stock_basics()
     df.reset_index(level=0, inplace=True)
     df = df[['code','name']]
@@ -58,6 +93,14 @@ def get_gem_classifyed():
     
 
 def get_sme_classifyed():
+    """
+        获取中小板股票
+    Return
+    --------
+    DataFrame
+        code :股票代码
+        name :股票名称
+    """
     df = fd.get_stock_basics()
     df.reset_index(level=0, inplace=True)
     df = df[['code','name']]
@@ -66,6 +109,14 @@ def get_sme_classifyed():
     return df 
 
 def get_st_classifyed():
+    """
+        获取风险警示板股票
+    Return
+    --------
+    DataFrame
+        code :股票代码
+        name :股票名称
+    """
     df = fd.get_stock_basics()
     df.reset_index(level=0, inplace=True)
     df = df[['code','name']]
