@@ -18,7 +18,7 @@ import time
 import tushare.stock.fundamental as fd
 
 
-def get_industry_classifyed():
+def get_industry_classified():
     """
         获取行业分类数据
     Return
@@ -38,7 +38,7 @@ def get_industry_classifyed():
     return data
         
 
-def get_concept_classifyed():
+def get_concept_classified():
     """
         获取概念分类数据
     Return
@@ -58,7 +58,7 @@ def get_concept_classifyed():
     return data
 
 
-def get_area_classifyed(file_path=None):
+def get_area_classified(file_path=None):
     """
         获取地域分类数据
     Return
@@ -75,7 +75,7 @@ def get_area_classifyed(file_path=None):
     return df
 
 
-def get_gem_classifyed(file_path=None):
+def get_gem_classified(file_path=None):
     """
         获取创业板股票
     Return
@@ -92,7 +92,7 @@ def get_gem_classifyed(file_path=None):
     return df
     
 
-def get_sme_classifyed(file_path=None):
+def get_sme_classified(file_path=None):
     """
         获取中小板股票
     Return
@@ -108,7 +108,7 @@ def get_sme_classifyed(file_path=None):
     df = df.sort('code').reset_index(drop=True)
     return df 
 
-def get_st_classifyed(file_path=None):
+def get_st_classified(file_path=None):
     """
         获取风险警示板股票
     Return
