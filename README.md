@@ -3,9 +3,6 @@ TuShare
 ![](https://api.travis-ci.org/waditu/tushare.png?branch=master)
 [![](https://pypip.in/v/tushare/badge.png)](https://pypi.python.org/pypi/tushare/0.1.5)
 
-Usage
--------
-
 TuShare是实现对股票/期货等金融数据从**数据采集**、**清洗加工** 到 **数据存储**过程的工具，满足金融量化分析师和学习数据分析的人在数据获取方面的需求,它的特点是数据覆盖范围广，接口调用简单,响应快速。
 
 ![](http://tushare.waditu.com/_images/main_pic_min.png)
