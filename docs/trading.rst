@@ -1,11 +1,10 @@
-.. contents::
-   :depth: 3.0
-..
+.. _trading:
 
-.. highlightlang:: python
+.. currentmodule:: tushare
 
-交易数据获取
-============
+
+交易数据
+========
 
 *交易类数据*\ 提供股票的交易行情数据，通过简单的接口调用可获取相应的DataFrame格式数据，主要包括以下类别：
 
@@ -52,9 +51,9 @@
 
 ::
 
-    import tushare.stock.trading as td
+    import tushare as ts
 
-    td.get_hist_data('600848') #一次性获取全部日k线数据
+    ts.get_hist_data('600848') #一次性获取全部日k线数据
 
 结果显示：
 
@@ -86,7 +85,7 @@
 
 ::
 
-    td.get_hist_data('600848',start='2015-01-05',end='2015-01-09')
+    ts.get_hist_data('600848',start='2015-01-05',end='2015-01-09')
 
                 open    high   close     low    volume     p_change     ma5    ma10 \  
     date                                                                            
@@ -107,18 +106,18 @@
 
 ::
 
-    td.get_hist_data('600848'，ktype='W') #获取周k线数据
-    td.get_hist_data('600848'，ktype='M') #获取月k线数据
-    td.get_hist_data('600848'，ktype='5') #获取5分钟k线数据
-    td.get_hist_data('600848'，ktype='15') #获取15分钟k线数据
-    td.get_hist_data('600848'，ktype='30') #获取30分钟k线数据
-    td.get_hist_data('600848'，ktype='60') #获取60分钟k线数据
-    td.get_hist_data('sh'）#获取上证指数k线数据，其它参数与个股一致，下同
-    td.get_hist_data('sz'）#获取深圳成指k线数据
-    td.get_hist_data('hs300'）#获取沪深300指数k线数据
-    td.get_hist_data('sz50'）#获取上证50指数k线数据
-    td.get_hist_data('zxb'）#获取中小板指数k线数据
-    td.get_hist_data('cyb'）#获取创业板指数k线数据
+    ts.get_hist_data('600848'，ktype='W') #获取周k线数据
+    ts.get_hist_data('600848'，ktype='M') #获取月k线数据
+    ts.get_hist_data('600848'，ktype='5') #获取5分钟k线数据
+    ts.get_hist_data('600848'，ktype='15') #获取15分钟k线数据
+    ts.get_hist_data('600848'，ktype='30') #获取30分钟k线数据
+    ts.get_hist_data('600848'，ktype='60') #获取60分钟k线数据
+    ts.get_hist_data('sh'）#获取上证指数k线数据，其它参数与个股一致，下同
+    ts.get_hist_data('sz'）#获取深圳成指k线数据
+    ts.get_hist_data('hs300'）#获取沪深300指数k线数据
+    ts.get_hist_data('sz50'）#获取上证50指数k线数据
+    ts.get_hist_data('zxb'）#获取中小板指数k线数据
+    ts.get_hist_data('cyb'）#获取创业板指数k线数据
 
 实时行情
 --------
@@ -127,9 +126,9 @@
 
 ::
 
-    import tushare.stock.trading as td
+    import tushare as ts
 
-    td.get_today_all()
+    ts.get_today_all()
 
 返回值说明：
 
@@ -178,9 +177,9 @@
 
 ::
 
-    import tushare.stock.trading as td
+    import tushare as ts
 
-    df = td.get_tick_data('600848','2014-01-09')
+    df = ts.get_tick_data('600848','2014-01-09')
     df.head(10)
 
 返回值说明：
@@ -224,9 +223,9 @@
 
 ::
 
-    import tushare.stock.trading as td
+    import tushare as ts
 
-    df = td.get_realtime_quotes('000581') #Single stock symbol
+    df = ts.get_realtime_quotes('000581') #Single stock symbol
     df[['code','name','price','bid','ask','volume','amount','time']]
 
 结果显示：
@@ -272,17 +271,17 @@
 ::
 
     #symbols from a list
-    td.get_realtime_quotes(['600848','000980','000981']) 
+    ts.get_realtime_quotes(['600848','000980','000981']) 
     #from a Series
-    td.get_realtime_quotes(df['code'].tail(10))  #一次获取10个股票的实时分笔数据
+    ts.get_realtime_quotes(df['code'].tail(10))  #一次获取10个股票的实时分笔数据
 
 获取实时指数：
 
 ::
 
     #上证指数
-    td.get_realtime_quotes('sh') 
+    ts.get_realtime_quotes('sh') 
     #上证指数 深圳成指 沪深300指数 上证50 中小板 创业板
-    td.get_realtime_quotes(['sh','sz','hs300','sz50','zxb','cyb'])  
+    ts.get_realtime_quotes(['sh','sz','hs300','sz50','zxb','cyb'])  
     #或者混搭
-    td.get_realtime_quotes(['sh','600848'])
+    ts.get_realtime_quotes(['sh','600848'])
