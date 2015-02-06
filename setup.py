@@ -42,9 +42,9 @@ Quick Start
 
 ::
 
-    import tushare.stock.trading as td
+    import tushare as ts
     
-    td.get_hist_data('600848')
+    ts.get_hist_data('600848')
     
 return::
 
@@ -66,7 +66,7 @@ return::
 setup(
     name='tushare',
     version=tushare.__version__,
-    description='TuShare is a utility for crawling historical and Realtime Quotes data of China stocks',
+    description='A utility for crawling historical and Real-time Quotes data of China stocks',
 #     long_description=read("READM.rst"),
     long_description = long_desc,
     author='Jimmy Liu',
@@ -77,6 +77,6 @@ setup(
     classifiers=['Development Status :: 4 - Beta',
     'Programming Language :: Python :: 2.7',
     'License :: OSI Approved :: BSD License'],
-    packages=['tushare','tushare.stock','tushare.data'],
+    packages=['tushare','tushare.stock','tushare.data','tushare.util'],
     package_data={'': ['*.csv']},
 )

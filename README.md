@@ -3,13 +3,12 @@ TuShare
 ![](https://api.travis-ci.org/waditu/tushare.png?branch=master)
 [![](https://pypip.in/v/tushare/badge.png)](https://pypi.python.org/pypi/tushare/0.1.5)
 
-股票、财经数据获取接口包
+Usage
+-------
 
- TuShare is a utility for crawling historical and Realtime Quotes data of China stocks.
+TuShare是实现对股票/期货等金融数据从**数据采集**、**清洗加工** 到 **数据存储**过程的工具，满足金融量化分析师和学习数据分析的人在数据获取方面的需求,它的特点是数据覆盖范围广，接口调用简单,响应快速。
 
-> 数据来源于各大财经网站，如遇访问异常请及时更新TuShare或自行查找并修改数据接口地址
-
-> 使用TuShare的优点是：**调用简单**、直接返回pandas **DataFrame对象**
+![](http://tushare.waditu.com/_images/main_pic_min.png)
 
 Dependencies
 =========
@@ -19,16 +18,10 @@ python 2.7
 
 Installation
 ====
-pandas
-
-
-- 方式1： pip install ipython pandas numpy tornado pyzmq jinja2 matplotlib
-- 方式2（推荐）：安装Anaconda [http://www.continuum.io/downloads](http://www.continuum.io/downloads "Anaconda")
-
-tushare
 
 - 方式1：pip install tushare
-- 方式2：下载到本地 python setup.py install
+- 方式2：python setup.py install
+- 方式3：访问[https://pypi.python.org/pypi/tushare/](https://pypi.python.org/pypi/tushare/)下载安装
 
 
 Upgrade
@@ -40,9 +33,9 @@ Quick Start
 ======
 **Example 1.** 获取个股历史交易数据（包括均线数据）：
 
-    import tushare.stock.trading as td
+    import tushare as ts
 
-	td.get_hist_data('600848') #一次性获取全部数据
+	ts.get_hist_data('600848') #一次性获取全部数据
 
 结果显示：
 
@@ -72,7 +65,7 @@ Quick Start
 
 设定历史数据的时间：      
 	
-	In [5]: td.get_hist_data('600848',start='2015-01-05',end='2015-01-09')
+	In [5]: ts.get_hist_data('600848',start='2015-01-05',end='2015-01-09')
 	Out[5]:
 				open    high   close     low    volume   p_change     ma5    ma10 \  
 	date                                                                            
@@ -92,9 +85,9 @@ Quick Start
 
 **Example 2.** 一次性获取最近一个日交易日所有股票的交易数据（结果显示速度取决于网速）
 	
-	import tushare.stock.trading as td
+	import tushare as ts
 
-	td.get_today_all()
+	ts.get_today_all()
 
 
 结果显示：
@@ -128,8 +121,8 @@ Quick Start
 
 **Example 3.** 获取历史分笔数据
 
-    In [1]: import tushare.stock.trading as td
-	In [2]: df = td.get_tick_data('600848','2014-01-09')
+    In [1]: import tushare as ts
+	In [2]: df = ts.get_tick_data('600848',date='2014-01-09')
 	In [3]: df.head(10)
 
 结果显示：
@@ -151,8 +144,8 @@ Quick Start
 
 **Example 4.** 获取实时交易数据(Realtime Quotes Data)
 
-    In [1]:import tushare.stock.trading as td
-	In [2]:td.get_realtime_quotes('000581') #Single stock symbol
+    In [1]:import tushare as ts
+	In [2]:ts.get_realtime_quotes('000581') #Single stock symbol
 
 结果显示：
 >名称、开盘价、昨价、现价、最高、最低、买入价、卖出价、成交量、成交金额...more in docs
@@ -167,8 +160,8 @@ Quick Start
 	  
 请求多个股票方法（一次最好不要超过30个）：
     
-	In [3]:td.get_realtime_quotes(['600848','000980','000981']) #symbols from a list
-	In [4]:td.get_realtime_quotes(df['code'].tail(10)) #from a Series
+	In [3]:ts.get_realtime_quotes(['600848','000980','000981']) #symbols from a list
+	In [4]:ts.get_realtime_quotes(df['code'].tail(10)) #from a Series
 
 
 更多文档
@@ -177,6 +170,11 @@ Quick Start
  
 Change Logs
 ------
+
+0.1.9 2015/02/06
+========
+- 增加分类数据
+- 增加数据存储示例
 
 0.1.6 2015/01/27
 ========
