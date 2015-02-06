@@ -58,7 +58,7 @@ def get_concept_classifyed():
     return data
 
 
-def get_area_classifyed():
+def get_area_classifyed(file_path=None):
     """
         获取地域分类数据
     Return
@@ -68,14 +68,14 @@ def get_area_classifyed():
         name :股票名称
         area :地域名称
     """
-    df = fd.get_stock_basics()
+    df = fd.get_stock_basics(file_path)
     df = df[['name','area']]
     df.reset_index(level=0, inplace=True)
     df = df.sort('area').reset_index(drop=True)
     return df
 
 
-def get_gem_classifyed():
+def get_gem_classifyed(file_path=None):
     """
         获取创业板股票
     Return
@@ -84,7 +84,7 @@ def get_gem_classifyed():
         code :股票代码
         name :股票名称
     """
-    df = fd.get_stock_basics()
+    df = fd.get_stock_basics(file_path)
     df.reset_index(level=0, inplace=True)
     df = df[['code','name']]
     df = df.ix[df.code.str[0] == '3']
@@ -92,7 +92,7 @@ def get_gem_classifyed():
     return df
     
 
-def get_sme_classifyed():
+def get_sme_classifyed(file_path=None):
     """
         获取中小板股票
     Return
@@ -101,14 +101,14 @@ def get_sme_classifyed():
         code :股票代码
         name :股票名称
     """
-    df = fd.get_stock_basics()
+    df = fd.get_stock_basics(file_path)
     df.reset_index(level=0, inplace=True)
     df = df[['code','name']]
     df = df.ix[df.code.str[0:3] == '002']
     df = df.sort('code').reset_index(drop=True)
     return df 
 
-def get_st_classifyed():
+def get_st_classifyed(file_path=None):
     """
         获取风险警示板股票
     Return
@@ -117,7 +117,7 @@ def get_st_classifyed():
         code :股票代码
         name :股票名称
     """
-    df = fd.get_stock_basics()
+    df = fd.get_stock_basics(file_path)
     df.reset_index(level=0, inplace=True)
     df = df[['code','name']]
     df = df.ix[df.name.str.contains('ST')]
