@@ -1,11 +1,11 @@
-.. contents::
-   :depth: 3.0
-..
+.. _fundamental:
+
+.. currentmodule:: tushare
 
 .. highlightlang:: python
 
-基本面数据获取
-==============
+基本面数据
+==========
 
 *基本面类数据*\ 提供所有股票的基本面情况，包括股本情况、业绩预告和业绩报告等。主要包括以下类别：
 
@@ -48,9 +48,9 @@
 
 ::
 
-    import tushare.stock.fundamental as fd
+    import tushare as ts
 
-    fd.get_stock_basics()
+    ts.get_stock_basics()
 
 结果显示：
 
@@ -69,7 +69,7 @@
     002103  广博股份     文教休闲   浙江  214.46  17095.44     21843.09    114295.57   
     002735  王子新材       塑料   深圳   80.95   2000.00      8000.00     41200.78 
 
-如果是使用自己的数据，只要表头与默认文件格式一致，可设定文件路径的方式读入，例如：fd.get\_stock\_basics('c:\\all\_stocks.csv')
+如果是使用自己的数据，只要表头与默认文件格式一致，可设定文件路径的方式读入，例如：ts.get\_stock\_basics('c:\\all\_stocks.csv')
 
 业绩预告
 --------
@@ -91,7 +91,7 @@
 ::
 
     #获取2014年中报的业绩预告数据
-    fd.get_forecast_data(2014,2)
+    ts.get_forecast_data(2014,2)
 
 结果返回：
 
@@ -134,7 +134,7 @@
 ::
 
     #获取2014年第3季度的业绩报表数据
-    fd.get_report_data(2014,3)
+    ts.get_report_data(2014,3)
 
 结果返回：
 
@@ -175,7 +175,7 @@
 ::
 
     #获取2014年第3季度的盈利能力数据
-    fd.get_profit_data(2014,3)
+    ts.get_profit_data(2014,3)
 
 结果返回：
 
@@ -215,7 +215,7 @@
 ::
 
     #获取2014年第3季度的营运能力数据
-    fd.get_operation_data(2014,3)
+    ts.get_operation_data(2014,3)
 
 结果返回：
 
@@ -255,7 +255,7 @@
 ::
 
     #获取2014年第3季度的成长能力数据
-    fd.get_growth_data(2014,3)
+    ts.get_growth_data(2014,3)
 
 结果返回：
 
@@ -295,7 +295,7 @@
 ::
 
     #获取2014年第3季度的偿债能力数据
-    fd.get_debtpaying_data(2014,3)
+    ts.get_debtpaying_data(2014,3)
 
 结果返回：
 
@@ -334,7 +334,7 @@
 ::
 
     #获取2014年第3季度的现金流量数据
-    fd.get_cashflow_data(2014,3)
+    ts.get_cashflow_data(2014,3)
 
 结果返回：
 
