@@ -17,7 +17,7 @@ from datetime import datetime
 import lxml.html
 from lxml import etree
 
-def get_latest_news(top=ct.PAGE_NUM[2], show_content=False):
+def get_latest_news(top=None, show_content=False):
     """
         获取即时财经新闻
     
@@ -33,11 +33,12 @@ def get_latest_news(top=ct.PAGE_NUM[2], show_content=False):
             title :新闻标题
             time :发布时间
             url :新闻链接
+            content:新闻内容（在show_content为True的情况下出现）
     """
+    top = ct.PAGE_NUM[2] if top is None else top
     try:
         request = urllib2.Request(nv.LATEST_URL % (ct.P_TYPE['http'], ct.DOMAINS['sina'],
-                                                   ct.PAGES[
-                                                       'lnews'],top ,
+                                                   ct.PAGES['lnews'], top,
                                                    _random()))
         data_str = urllib2.urlopen(request, timeout=10).read()
         data_str = data_str.decode('GBK')
@@ -79,6 +80,61 @@ def latest_content(url):
         return content
     except Exception as er:
         print str(er)  
+
+
+def get_notices(code=None, date=None):
+    '''
+    个股信息地雷
+    Parameters
+    --------
+        code:股票代码
+        date:信息公布日期
+    
+    Return
+    --------
+        DataFrame，属性列表：
+        title:信息标题
+        type:信息类型
+        date:公告日期
+        url:信息内容URL
+    '''
+    if code is None:
+        return None
+    symbol = 'sh' + code if code[:1] == '6' else 'sz' + code
+    url = nv.NOTICE_INFO_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                              ct.PAGES['ntinfo'], symbol)
+    url = url if date is None else '%s&gg_date=%s'%(url,date)
+    html = lxml.html.parse(url)
+    res = html.xpath('//table[@class=\"body_table\"]/tbody/tr')
+    data = []
+    for td in res:
+        title = td.xpath('th/a/text()')[0]
+        type = td.xpath('td[1]/text()')[0]
+        date = td.xpath('td[2]/text()')[0]
+        url = '%s%s%s'%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], td.xpath('th/a/@href')[0])
+        data.append([title, type, date, url])
+    df = pd.DataFrame(data, columns=nv.NOTICE_INFO_CLS)
+    return df
+
+
+def notice_content(url):
+    '''
+        获取信息地雷内容
+    Parameter
+    --------
+        url:内容链接
+    
+    Return
+    --------
+        string:信息内容
+    '''
+    try:
+        html = lxml.html.parse(url)
+        res = html.xpath('//div[@id=\"content\"]/pre/text()')[0]
+        return res.strip()
+    except Exception as er:
+        print str(er)  
+        
 
 def _random(n=16):
     from random import randint
