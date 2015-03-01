@@ -63,7 +63,7 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
             df = pd.DataFrame(js['record'],columns=cols)
             if ktype.upper() in ['D','W','M']:
                 df = df.applymap(lambda x: x.replace(u',', u''))
-            df = df.set_index(['date']) 
+#             df = df.set_index(['date']) 
             if start is not None:
                 df = df.ix[df.index>=start]
             if end is not None:
