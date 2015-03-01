@@ -1,0 +1,14 @@
+2015-2-10
+------------
+ASK:Stupidinsect:希望增加基金数据
+REP:后期增加
+
+2015-2-26
+------------
+ASK:Allisnone：problem with python keywords
+REP:自行解决
+
+2015-3-1
+------------
+ASK:曹欣田: 调用get_hist_data方法后存入MySQL报错，date(index)列无法入库
+REP:暂时通过增加df['date'] = df.index来解决，并在to_sql设置参数index=False，下一个版本取消index项
