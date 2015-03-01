@@ -65,9 +65,9 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
                 df = df.applymap(lambda x: x.replace(u',', u''))
 #             df = df.set_index(['date']) 
             if start is not None:
-                df = df.ix[df.index>=start]
+                df = df[df.date>=start]
             if end is not None:
-                df = df.ix[df.index<=end]
+                df = df[df.date<=end]
             if (code in ct.INDEX_LABELS) & (ktype in ct.K_MIN_LABELS):
                 df = df.drop('turnover',axis=1)
             return df
