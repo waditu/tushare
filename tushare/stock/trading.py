@@ -64,6 +64,8 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
             if ktype.upper() in ['D','W','M']:
                 df = df.applymap(lambda x: x.replace(u',', u''))
 #             df = df.set_index(['date']) 
+            for col in cols[1:]:
+                df[col] = df[col].astype(float)
             if start is not None:
                 df = df[df.date>=start]
             if end is not None:
