@@ -188,7 +188,25 @@ def get_hs300s():
         return pd.merge(df,wt)
     except Exception as er:
         print str(er)
-        
+
+
+def get_sz50s():
+    """
+    获取上证50成份股
+    Return
+    --------
+    DataFrame
+        code :股票代码
+        name :股票名称
+    """
+    try:
+        df = pd.read_excel(ct.HS300_CLASSIFY_URL%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
+                                                  ct.INDEX_C_COMM, ct.PAGES['sz50b']), parse_cols=[0,1])
+        df.columns = ct.FOR_CLASSIFY_B_COLS
+        df['code'] = df['code'].map(lambda x :str(x).zfill(6))
+        return df
+    except Exception as er:
+        print str(er)      
         
 if __name__ == '__main__':
-    print get_hs300s()
+    print get_sz50s()

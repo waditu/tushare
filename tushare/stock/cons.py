@@ -22,7 +22,7 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
          'ntinfo':'vCB_BulletinGather.php', 'hs300b':'000300cons.xls',
-         'hs300w':'000300closeweight.xls'}
+         'hs300w':'000300closeweight.xls','sz50b':'000016cons.xls'}
 TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
 DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
                        'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
