@@ -1,4 +1,4 @@
-__version__ = '0.1.9'
+__version__ = '0.2.0'
 __author__ = 'Jimmy Liu'
 
 
@@ -16,4 +16,5 @@ from tushare.stock.macro import (get_gdp_year, get_gdp_quarter,
                                  get_money_supply, get_money_supply_bal)
 from tushare.stock.classifying import (get_industry_classified, get_concept_classified,
                                        get_area_classified, get_gem_classified,
-                                       get_sme_classified, get_st_classified)
+                                       get_sme_classified, get_st_classified,
+                                       get_hs300s, get_sz50s)
