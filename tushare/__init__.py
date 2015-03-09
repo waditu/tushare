@@ -21,3 +21,6 @@ from tushare.stock.classifying import (get_industry_classified, get_concept_clas
                                        get_area_classified, get_gem_classified,
                                        get_sme_classified, get_st_classified,
                                        get_hs300s, get_sz50s)
+
+from tushare.stock.newsevent import (get_latest_news, latest_content,
+                                     get_notices, notice_content)
