@@ -11,7 +11,7 @@ before_install:
 - conda update --yes conda
 
 install:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy pandas matplotlib lxml demjson
+  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy pandas matplotlib lxml demjson 
   
 before_script:
   - python setup.py install

@@ -9,7 +9,7 @@ TuShare是实现对股票/期货等金融数据从**数据采集**、**清洗加
 
 Dependencies
 =========
-python 2.7 | lxml | demjson
+python 2.7 | lxml | demjson 
 
 [pandas](http://pandas.pydata.org/ "pandas")
 
