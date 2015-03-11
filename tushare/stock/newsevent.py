@@ -11,7 +11,7 @@ Created on 2015/02/07
 import urllib2
 from tushare.stock import cons as ct
 from tushare.stock import news_vars as nv
-import demjson
+from tushare.util import demjson
 import pandas as pd
 from datetime import datetime
 import lxml.html
