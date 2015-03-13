@@ -6,15 +6,20 @@ Created on 2014/07/31
 @group : waditu
 @contact: jimmysoa@sina.cn
 """
+from __future__ import division
+
 import time
 import json
 import urllib2
+import lxml.html
+from lxml import etree
 import pandas as pd
 from tushare.stock import cons as ct
 from pandas.io.common import urlopen
 from pandas.util.testing import _network_error_classes
 import re
 from StringIO import StringIO
+from tushare.util import dateutil as du
 
 def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
                    pause=0.001):
@@ -220,6 +225,83 @@ def get_realtime_quotes(symbols=None):
         df[txt] = df[txt].map(lambda x:x[:-2])
     return df
 
+def get_h_data(code, start=None, end=None, autype='qfq',
+               retry_count=3, pause=0.001):
+    start = du.today_last_year() if start is None else start
+    end = du.today() if end is None else end
+    qs = du.get_quarts(start, end)
+    qt = qs[0]
+    data = _parse_fq_data(ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                              code, qt[0], qt[1]), retry_count, pause)
+    format = lambda x: '%.2f' % x
+    if len(qs)>1:
+        for d in range(1,len(qs)):
+            qt = qs[d]
+            url = ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                  code, qt[0], qt[1])
+            df = _parse_fq_data(url, retry_count, pause)
+            print df
+            data = data.append(df, ignore_index=True)
+    if start is not None:
+        data = data[data.date>=start]
+    if end is not None:
+        data = data[data.date<=end]
+    if autype == 'hfq':
+        data = data.drop('factor',axis=1)
+        for label in ['open', 'high', 'close', 'low']:
+            data[label] = data[label].map(format)
+        return data
+    else:
+        for label in ['open', 'high', 'close', 'low']:
+            data[label] = data[label]/data['factor']
+        data = data.drop('factor',axis=1)
+        
+        df = _parase_fq_factor(code, start, end)
+        df = df[df.date>=start]
+        df = df[df.date<=end]
+        df = data.merge(df)
+        frow = df.ix[0]
+        rate = float(frow['close'])/float(frow['factor'])
+        df['close_temp'] = df['close']
+        df['close'] = rate * df['factor']
+        for label in ['open', 'high', 'low']:
+            df[label] = df[label] * (df['close']/df['close_temp'])
+            df[label] = df[label].map(format)
+        df = df.drop(['factor','close_temp'],axis=1)
+        df['close'] = df['close'].map(format)
+        return df
+
+def _parase_fq_factor(code, start, end):
+    from tushare.util import demjson
+    symbol = code_to_symbol(code)
+    url = ct.HIST_FQ_FACTOR_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],symbol)
+    request = urllib2.Request(url)
+    text = urllib2.urlopen(request,timeout=10).read()
+    text = text[1:len(text)-1]
+    text = demjson.decode(text)
+    df = pd.DataFrame({'date':text['data'].keys(), 'factor':text['data'].values()})
+    df['date'] = df['date'].map(lambda x:x[1:].replace('_', '-'))
+    df = df.sort('date',ascending=False)
+    df['factor'] = df['factor'].astype(float)
+    return df
+
+def _parse_fq_data(url, retry_count, pause):
+    for _ in range(retry_count):
+        time.sleep(pause)
+        try:
+            html = lxml.html.parse(url)  
+            res = html.xpath('//table[@id=\"FundHoldSharesTable\"]')
+            sarr = [etree.tostring(node) for node in res]
+            sarr = ''.join(sarr)
+            df = pd.read_html(sarr,skiprows=[0,1])[0]
+            df.columns = ct.HIST_FQ_COLS
+        except _network_error_classes:
+            pass
+        else:
+            return df
+    raise IOError("获取失败，请检查网络和URL:%s" % url)
+
+
 def random(n=13):
     from random import randint
     start = 10**(n-1)
@@ -237,3 +319,6 @@ def code_to_symbol(code):
             return ''
         else:
             return 'sh'+code if code[:1]=='6' else 'sz'+code
+        
+if __name__ == '__main__':
+    print get_h_data('300013',start='2014-06-01',end='2014-06-21',autype='hfq')

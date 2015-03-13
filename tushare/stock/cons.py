@@ -61,10 +61,12 @@ GROWTH_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/grow/%s?s_i=&s_a=&s_c=&reportda
 DEBTPAYING_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/debtpaying/%s?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=%s'
 CASHFLOW_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/cashflow/%s?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=%s'
 ALL_STOCK_BASICS_FILE = '%s/tushare/data/all.csv'
-
 SINA_CONCEPTS_INDEX_URL = '%smoney.%s/q/view/%s?param=class'
 SINA_INDUSTRY_INDEX_URL = '%s%s/q/view/%s'
 SINA_DATA_DETAIL_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?page=1&num=400&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
-
 INDEX_C_COMM = 'sseportal/ps/zhs/hqjt/csi'
 HS300_CLASSIFY_URL = '%s%s/%s/%s'
+HIST_FQ_URL = '%s%s/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml?year=%s&jidu=%s'
+HIST_FQ_FACTOR_URL = '%s%s/api/json.php/BasicStockSrv.getStockFuQuanData?symbol=%s&type=qfq'
+HIST_FQ_COLS = ['date', 'open', 'high', 'close', 'low', 'volumn', 'amount', 'factor']
+HIST_FQ_FACTOR_COLS = ['code','value']
