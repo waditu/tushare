@@ -71,3 +71,4 @@ HIST_FQ_URL = '%s%s/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml?year=%s
 HIST_FQ_FACTOR_URL = '%s%s/api/json.php/BasicStockSrv.getStockFuQuanData?symbol=%s&type=qfq'
 HIST_FQ_COLS = ['date', 'open', 'high', 'close', 'low', 'volumn', 'amount', 'factor']
 HIST_FQ_FACTOR_COLS = ['code','value']
+FQ_PRINTING = 'crawling the data of %sQ%s ...'

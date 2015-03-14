@@ -21,6 +21,7 @@ import re
 from StringIO import StringIO
 from tushare.util import dateutil as du
 
+
 def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
                    pause=0.001):
     """
@@ -33,8 +34,10 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
                   开始日期 format：YYYY-MM-DD 为空时取到API所提供的最早日期数据
       end:string
                   结束日期 format：YYYY-MM-DD 为空时取到最近一个交易日数据
+      ktype：string
+                  数据类型，D=日k线 W=周 M=月 5=5分钟 15=15分钟 30=30分钟 60=60分钟，默认为D
       retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 Number of times to retry query request.
+                 如遇网络等问题重复执行的次数 
       pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
     return
@@ -45,9 +48,11 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
     symbol = code_to_symbol(code)
     url = ''
     if ktype.upper() in ct.K_LABELS:
-        url = ct.DAY_PRICE_URL%(ct.P_TYPE['http'],ct.DOMAINS['ifeng'],ct.K_TYPE[ktype.upper()],symbol)
+        url = ct.DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['ifeng'],
+                                ct.K_TYPE[ktype.upper()], symbol)
     elif ktype in ct.K_MIN_LABELS:
-        url = ct.DAY_PRICE_MIN_URL%(ct.P_TYPE['http'],ct.DOMAINS['ifeng'],symbol,ktype)
+        url = ct.DAY_PRICE_MIN_URL%(ct.P_TYPE['http'], ct.DOMAINS['ifeng'],
+                                    symbol,ktype)
     else:
         raise TypeError('ktype input error.')
     
@@ -65,7 +70,7 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
                 cols = ct.INX_DAY_PRICE_COLUMNS
             else:
                 cols = ct.DAY_PRICE_COLUMNS
-            df = pd.DataFrame(js['record'],columns=cols)
+            df = pd.DataFrame(js['record'], columns=cols)
             if ktype.upper() in ['D','W','M']:
                 df = df.applymap(lambda x: x.replace(u',', u''))
 #             df = df.set_index(['date']) 
@@ -80,6 +85,7 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
             return df
     raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
 
+
 def _parsing_dayprice_json(pageNum=1):
     """
            处理当日行情分页数据，格式为json
@@ -91,9 +97,10 @@ def _parsing_dayprice_json(pageNum=1):
         DataFrame 当日所有股票交易数据(DataFrame)
     """
     print 'getting page %s ...'%pageNum
-    url = ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],ct.PAGES['jv'],pageNum)
+    url = ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                 ct.PAGES['jv'], pageNum)
     request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
+    text = urllib2.urlopen(request, timeout=10).read()
     if text == 'null':
         return None
     reg = re.compile(r'\,(.*?)\:') 
@@ -101,14 +108,15 @@ def _parsing_dayprice_json(pageNum=1):
     text = reg.sub(r',"\1":', text) 
     text = text.replace('"{symbol','{"symbol')
     text = text.replace('{symbol','{"symbol"')
-    jstr = json.dumps(text,encoding='GBK')
+    jstr = json.dumps(text, encoding='GBK')
     js = json.loads(jstr)
-    df = pd.DataFrame(pd.read_json(js,dtype={'code':object}),columns=ct.DAY_TRADING_COLUMNS)
+    df = pd.DataFrame(pd.read_json(js, dtype={'code':object}), columns=ct.DAY_TRADING_COLUMNS)
     #删除原始数据的symbol属性
-    df = df.drop('symbol',axis=1)
+    df = df.drop('symbol', axis=1)
     #删除停牌的股票
     df = df.ix[df.volume>0]
     return df
+
 
 def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
     """
@@ -120,7 +128,7 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
         date:string
                   日期 format：YYYY-MM-DD
         retry_count : int, 默认 3
-                  如遇网络等问题重复执行的次数 Number of times to retry query request.
+                  如遇网络等问题重复执行的次数
         pause : int, 默认 0
                  重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
      return
@@ -137,14 +145,16 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
         time.sleep(pause)
         try:
             re = urllib2.Request(url)
-            lines = urllib2.urlopen(re,timeout=10).read()
+            lines = urllib2.urlopen(re, timeout=10).read()
             lines = lines.decode('GBK')      
         except _network_error_classes:
             pass
         else:
-            df = pd.read_table(StringIO(lines),names=ct.TICK_COLUMNS,skiprows=[0]) 
+            df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
+                               skiprows=[0]) 
             return df
     raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
+    
     
 def get_today_all():
     """
@@ -158,8 +168,9 @@ def get_today_all():
     if df is not None:
         for i in range(2,ct.PAGE_NUM[0]):
             newdf = _parsing_dayprice_json(i)
-            df = df.append(newdf,ignore_index=True)
+            df = df.append(newdf, ignore_index=True)
     return df
+
 
 def get_realtime_quotes(symbols=None):
     """
@@ -205,8 +216,9 @@ def get_realtime_quotes(symbols=None):
     else:
         symbols_list = code_to_symbol(symbols)
         
-    symbols_list = symbols_list[:-1] if len(symbols_list)>8 else symbols_list 
-    request = urllib2.Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'],ct.DOMAINS['sinahq'],random(),symbols_list))
+    symbols_list = symbols_list[:-1] if len(symbols_list) > 8 else symbols_list 
+    request = urllib2.Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['sinahq'],
+                                                random(), symbols_list))
     text = urllib2.urlopen(request,timeout=10).read()
     text = text.decode('GBK')
     reg = re.compile(r'\="(.*?)\";')
@@ -217,49 +229,84 @@ def get_realtime_quotes(symbols=None):
     for row in data:
         if len(row)>1:
             data_list.append([astr for astr in row.split(',')])
-    df = pd.DataFrame(data_list,columns=ct.LIVE_DATA_COLS)
-    df = df.drop('s',axis=1)
+    df = pd.DataFrame(data_list, columns=ct.LIVE_DATA_COLS)
+    df = df.drop('s', axis=1)
     df['code'] = syms
     ls = [cls for cls in df.columns if '_v' in cls]
     for txt in ls:
-        df[txt] = df[txt].map(lambda x:x[:-2])
+        df[txt] = df[txt].map(lambda x : x[:-2])
     return df
+
 
 def get_h_data(code, start=None, end=None, autype='qfq',
                retry_count=3, pause=0.001):
+    '''
+    获取历史复权数据
+    Parameters
+    ------
+      code:string
+                  股票代码 e.g. 600848
+      start:string
+                  开始日期 format：YYYY-MM-DD 为空时取当前日期
+      end:string
+                  结束日期 format：YYYY-MM-DD 为空时取去年今日
+      autype:string
+                  复权类型，qfq-前复权 hfq-后复权 no-不复权，默认为qfq
+      retry_count : int, 默认 3
+                 如遇网络等问题重复执行的次数 
+      pause : int, 默认 0
+                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    return
+    -------
+      DataFrame
+          date 交易日期 (index)
+          open 开盘价
+          high  最高价
+          close 收盘价
+          low 最低价
+          volumn 成交量
+          amount 成交金额
+    '''
+    
     start = du.today_last_year() if start is None else start
     end = du.today() if end is None else end
     qs = du.get_quarts(start, end)
     qt = qs[0]
+    print ct.FQ_PRINTING%(qt[0], qt[1])
     data = _parse_fq_data(ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                               code, qt[0], qt[1]), retry_count, pause)
     if len(qs)>1:
-        for d in range(1,len(qs)):
+        for d in range(1, len(qs)):
             qt = qs[d]
+            print ct.FQ_PRINTING%(qt[0], qt[1])
             url = ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                   code, qt[0], qt[1])
             df = _parse_fq_data(url, retry_count, pause)
-            print df
             data = data.append(df, ignore_index=True)
+    data = data.drop_duplicates('date')
     if start is not None:
         data = data[data.date>=start]
     if end is not None:
         data = data[data.date<=end]
     if autype == 'hfq':
-        data = data.drop('factor',axis=1)
+        data = data.drop('factor', axis=1)
         for label in ['open', 'high', 'close', 'low']:
             data[label] = data[label].map(ct.FORMAT)
+        data = data.set_index('date')
+        data = data.sort_index(ascending=False)
         return data
     else:
         for label in ['open', 'high', 'close', 'low']:
-                data[label] = data[label] / data['factor']
+            data[label] = data[label] / data['factor']
         data = data.drop('factor', axis=1)
         if autype == 'qfq':
             df = _parase_fq_factor(code, start, end)
+            df = df.drop_duplicates('date')
             df = df[df.date>=start]
             df = df[df.date<=end]
             df = data.merge(df)
-            frow = df.ix[0]
+            df = df.sort('date', ascending=False)
+            frow = df.head(1)
             rate = float(frow['close']) / float(frow['factor'])
             df['close_temp'] = df['close']
             df['close'] = rate * df['factor']
@@ -269,11 +316,15 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             df = df.drop(['factor', 'close_temp'], axis=1)
             df['close'] = df['close'].map(ct.FORMAT)
             df = df.set_index('date')
+            df = df.sort_index(ascending=False)
             return df
         else:
             for label in ['open', 'high', 'close', 'low']:
                 data[label] = data[label].map(ct.FORMAT)
+            data = data.set_index('date')
+            data = data.sort_index(ascending=False)
             return data
+
 
 def _parase_fq_factor(code, start, end):
     from tushare.util import demjson
@@ -285,9 +336,10 @@ def _parase_fq_factor(code, start, end):
     text = demjson.decode(text)
     df = pd.DataFrame({'date':text['data'].keys(), 'factor':text['data'].values()})
     df['date'] = df['date'].map(lambda x:x[1:].replace('_', '-'))
-    df = df.sort('date',ascending=False)
+    df = df.drop_duplicates('date')
     df['factor'] = df['factor'].astype(float)
     return df
+
 
 def _parse_fq_data(url, retry_count, pause):
     for _ in range(retry_count):
@@ -297,11 +349,12 @@ def _parse_fq_data(url, retry_count, pause):
             res = html.xpath('//table[@id=\"FundHoldSharesTable\"]')
             sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
-            df = pd.read_html(sarr,skiprows=[0,1])[0]
+            df = pd.read_html(sarr, skiprows=[0, 1])[0]
             df.columns = ct.HIST_FQ_COLS
         except _network_error_classes:
             pass
         else:
+            df = df.drop_duplicates('date')
             return df
     raise IOError("获取失败，请检查网络和URL:%s" % url)
 
@@ -322,7 +375,5 @@ def code_to_symbol(code):
         if len(code) != 6 :
             return ''
         else:
-            return 'sh'+code if code[:1]=='6' else 'sz'+code
-        
-if __name__ == '__main__':
-    print get_h_data('300013',start='2014-06-01',end='2014-06-21',autype='bfq')
+            return 'sh%s'%code if code[:1] == '6' else 'sz%s'%code
+
