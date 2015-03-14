@@ -233,7 +233,6 @@ def get_h_data(code, start=None, end=None, autype='qfq',
     qt = qs[0]
     data = _parse_fq_data(ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                               code, qt[0], qt[1]), retry_count, pause)
-    format = lambda x: '%.2f' % x
     if len(qs)>1:
         for d in range(1,len(qs)):
             qt = qs[d]
@@ -249,27 +248,32 @@ def get_h_data(code, start=None, end=None, autype='qfq',
     if autype == 'hfq':
         data = data.drop('factor',axis=1)
         for label in ['open', 'high', 'close', 'low']:
-            data[label] = data[label].map(format)
+            data[label] = data[label].map(ct.FORMAT)
         return data
     else:
         for label in ['open', 'high', 'close', 'low']:
-            data[label] = data[label]/data['factor']
-        data = data.drop('factor',axis=1)
-        
-        df = _parase_fq_factor(code, start, end)
-        df = df[df.date>=start]
-        df = df[df.date<=end]
-        df = data.merge(df)
-        frow = df.ix[0]
-        rate = float(frow['close'])/float(frow['factor'])
-        df['close_temp'] = df['close']
-        df['close'] = rate * df['factor']
-        for label in ['open', 'high', 'low']:
-            df[label] = df[label] * (df['close']/df['close_temp'])
-            df[label] = df[label].map(format)
-        df = df.drop(['factor','close_temp'],axis=1)
-        df['close'] = df['close'].map(format)
-        return df
+                data[label] = data[label] / data['factor']
+        data = data.drop('factor', axis=1)
+        if autype == 'qfq':
+            df = _parase_fq_factor(code, start, end)
+            df = df[df.date>=start]
+            df = df[df.date<=end]
+            df = data.merge(df)
+            frow = df.ix[0]
+            rate = float(frow['close']) / float(frow['factor'])
+            df['close_temp'] = df['close']
+            df['close'] = rate * df['factor']
+            for label in ['open', 'high', 'low']:
+                df[label] = df[label] * (df['close'] / df['close_temp'])
+                df[label] = df[label].map(ct.FORMAT)
+            df = df.drop(['factor', 'close_temp'], axis=1)
+            df['close'] = df['close'].map(ct.FORMAT)
+            df = df.set_index('date')
+            return df
+        else:
+            for label in ['open', 'high', 'close', 'low']:
+                data[label] = data[label].map(ct.FORMAT)
+            return data
 
 def _parase_fq_factor(code, start, end):
     from tushare.util import demjson
@@ -321,4 +325,4 @@ def code_to_symbol(code):
             return 'sh'+code if code[:1]=='6' else 'sz'+code
         
 if __name__ == '__main__':
-    print get_h_data('300013',start='2014-06-01',end='2014-06-21',autype='hfq')
+    print get_h_data('300013',start='2014-06-01',end='2014-06-21',autype='bfq')
