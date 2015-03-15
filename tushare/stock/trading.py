@@ -22,8 +22,9 @@ from StringIO import StringIO
 from tushare.util import dateutil as du
 
 
-def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
-                   pause=0.001):
+def get_hist_data(code=None, start=None, end=None,
+                  ktype='D', retry_count=3,
+                  pause=0.001):
     """
         获取个股历史交易记录
     Parameters
@@ -52,7 +53,7 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
                                 ct.K_TYPE[ktype.upper()], symbol)
     elif ktype in ct.K_MIN_LABELS:
         url = ct.DAY_PRICE_MIN_URL%(ct.P_TYPE['http'], ct.DOMAINS['ifeng'],
-                                    symbol,ktype)
+                                    symbol, ktype)
     else:
         raise TypeError('ktype input error.')
     
@@ -73,15 +74,14 @@ def get_hist_data(code=None, start=None, end=None,ktype='D', retry_count=3,
             df = pd.DataFrame(js['record'], columns=cols)
             if ktype.upper() in ['D','W','M']:
                 df = df.applymap(lambda x: x.replace(u',', u''))
-#             df = df.set_index(['date']) 
             for col in cols[1:]:
                 df[col] = df[col].astype(float)
             if start is not None:
-                df = df[df.date>=start]
+                df = df[df.date >= start]
             if end is not None:
-                df = df[df.date<=end]
+                df = df[df.date <= end]
             if (code in ct.INDEX_LABELS) & (ktype in ct.K_MIN_LABELS):
-                df = df.drop('turnover',axis=1)
+                df = df.drop('turnover', axis=1)
             return df
     raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
 
@@ -106,15 +106,16 @@ def _parsing_dayprice_json(pageNum=1):
     reg = re.compile(r'\,(.*?)\:') 
     #修改成read_json能读入的json格式
     text = reg.sub(r',"\1":', text) 
-    text = text.replace('"{symbol','{"symbol')
-    text = text.replace('{symbol','{"symbol"')
+    text = text.replace('"{symbol', '{"symbol')
+    text = text.replace('{symbol', '{"symbol"')
     jstr = json.dumps(text, encoding='GBK')
     js = json.loads(jstr)
-    df = pd.DataFrame(pd.read_json(js, dtype={'code':object}), columns=ct.DAY_TRADING_COLUMNS)
+    df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),
+                      columns=ct.DAY_TRADING_COLUMNS)
     #删除原始数据的symbol属性
     df = df.drop('symbol', axis=1)
     #删除停牌的股票
-    df = df.ix[df.volume>0]
+    df = df.ix[df.volume > 0]
     return df
 
 
@@ -212,7 +213,7 @@ def get_realtime_quotes(symbols=None):
     symbols_list = ''
     if type(symbols) is list or type(symbols) is set or type(symbols) is tuple or type(symbols) is pd.Series:
         for code in symbols:
-            symbols_list += code_to_symbol(code) +','
+            symbols_list += code_to_symbol(code) + ','
     else:
         symbols_list = code_to_symbol(symbols)
         
@@ -329,9 +330,9 @@ def get_h_data(code, start=None, end=None, autype='qfq',
 def _parase_fq_factor(code, start, end):
     from tushare.util import demjson
     symbol = code_to_symbol(code)
-    url = ct.HIST_FQ_FACTOR_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],symbol)
+    url = ct.HIST_FQ_FACTOR_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], symbol)
     request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
+    text = urllib2.urlopen(request, timeout=10).read()
     text = text[1:len(text)-1]
     text = demjson.decode(text)
     df = pd.DataFrame({'date':text['data'].keys(), 'factor':text['data'].values()})
@@ -365,6 +366,7 @@ def random(n=13):
     end = (10**n)-1
     return str(randint(start, end))
 
+
 def code_to_symbol(code):
     """
         生成symbol代码标志
@@ -377,3 +379,6 @@ def code_to_symbol(code):
         else:
             return 'sh%s'%code if code[:1] == '6' else 'sz%s'%code
 
+
+if __name__ == '__main__':
+    print get_h_data('600848')
