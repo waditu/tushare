@@ -13,6 +13,11 @@
 
 3、修改get\_hist_data()接口
 
-- 取消了date作为index列
 - 修改数值型数据的dtype为float
+
+4、新增历史复权数据接口get\_h_data
+
+- 前复权（默认）
+- 后复权
+- 不复权
 

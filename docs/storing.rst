@@ -16,7 +16,7 @@
 -  存入MySQL等关系型数据库
 -  存入NoSQL数据库
 
-csv文件
+CSV文件
 -------
 
 pandas的DataFrame和Series对象提供了直接保存csv文件格式的方法，通过参数设定，轻松将数据内容保存在本地磁盘。

@@ -208,5 +208,3 @@ def get_sz50s():
     except Exception as er:
         print str(er)      
         
-if __name__ == '__main__':
-    print get_sz50s()

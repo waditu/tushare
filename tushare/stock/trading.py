@@ -82,6 +82,7 @@ def get_hist_data(code=None, start=None, end=None,
                 df = df[df.date <= end]
             if (code in ct.INDEX_LABELS) & (ktype in ct.K_MIN_LABELS):
                 df = df.drop('turnover', axis=1)
+            df = df.set_index('date')
             return df
     raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
 
@@ -252,7 +253,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
       end:string
                   结束日期 format：YYYY-MM-DD 为空时取去年今日
       autype:string
-                  复权类型，qfq-前复权 hfq-后复权 no-不复权，默认为qfq
+                  复权类型，qfq-前复权 hfq-后复权 None-不复权，默认为qfq
       retry_count : int, 默认 3
                  如遇网络等问题重复执行的次数 
       pause : int, 默认 0
@@ -378,7 +379,3 @@ def code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] == '6' else 'sz%s'%code
-
-
-if __name__ == '__main__':
-    print get_h_data('600848')

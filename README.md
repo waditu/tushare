@@ -63,8 +63,8 @@ Quick Start
 
 设定历史数据的时间：      
 	
-	In [5]: ts.get_hist_data('600848',start='2015-01-05',end='2015-01-09')
-	Out[5]:
+	ts.get_hist_data('600848',start='2015-01-05',end='2015-01-09')
+
 				open    high   close     low    volume   p_change     ma5    ma10 \  
 	date                                                                            
 	2015-01-05  11.160  11.390  11.260  10.890  46383.57     1.26  11.156  11.212   
@@ -81,9 +81,17 @@ Quick Start
 	2015-01-09  11.682  58792.43  60665.93  107924.27     1.54  
 
 
+**复权历史数据**
+获取历史复权数据，分为前复权和后复权数据，接口提供股票上市以来所有历史数据，默认为前复权。如果不设定开始和结束日期，则返回近一年的复权数据，从性能上考虑，推荐设定开始日期和结束日期，而且最好不要超过一年以上，获取到数据后，请及时在本地存储。
+
+	ts.get_h_data('002337') #前复权
+	ts.get_h_data('002337',autype='hfq') #后复权
+	ts.get_h_data('002337',autype=None) #不复权
+	ts.get_h_data('002337',start='2015-01-01',end='2015-03-16') #两个日期之间的前复权数据
+
+
 **Example 2.** 一次性获取最近一个日交易日所有股票的交易数据（结果显示速度取决于网速）
 	
-	import tushare as ts
 
 	ts.get_today_all()
 
@@ -119,9 +127,10 @@ Quick Start
 
 **Example 3.** 获取历史分笔数据
 
-    In [1]: import tushare as ts
-	In [2]: df = ts.get_tick_data('600848',date='2014-01-09')
-	In [3]: df.head(10)
+    import tushare as ts
+
+	df = ts.get_tick_data('600848',date='2014-01-09')
+	df.head(10)
 
 结果显示：
 >成交时间、成交价格、价格变动，成交手、成交金额(元)，买卖类型
@@ -142,24 +151,20 @@ Quick Start
 
 **Example 4.** 获取实时交易数据(Realtime Quotes Data)
 
-    In [1]:import tushare as ts
-	In [2]:ts.get_realtime_quotes('000581') #Single stock symbol
+    df = ts.get_realtime_quotes('000581') #Single stock symbol
+	df[['code','name','price','bid','ask','volume','amount','time']]
 
 结果显示：
 >名称、开盘价、昨价、现价、最高、最低、买入价、卖出价、成交量、成交金额...more in docs
 
-	Out[2]:
-	  name      open pre_close  price   high    low    bid    ask    volume  \  
-	0 威孚高科  31.50     31.38  30.25  31.63  30.08  30.25  30.27  10148935 
-	  amount      ...        a2_p a3_v   a3_p a4_v   a4_p a5_v   a5_p  \
-	0 314310351.22      ...       30.29    2  30.30  234  30.31   19  30.32 \
-	  date      	time     code  
-	0  2015-01-14  14:30:46  000581  
+
+	   code    name     price  bid    ask    volume   amount        time
+	0  000581  威孚高科  31.15  31.14  31.15  8183020  253494991.16  11:30:36 
 	  
 请求多个股票方法（一次最好不要超过30个）：
     
-	In [3]:ts.get_realtime_quotes(['600848','000980','000981']) #symbols from a list
-	In [4]:ts.get_realtime_quotes(df['code'].tail(10)) #from a Series
+	ts.get_realtime_quotes(['600848','000980','000981']) #symbols from a list
+	ts.get_realtime_quotes(df['code'].tail(10)) #from a Series
 
 
 更多文档
@@ -168,6 +173,15 @@ Quick Start
  
 Change Logs
 ------
+
+0.2.0 2015/03/17
+=======
+
+ - 新增历史复权数据接口
+ - 新增即时滚动新闻、信息地雷数据
+ - 新增沪深300指数成股份及动态权重、
+ - 新增上证50指数成份股
+ - 修改历史行情数据类型为float
 
 0.1.9 2015/02/06
 ========
@@ -182,18 +196,18 @@ Change Logs
 0.1.5 2015/01/26
 =====
 
-- 增加了基本面数据的获取
+- 增加基本面数据接口
 - 发布一版使用手册，开通[TuShare docs](http://tushare.waditu.com)网站
 
 0.1.3 2015/01/13
 ===
-- 增加了实时交易数据的获取
+- 增加实时交易数据的获取
 - Done for crawling Realtime Quotes data
 
 0.1.1 2015/01/11
 ===
 
-- 增加了tick数据的获取
+- 增加tick数据的获取
 
 0.1.0 2014/12/01
 ===
