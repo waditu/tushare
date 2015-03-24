@@ -7,7 +7,7 @@ from tushare.stock.trading import (get_hist_data, get_tick_data,
                                    get_h_data)
 
 from tushare.stock.fundamental import (get_stock_basics, get_report_data,
-                                       get_forecast_data, get_profit_data,
+                                       get_profit_data,
                                        get_operation_data, get_growth_data,
                                        get_debtpaying_data, get_cashflow_data)
 
@@ -26,4 +26,5 @@ from tushare.stock.classifying import (get_industry_classified, get_concept_clas
 from tushare.stock.newsevent import (get_latest_news, latest_content,
                                      get_notices, notice_content)
 
-from tushare.stock.reference import (get_divis)
+from tushare.stock.reference import (profit_data, forecast_data,
+                                     xsg_data, fund_holdings)

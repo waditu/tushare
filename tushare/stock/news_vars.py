@@ -5,3 +5,4 @@ LATEST_COLS = ['classify','title','time','url']
 LATEST_COLS_C = ['classify','title','time','url','content']
 NOTICE_INFO_URL = '%s%s/corp/view/%s?stock_str=%s'
 NOTICE_INFO_CLS = ['title', 'type', 'date', 'url']
+GUBA_SINA_URL = '%sguba.%s'

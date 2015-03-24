@@ -309,7 +309,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             df = data.merge(df)
             df = df.sort('date', ascending=False)
             frow = df.head(1)
-            rate = float(frow['close']) / float(frow['factor'])
+            rate = float(frow['close'].values[0]) / float(frow['factor'].values[0])
             df['close_temp'] = df['close']
             df['close'] = rate * df['factor']
             for label in ['open', 'high', 'low']:

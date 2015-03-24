@@ -105,57 +105,6 @@ def _get_report_data(year, quarter, pageNo, dataArr):
     except:
         pass
 
-def get_forecast_data(year,quarter):
-    """
-        获取业绩预告数据
-    Parameters
-    --------
-    year:int 年度 e.g:2014
-    quarter:int 季度 :1、2、3、4，只能输入这4个季度
-       说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
-       
-    Return
-    --------
-    DataFrame
-        code,代码
-        name,名称
-        type,业绩变动类型【预增、预亏等】
-        report_date,发布日期
-        pre_eps,上年同期每股收益
-        range,业绩变动范围
-        
-    """
-    if _check_input(year,quarter) is True:
-        data =  _get_forecast_data(year,quarter,1,[])
-        df = pd.DataFrame(data,columns=ct.FORECAST_COLS)
-        return df
-
-
-def _get_forecast_data(year, quarter, pageNo, dataArr):
-    url = ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
-                           quarter, pageNo, ct.PAGE_NUM[1])
-    print 'getting page %s ...'%pageNo
-    try:
-        html = lxml.html.parse(url)
-        xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
-        for trs in xtrs:
-            code = trs.xpath('td[1]//span/a/text()')[0]
-            name = trs.xpath('td[2]/span/a/text()')[0]
-            type = trs.xpath('td[3]/a/text()')
-            type = type[0] if len(type)>0 else trs.xpath('td[3]/text()')[0]
-            report_date = trs.xpath('td[4]/text()')[0] 
-            pre_eps = trs.xpath('td[7]/text()')[0] 
-            pre_eps = '0' if pre_eps == '--' else pre_eps
-            range = trs.xpath('td[8]/text()')[0] 
-            dataArr.append([code,name,type,report_date,pre_eps,range])
-        nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
-        if len(nextPage)>0:
-            pageNo = re.findall(r'\d+',nextPage[0])[0]
-            return _get_forecast_data(year,quarter,pageNo,dataArr)
-        else:
-            return dataArr
-    except:
-        pass
 
 def get_profit_data(year,quarter):
     """

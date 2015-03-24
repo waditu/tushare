@@ -26,6 +26,13 @@ def today():
     day = datetime.datetime.today().date()
     return str(day) 
 
+def get_year():
+    year = datetime.datetime.today().year
+    return year
+
+def get_month():
+    month = datetime.datetime.today().month
+    return month
 
 def today_last_year():
     lasty = datetime.datetime.today().date() + datetime.timedelta(-365)

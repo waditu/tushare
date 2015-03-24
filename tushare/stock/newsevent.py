@@ -134,6 +134,21 @@ def notice_content(url):
         return res.strip()
     except Exception as er:
         print str(er)  
+
+
+def get_guba_sina(show_content=False):
+    try:
+        html = lxml.html.parse(nv.GUBA_SINA_URL%(ct.P_TYPE['http'], ct.DOMAINS['sina']))
+        res = html.xpath('//div[@id=\"artibody\"]/p')
+        sarr = [etree.tostring(node) for node in res]
+        sarr = ''.join(sarr).replace('&#12288;', '')#.replace('\n\n', '\n').
+        html_content = lxml.html.fromstring(sarr)
+        content = html_content.text_content()
+        return content
+    except Exception as er:
+        print str(er)  
+    
+    pass
         
 
 def _random(n=16):
