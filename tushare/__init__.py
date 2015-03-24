@@ -1,4 +1,4 @@
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 __author__ = 'Jimmy Liu'
 
 
@@ -25,3 +25,5 @@ from tushare.stock.classifying import (get_industry_classified, get_concept_clas
 
 from tushare.stock.newsevent import (get_latest_news, latest_content,
                                      get_notices, notice_content)
+
+from tushare.stock.reference import (get_divis)
