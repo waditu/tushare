@@ -12,3 +12,8 @@ REP:自行解决
 ------------
 ASK:曹欣田: 调用get_hist_data方法后存入MySQL报错，date(index)列无法入库
 REP:暂时通过增加df['date'] = df.index来解决，并在to_sql设置参数index=False，下一个版本取消index项
+
+2015-3-23
+--------------
+chendonghui1987:取前复权数据报错，TypeError: cannot convert the series to <type 'float'>
+已修正代码from v0.2.1
