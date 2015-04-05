@@ -70,6 +70,7 @@ def get_report_data(year,quarter):
     if _check_input(year,quarter) is True:
         data =  _get_report_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.REPORT_COLS)
+        df = df.drop_duplicates('code')
         return df
 
 
@@ -131,6 +132,7 @@ def get_profit_data(year,quarter):
     if _check_input(year,quarter) is True:
         data =  _get_profit_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.PROFIT_COLS)
+        df = df.drop_duplicates('code')
         return df
 
 
@@ -192,6 +194,7 @@ def get_operation_data(year,quarter):
     if _check_input(year,quarter) is True:
         data =  _get_operation_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.OPERATION_COLS)
+        df = df.drop_duplicates('code')
         return df
 
 
@@ -251,6 +254,7 @@ def get_growth_data(year,quarter):
     if _check_input(year,quarter) is True:
         data =  _get_growth_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.GROWTH_COLS)
+        df = df.drop_duplicates('code')
         return df
 
 
@@ -310,6 +314,7 @@ def get_debtpaying_data(year,quarter):
     if _check_input(year,quarter) is True:
         data =  _get_debtpaying_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.DEBTPAYING_COLS)
+        df = df.drop_duplicates('code')
         return df
 
 
@@ -368,6 +373,7 @@ def get_cashflow_data(year,quarter):
     if _check_input(year,quarter) is True:
         data =  _get_cashflow_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.CASHFLOW_COLS)
+        df = df.drop_duplicates('code')
         return df
 
 
