@@ -14,6 +14,7 @@ import urllib2
 import lxml.html
 from lxml import etree
 import pandas as pd
+import numpy as np
 from tushare.stock import cons as ct
 from pandas.io.common import urlopen
 from pandas.util.testing import _network_error_classes
@@ -306,10 +307,10 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             df = df.drop_duplicates('date')
             df = df[df.date>=start]
             df = df[df.date<=end]
-            df = data.merge(df)
+            df = pd.merge(data, df)
             df = df.sort('date', ascending=False)
             frow = df.head(1)
-            rate = float(frow['close'].values[0]) / float(frow['factor'].values[0])
+            rate = float(frow['close']) / float(frow['factor'])
             df['close_temp'] = df['close']
             df['close'] = rate * df['factor']
             for label in ['open', 'high', 'low']:
@@ -338,6 +339,8 @@ def _parase_fq_factor(code, start, end):
     text = demjson.decode(text)
     df = pd.DataFrame({'date':text['data'].keys(), 'factor':text['data'].values()})
     df['date'] = df['date'].map(lambda x:x[1:].replace('_', '-'))
+    if df['date'].dtypes == np.object:
+        df['date'] = df['date'].astype(np.datetime64)
     df = df.drop_duplicates('date')
     df['factor'] = df['factor'].astype(float)
     return df
@@ -356,6 +359,8 @@ def _parse_fq_data(url, retry_count, pause):
         except _network_error_classes:
             pass
         else:
+            if df['date'].dtypes == np.object:
+                df['date'] = df['date'].astype(np.datetime64)
             df = df.drop_duplicates('date')
             return df
     raise IOError("获取失败，请检查网络和URL:%s" % url)

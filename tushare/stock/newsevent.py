@@ -136,15 +136,18 @@ def notice_content(url):
         print str(er)  
 
 
-def get_guba_sina(show_content=False):
+def guba_sina(show_content=False):
+    from pandas.io.common import urlopen
     try:
         html = lxml.html.parse(nv.GUBA_SINA_URL%(ct.P_TYPE['http'], ct.DOMAINS['sina']))
-        res = html.xpath('//div[@id=\"artibody\"]/p')
-        sarr = [etree.tostring(node) for node in res]
-        sarr = ''.join(sarr).replace('&#12288;', '')#.replace('\n\n', '\n').
-        html_content = lxml.html.fromstring(sarr)
-        content = html_content.text_content()
-        return content
+#         res = html.xpath('//div[@class=\"topNav\"]/div')
+#         print res
+#         return ''
+    
+        with urlopen(nv.GUBA_SINA_URL%(ct.P_TYPE['http'],
+                                       ct.DOMAINS['sina'])) as resp:
+            lines = resp.read()
+        print lines
     except Exception as er:
         print str(er)  
     
@@ -157,3 +160,6 @@ def _random(n=16):
     end = (10 ** n) - 1
     return str(randint(start, end))
 
+
+if __name__ == '__main__':
+    guba_sina()
