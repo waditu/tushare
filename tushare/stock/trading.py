@@ -19,7 +19,7 @@ from pandas.io.common import urlopen
 from pandas.util.testing import _network_error_classes
 import re
 from StringIO import StringIO
-from tushare.util import dateutil as du
+from tushare.util import dateu as du
 
 
 def get_hist_data(code=None, start=None, end=None,
