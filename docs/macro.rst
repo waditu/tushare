@@ -1,4 +1,8 @@
-.. _macro:
+.. contents::
+   :depth: 3.0
+..
+
+.. \_macro:
 
 .. currentmodule:: tushare
 

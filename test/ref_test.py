@@ -3,5 +3,5 @@
 from tushare.stock import reference as rf
 
 if __name__ == '__main__':
-    df = rf.get_divis(top=60)
+    df = rf.profit_data(top=60)
     print df[df.shares>=10]

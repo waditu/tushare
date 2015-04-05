@@ -1,4 +1,8 @@
-.. _preface:
+.. contents::
+   :depth: 3.0
+..
+
+.. \_preface:
 
 .. currentmodule:: tushare
 
@@ -17,7 +21,7 @@ TuShare的数据主要来源于新浪财经、凤凰财经等各大门户网站�
 QQ:52799046**
 联系我，如果有什么好的建议和意见，也请及时联系我，在此谢过。
 
-TuShare的产生完全是本人业余兴趣和学习新鲜事物的结果，以免费和开源的形式分享出来，希望对有需求的人有所帮助。如果您觉得TuShare好用，在\ `GitHub <https://github.com/waditu/tushare>`__\ 里对TuShare点一下\ **Star**\ 来就算是对她的支持，如果您也想参与其中，欢迎Fork和提交Pull
+TuShare的产生完全是本人业余兴趣和学习新鲜事物的结果，以免费和开源的形式分享出来，希望对有需求的人有所帮助。如果您觉得TuShare好用，在\ `GitHub <https://github.com/waditu/tushare>`__\ 里对TuShare点一下\ **Star**\ 来就算是对她的支持，如果您也想参与其中，欢迎Fork，并提交Pull
 Requests.
 
 .. figure:: _static/main_pic_min.png

@@ -1,4 +1,8 @@
-.. _storing:
+.. contents::
+   :depth: 3.0
+..
+
+.. \_storing:
 
 .. currentmodule:: tushare
 
