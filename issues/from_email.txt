@@ -17,3 +17,14 @@ REP:暂时通过增加df['date'] = df.index来解决，并在to_sql设置参数index=False，下一
 --------------
 chendonghui1987:取前复权数据报错，TypeError: cannot convert the series to <type 'float'>
 已修正代码from v0.2.1
+
+2015-04-05
+-------------------
+蔡国琛:
+JimmyTu，您好！
+首先感谢你提供了这么好的一个库，解决了困扰我很久的难题，
+另外想提交一个bug，就是下载公司的年报数据（函数：report = ts.get_report_data(2014, 1)）
+会出现两个问题：
+1、缺乏个别公司，如平安银行（000001）
+2、个别公司的数据有重复，如附件的刷黄
+以上，感谢指导！
