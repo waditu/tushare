@@ -9,7 +9,7 @@ Created on 2015/03/21
 
 from tushare.stock import cons as ct
 from tushare.stock import ref_vars as rv
-from tushare.util import dateutil as dt
+from tushare.util import dateu as dt
 import pandas as pd
 import time
 import lxml.html
