@@ -11,6 +11,7 @@ from tushare.stock import cons as ct
 import lxml.html
 import re
 
+
 def get_stock_basics(file_path=None):
     """
         获取沪深上市公司基本情况
@@ -39,11 +40,12 @@ def get_stock_basics(file_path=None):
                timeToMarket,上市日期
     """
     file_path = file_path if file_path else ct.ALL_STOCK_BASICS_FILE%_data_path()
-    df = pd.read_csv(file_path,dtype={'code':'object'},encoding='GBK')
+    df = pd.read_csv(file_path, type={'code':'object'}, encoding='GBK')
     df = df.set_index('code')
     return df
 
-def get_report_data(year,quarter):
+
+def get_report_data(year, quarter):
     """
         获取业绩报表数据
     Parameters
@@ -68,8 +70,8 @@ def get_report_data(year,quarter):
         report_date,发布日期
     """
     if _check_input(year,quarter) is True:
-        data =  _get_report_data(year,quarter,1,[])
-        df = pd.DataFrame(data,columns=ct.REPORT_COLS)
+        data =  _get_report_data(year, quarter, 1, [])
+        df = pd.DataFrame(data, columns=ct.REPORT_COLS)
         df = df.drop_duplicates('code')
         return df
 
@@ -96,18 +98,20 @@ def _get_report_data(year, quarter, pageNo, dataArr):
             profits_yoy = trs.xpath('td[9]/text()')[0] #净利润同比(%)
             distrib = trs.xpath('td[10]/text()')[0] #分配方案
             report_date = trs.xpath('td[11]/text()')[0] #发布日期
-            dataArr.append([code,name,eps,eps_yoy,bvps,roe,epcf,net_profits,profits_yoy,distrib,report_date])
+            dataArr.append([code, name, eps, eps_yoy, bvps, roe,
+                            epcf, net_profits, profits_yoy, distrib,
+                            report_date])
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
         if len(nextPage)>0:
-            pageNo = re.findall(r'\d+',nextPage[0])[0]
-            return _get_report_data(year,quarter,pageNo,dataArr)
+            pageNo = re.findall(r'\d+', nextPage[0])[0]
+            return _get_report_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
     except:
         pass
 
 
-def get_profit_data(year,quarter):
+def get_profit_data(year, quarter):
     """
         获取盈利能力数据
     Parameters
@@ -129,9 +133,9 @@ def get_profit_data(year,quarter):
         business_income,营业收入(百万元)
         bips,每股主营业务收入(元)
     """
-    if _check_input(year,quarter) is True:
-        data =  _get_profit_data(year,quarter,1,[])
-        df = pd.DataFrame(data,columns=ct.PROFIT_COLS)
+    if _check_input(year, quarter) is True:
+        data =  _get_profit_data(year, quarter, 1, [])
+        df = pd.DataFrame(data, columns=ct.PROFIT_COLS)
         df = df.drop_duplicates('code')
         return df
 
@@ -160,17 +164,19 @@ def _get_profit_data(year, quarter, pageNo, dataArr):
             business_income = '0' if business_income == '--' else business_income
             bips = trs.xpath('td[9]/text()')[0] 
             bips = '0' if bips == '--' else bips
-            dataArr.append([code,name,roe,net_profit_ratio,gross_profit_rate,net_profits,eps,business_income,bips])
+            dataArr.append([code, name, roe, net_profit_ratio, gross_profit_rate,
+                            net_profits, eps, business_income, bips])
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
         if len(nextPage)>0:
-            pageNo = re.findall(r'\d+',nextPage[0])[0]
-            return _get_profit_data(year,quarter,pageNo,dataArr)
+            pageNo = re.findall(r'\d+', nextPage[0])[0]
+            return _get_profit_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
     except:
         pass
 
-def get_operation_data(year,quarter):
+
+def get_operation_data(year, quarter):
     """
         获取营运能力数据
     Parameters
@@ -191,9 +197,9 @@ def get_operation_data(year,quarter):
         currentasset_turnover,流动资产周转率(次)
         currentasset_days,流动资产周转天数(天)
     """
-    if _check_input(year,quarter) is True:
-        data =  _get_operation_data(year,quarter,1,[])
-        df = pd.DataFrame(data,columns=ct.OPERATION_COLS)
+    if _check_input(year, quarter) is True:
+        data =  _get_operation_data(year, quarter, 1, [])
+        df = pd.DataFrame(data, columns=ct.OPERATION_COLS)
         df = df.drop_duplicates('code')
         return df
 
@@ -220,17 +226,19 @@ def _get_operation_data(year, quarter, pageNo, dataArr):
             currentasset_turnover = '0' if currentasset_turnover == '--' else currentasset_turnover
             currentasset_days = trs.xpath('td[8]/text()')[0] 
             currentasset_days = '0' if currentasset_days == '--' else currentasset_days
-            dataArr.append([code, name,arturnover,arturndays,inventory_turnover,inventory_days,currentasset_turnover,currentasset_days])
+            dataArr.append([code, name, arturnover, arturndays, inventory_turnover,
+                            inventory_days, currentasset_turnover, currentasset_days])
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
         if len(nextPage)>0:
-            pageNo = re.findall(r'\d+',nextPage[0])[0]
-            return _get_growth_data(year,quarter,pageNo,dataArr)
+            pageNo = re.findall(r'\d+', nextPage[0])[0]
+            return _get_growth_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
     except:
         pass
-    
-def get_growth_data(year,quarter):
+
+
+def get_growth_data(year, quarter):
     """
         获取成长能力数据
     Parameters
@@ -251,9 +259,9 @@ def get_growth_data(year,quarter):
         epsg,每股收益增长率
         seg,股东权益增长率
     """
-    if _check_input(year,quarter) is True:
-        data =  _get_growth_data(year,quarter,1,[])
-        df = pd.DataFrame(data,columns=ct.GROWTH_COLS)
+    if _check_input(year, quarter) is True:
+        data =  _get_growth_data(year, quarter, 1, [])
+        df = pd.DataFrame(data, columns=ct.GROWTH_COLS)
         df = df.drop_duplicates('code')
         return df
 
@@ -280,17 +288,18 @@ def _get_growth_data(year, quarter, pageNo, dataArr):
             epsg = '0' if epsg == '--' else epsg
             seg = trs.xpath('td[8]/text()')[0] 
             seg = '0' if seg == '--' else seg
-            dataArr.append([code,name,mbrg,nprg,nav,targ,epsg,seg])
+            dataArr.append([code, name, mbrg, nprg, nav, targ, epsg, seg])
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
         if len(nextPage)>0:
-            pageNo = re.findall(r'\d+',nextPage[0])[0]
-            return _get_growth_data(year,quarter,pageNo,dataArr)
+            pageNo = re.findall(r'\d+', nextPage[0])[0]
+            return _get_growth_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
     except:
         pass
 
-def get_debtpaying_data(year,quarter):
+
+def get_debtpaying_data(year, quarter):
     """
         获取偿债能力数据
     Parameters
@@ -311,9 +320,9 @@ def get_debtpaying_data(year,quarter):
         sheqratio,股东权益比率
         adratio,股东权益增长率
     """
-    if _check_input(year,quarter) is True:
-        data =  _get_debtpaying_data(year,quarter,1,[])
-        df = pd.DataFrame(data,columns=ct.DEBTPAYING_COLS)
+    if _check_input(year, uarter) is True:
+        data =  _get_debtpaying_data(year, quarter, 1, [])
+        df = pd.DataFrame(data, columns=ct.DEBTPAYING_COLS)
         df = df.drop_duplicates('code')
         return df
 
@@ -340,17 +349,19 @@ def _get_debtpaying_data(year, quarter, pageNo, dataArr):
             sheqratio = '0' if sheqratio == '--' else sheqratio
             adratio = trs.xpath('td[8]/text()')[0] 
             adratio = '0' if adratio == '--' else adratio
-            dataArr.append([code,name,currentratio,quickratio,cashratio,icratio,sheqratio,adratio])
+            dataArr.append([code, name, currentratio, quickratio, cashratio,
+                            icratio, sheqratio, adratio])
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
         if len(nextPage)>0:
-            pageNo = re.findall(r'\d+',nextPage[0])[0]
-            return _get_debtpaying_data(year,quarter,pageNo,dataArr)
+            pageNo = re.findall(r'\d+', nextPage[0])[0]
+            return _get_debtpaying_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
     except:
         pass
  
-def get_cashflow_data(year,quarter):
+ 
+def get_cashflow_data(year, quarter):
     """
         获取现金流量数据
     Parameters
@@ -370,9 +381,9 @@ def get_cashflow_data(year,quarter):
         cf_liabilities,经营现金净流量对负债比率
         cashflowratio,现金流量比率
     """
-    if _check_input(year,quarter) is True:
-        data =  _get_cashflow_data(year,quarter,1,[])
-        df = pd.DataFrame(data,columns=ct.CASHFLOW_COLS)
+    if _check_input(year, quarter) is True:
+        data =  _get_cashflow_data(year, quarter, 1, [])
+        df = pd.DataFrame(data, columns=ct.CASHFLOW_COLS)
         df = df.drop_duplicates('code')
         return df
 
@@ -397,23 +408,26 @@ def _get_cashflow_data(year, quarter, pageNo, dataArr):
             cf_liabilities = '0' if cf_liabilities == '--' else cf_liabilities
             cashflowratio = trs.xpath('td[7]/text()')[0] 
             cashflowratio = '0' if cashflowratio == '--' else cashflowratio
-            dataArr.append([code,name,cf_sales,rateofreturn,cf_nm,cf_liabilities,cashflowratio])
+            dataArr.append([code, name, cf_sales, rateofreturn, cf_nm,
+                            cf_liabilities, cashflowratio])
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
         if len(nextPage)>0:
-            pageNo = re.findall(r'\d+',nextPage[0])[0]
-            return _get_cashflow_data(year,quarter,pageNo,dataArr)
+            pageNo = re.findall(r'\d+', nextPage[0])[0]
+            return _get_cashflow_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
     except:
         pass
        
-def _check_input(year,quarter):
+       
+def _check_input(year, quarter):
     if type(year) is str or year < 1989 :
         raise TypeError('年度输入错误：请输入1989年以后的年份数字，格式：YYYY')
-    elif quarter is None or type(quarter) is str or quarter not in [1,2,3,4]:
+    elif quarter is None or type(quarter) is str or quarter not in [1, 2, 3, 4]:
         raise TypeError('季度输入错误：请输入1、2、3或4数字')
     else:
         return True
+
 
 def _data_path():
     import os
@@ -422,3 +436,6 @@ def _data_path():
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
 
+
+if __name__ == '__main__':
+    print get_report_data(2014, 1)
