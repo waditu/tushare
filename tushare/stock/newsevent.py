@@ -204,8 +204,3 @@ def _random(n=16):
     end = (10 ** n) - 1
     return str(randint(start, end))
 
-
-if __name__ == '__main__':
-    df = guba_sina(True)
-    print df.ix[3]['content']
-#     _guba_content('http://guba.sina.com.cn/?s=thread&tid=35831&bid=2285&dpc=1')
