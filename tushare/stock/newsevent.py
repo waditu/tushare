@@ -175,6 +175,7 @@ def guba_sina(show_content=False):
             ds.extend(_guba_content(url))
             data.append(ds)
         df = pd.DataFrame(data, columns=nv.GUBA_SINA_COLS)
+        df['rcounts'] = df['rcounts'].astype(float)
         return df if show_content is True else df.drop('content', axis=1)
     except Exception as er:
         print str(er)  
@@ -194,7 +195,7 @@ def _guba_content(url):
         rcounts = reg.findall(rcounts)[0]
         return [content, ptime, rcounts]
     except Exception:
-        return ['', '', '']
+        return ['', '', '0']
 
 
 def _random(n=16):
@@ -203,3 +204,8 @@ def _random(n=16):
     end = (10 ** n) - 1
     return str(randint(start, end))
 
+
+if __name__ == '__main__':
+    df = guba_sina(True)
+    print df.ix[3]['content']
+#     _guba_content('http://guba.sina.com.cn/?s=thread&tid=35831&bid=2285&dpc=1')
