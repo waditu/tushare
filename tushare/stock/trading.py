@@ -72,6 +72,8 @@ def get_hist_data(code=None, start=None, end=None,
                 cols = ct.INX_DAY_PRICE_COLUMNS
             else:
                 cols = ct.DAY_PRICE_COLUMNS
+            if len(js['record'][0]) == 14:
+                cols = ct.INX_DAY_PRICE_COLUMNS
             df = pd.DataFrame(js['record'], columns=cols)
             if ktype.upper() in ['D','W','M']:
                 df = df.applymap(lambda x: x.replace(u',', u''))
@@ -384,3 +386,4 @@ def code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] == '6' else 'sz%s'%code
+
