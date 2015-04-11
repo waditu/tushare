@@ -40,7 +40,7 @@ def get_stock_basics(file_path=None):
                timeToMarket,上市日期
     """
     file_path = file_path if file_path else ct.ALL_STOCK_BASICS_FILE%_data_path()
-    df = pd.read_csv(file_path, type={'code':'object'}, encoding='GBK')
+    df = pd.read_csv(file_path, dtype={'code':'object'}, encoding='GBK')
     df = df.set_index('code')
     return df
 

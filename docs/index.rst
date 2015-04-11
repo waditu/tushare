@@ -10,7 +10,7 @@
 
 **TuShare是一个免费、开源的python财经数据接口包。**\ 主要实现对股票等金融数据从\ **数据采集**\ 、\ **清洗加工**
 到
-**数据存储**\ 的过程，能够为金融分析人员提供快速、整洁、和多样的便于分析的数据。考虑到python
+**数据存储**\ 的过程，能够为金融分析人员提供快速、整洁、和多样的便于分析的数据，为他们在数据获取方面减轻工作量，使他们更加专注于策略的研究和实现上。考虑到python
 pandas包在金融量化分析中体现出的优势，TuShare返回的绝大部分的数据格式都是pandas
 DataFrame类型，非常便于用pandas/NumPy/Matplotlib进行数据分析和可视化。
 
@@ -18,8 +18,8 @@ TuShare的数据主要来源于新浪财经、凤凰财经等各大门户网站�
 QQ:52799046**
 联系我，如果有什么好的建议和意见，也请及时联系我，在此谢过。
 
-TuShare的产生完全是本人业余兴趣和学习新鲜事物的结果，以免费和开源的形式分享出来，希望对有需求的人有所帮助。如果您觉得TuShare好用，在\ `GitHub <https://github.com/waditu/tushare>`__\ 里对TuShare点一下\ **Star**\ 来就算是对她的支持，TuShare还在继续完善和改进，如果您也想参与其中，欢迎Fork和提交Pull
-Requests.
+TuShare的产生完全是本人业余兴趣和学习新鲜事物的结果，用免费和开源的形式分享出来，希望对有需求的人有所帮助。如果您觉得TuShare好用，在\ `GitHub <https://github.com/waditu/tushare>`__\ 里对TuShare点一下\ **Star**\ 来就算是对她的支持，TuShare还在继续完善和改进，如果您也想参与其中，欢迎Fork和提交Pull
+Requests。如果在pandas/NumPy技术上有问题，也欢迎加入“pandas数据分析”QQ群：297882961 进行交流和讨论。
 
 
 .. figure:: _static/main_pic_min.png

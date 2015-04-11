@@ -47,7 +47,7 @@ def get_hist_data(code=None, start=None, end=None,
       DataFrame
           属性:日期 ，开盘价， 最高价， 收盘价， 最低价， 成交量， 价格变动 ，涨跌幅，5日均价，10日均价，20日均价，5日均量，10日均量，20日均量，换手率
     """
-    symbol = code_to_symbol(code)
+    symbol = _code_to_symbol(code)
     url = ''
     if ktype.upper() in ct.K_LABELS:
         url = ct.DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['ifeng'],
@@ -143,7 +143,7 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
     """
     if code is None or len(code)!=6 or date is None:
         return None
-    symbol = code_to_symbol(code)
+    symbol = _code_to_symbol(code)
     url = ct.TICK_PRICE_URL % (ct.P_TYPE['http'], ct.DOMAINS['sf'], ct.PAGES['dl'],
                                 date, symbol)
     for _ in range(retry_count):
@@ -151,12 +151,12 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
         try:
             re = urllib2.Request(url)
             lines = urllib2.urlopen(re, timeout=10).read()
-            lines = lines.decode('GBK')      
+            lines = lines.decode('GBK') 
+            df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
+                               skiprows=[0])      
         except _network_error_classes:
             pass
         else:
-            df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
-                               skiprows=[0]) 
             return df
     raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
     
@@ -217,13 +217,13 @@ def get_realtime_quotes(symbols=None):
     symbols_list = ''
     if type(symbols) is list or type(symbols) is set or type(symbols) is tuple or type(symbols) is pd.Series:
         for code in symbols:
-            symbols_list += code_to_symbol(code) + ','
+            symbols_list += _code_to_symbol(code) + ','
     else:
-        symbols_list = code_to_symbol(symbols)
+        symbols_list = _code_to_symbol(symbols)
         
     symbols_list = symbols_list[:-1] if len(symbols_list) > 8 else symbols_list 
     request = urllib2.Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['sinahq'],
-                                                random(), symbols_list))
+                                                _random(), symbols_list))
     text = urllib2.urlopen(request,timeout=10).read()
     text = text.decode('GBK')
     reg = re.compile(r'\="(.*?)\";')
@@ -322,18 +322,20 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             df['close'] = df['close'].map(ct.FORMAT)
             df = df.set_index('date')
             df = df.sort_index(ascending=False)
+            df = df.astype(float)
             return df
         else:
             for label in ['open', 'high', 'close', 'low']:
                 data[label] = data[label].map(ct.FORMAT)
             data = data.set_index('date')
             data = data.sort_index(ascending=False)
+            data = data.astype(float)
             return data
 
 
 def _parase_fq_factor(code, start, end):
     from tushare.util import demjson
-    symbol = code_to_symbol(code)
+    symbol = _code_to_symbol(code)
     url = ct.HIST_FQ_FACTOR_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], symbol)
     request = urllib2.Request(url)
     text = urllib2.urlopen(request, timeout=10).read()
@@ -358,24 +360,24 @@ def _parse_fq_data(url, retry_count, pause):
             sarr = ''.join(sarr)
             df = pd.read_html(sarr, skiprows=[0, 1])[0]
             df.columns = ct.HIST_FQ_COLS
-        except _network_error_classes:
-            pass
-        else:
             if df['date'].dtypes == np.object:
                 df['date'] = df['date'].astype(np.datetime64)
             df = df.drop_duplicates('date')
+        except _network_error_classes:
+            pass
+        else:
             return df
     raise IOError("获取失败，请检查网络和URL:%s" % url)
 
 
-def random(n=13):
+def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))
 
 
-def code_to_symbol(code):
+def _code_to_symbol(code):
     """
         生成symbol代码标志
     """
