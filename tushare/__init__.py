@@ -28,4 +28,5 @@ from tushare.stock.newsevent import (get_latest_news, latest_content,
                                      guba_sina)
 
 from tushare.stock.reference import (profit_data, forecast_data,
-                                     xsg_data, fund_holdings)
+                                     xsg_data, fund_holdings,
+                                     new_stocks)

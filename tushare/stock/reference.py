@@ -43,10 +43,10 @@ def profit_data(year=2014, top=25,
     shares:转增和送股数（每10股）
     """
     if top <= 25:
-        df,pages = _dist_cotent(year, 0, retry_count, pause)
+        df, pages = _dist_cotent(year, 0, retry_count, pause)
         return df.head(top)
     elif top == 'all':
-        df,pages = _dist_cotent(year, 0, retry_count, pause)
+        df, pages = _dist_cotent(year, 0, retry_count, pause)
         for idx in xrange(1,int(pages)):
             df = df.append(_dist_cotent(year, idx, retry_count,
                                         pause), ignore_index=True)
@@ -54,10 +54,10 @@ def profit_data(year=2014, top=25,
     else:
         if isinstance(top, int):
             allPages = top/25+1 if top%25>0 else top/25
-            df,pages = _dist_cotent(year, 0, retry_count, pause)
+            df, pages = _dist_cotent(year, 0, retry_count, pause)
             if allPages < pages:
                 pages = allPages
-            for idx in xrange(1,int(pages)):
+            for idx in xrange(1, int(pages)):
                 df = df.append(_dist_cotent(year, idx, retry_count,
                                             pause), ignore_index=True)
             return df.head(top)
@@ -69,6 +69,7 @@ def _fun_divi(x):
     reg = re.compile(ur'分红(.*?)元', re.UNICODE)
     res = reg.findall(x)
     return 0 if len(res)<1 else float(res[0])
+
 
 def _fun_into(x):
     reg1 = re.compile(ur'转增(.*?)股', re.UNICODE)
@@ -295,6 +296,66 @@ def _holding_cotent(start, end, pageNo, retry_count, pause):
     raise IOError("获取失败，请检查网络和URL:%s" % url)    
     
 
+def new_stocks(retry_count=3, pause=0.001):
+    """
+    获取新股上市数据
+    Parameters
+    --------
+    retry_count : int, 默认 3
+                 如遇网络等问题重复执行的次数 
+    pause : int, 默认 0
+                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    
+    Return
+    ------
+    DataFrame
+    code:股票代码
+    name:名称
+    ipo_date:上网发行日期
+    issue_date:上市日期
+    amount:发行数量(万股)
+    markets:上网发行数量(万股)
+    price:发行价格(元)
+    pe:发行市盈率
+    limit:个人申购上限(万股)
+    funds：募集资金(亿元)
+    ballot:网上中签率(%)
+    """
+    data = pd.DataFrame()
+    df = _newstocks(data, 1, retry_count,
+                    pause)
+    return df
+
+
+def _newstocks(data, pageNo, retry_count, pause):
+    for _ in range(retry_count):
+        time.sleep(pause)
+        print 'getting data %s' % pageNo
+        try:
+            html = lxml.html.parse(rv.NEW_STOCKS_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],
+                         ct.PAGES['newstock'], pageNo))
+            res = html.xpath('//table[@id=\"NewStockTable\"]/tr')
+            sarr = [etree.tostring(node) for node in res]
+            sarr = ''.join(sarr)
+            sarr = sarr.replace('<font color="red">*</font>', '')
+            sarr = '<table>%s</table>'%sarr
+            df = pd.read_html(sarr, skiprows=[0, 1])[0]
+            df = df.drop([df.columns[idx] for idx in [1, 12, 13, 14]], axis=1)
+            df.columns = rv.NEW_STOCKS_COLS
+            df['code'] = df['code'].map(lambda x : str(x).zfill(6))
+            
+            res = html.xpath('//table[@class=\"table2\"]/tr[1]/td[1]/a/text()')
+            hasNext = True if u'下一页' in res else False 
+            data = data.append(df, ignore_index=True)
+            pageNo += 1
+            if hasNext:
+                data = _newstocks(data, pageNo, retry_count, pause)
+        except Exception as ex:
+            print ex
+        else:
+            return data 
+
+
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
@@ -308,4 +369,6 @@ def _check_input(year, quarter):
     elif quarter is None or type(quarter) is str or quarter not in [1, 2, 3, 4]:
         raise TypeError('季度输入错误：请输入1、2、3或4数字')
     else:
-        return True    
+        return True   
+    
+
