@@ -17,7 +17,6 @@ def xls():
 def hdf():
     df = ts.get_hist_data('000875')
 #     df.to_hdf('c:/day/store.h5','table')
-    print df
     
     store = HDFStore('c:/day/store.h5')
     store['000875'] = df
@@ -28,7 +27,7 @@ def json():
     df.to_json('c:/day/000875.json',orient='records')
 
     #或者直接使用
-    print df.to_json(orient='records')
+    print(df.to_json(orient='records'))
 
 def appends():
     filename = 'c:/day/bigfile.csv'
@@ -41,7 +40,6 @@ def appends():
 
 def db():
     df = ts.get_tick_data('600848',date='2014-12-22')
-    print df
     engine = create_engine('mysql://root:jimmy1@127.0.0.1/mystock?charset=utf8')
 #     db = MySQLdb.connect(host='127.0.0.1',user='root',passwd='jimmy1',db="mystock",charset="utf8")
 #     df.to_sql('TICK_DATA',con=db,flavor='mysql')
@@ -53,7 +51,7 @@ def nosql():
     import json
     conn = pymongo.Connection('127.0.0.1', port=27017)
     df = ts.get_tick_data('600848',date='2014-12-22')
-    print df.to_json(orient='records')
+    print(df.to_json(orient='records'))
     
     conn.db.tickdata.insert(json.loads(df.to_json(orient='records')))
     

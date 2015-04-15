@@ -1,12 +1,39 @@
 # -*- coding:utf-8 -*- 
+'''
+Created on 2015/3/14
+@author: Jimmy Liu
+'''
+import unittest
+import tushare.stock.trading as fd
 
-# import tushare.stock.trading as td
-import tushare as ts
+class Test(unittest.TestCase):
 
-if __name__ == '__main__':
-#     print td.get_tick_data('600848', '2015-01-09')
-#     print td.get_realtime_quotes('600848')
-#     print td.get_realtime_quotes(['600848','000980','000981'])
-#     df = td.get_today_all()
-#     print td.get_realtime_quotes(df['code'].tail(10))
-    print ts.get_hist_data('600848',start='2015-02-25')
+    def set_data(self):
+        self.code = '600848'
+        self.start = '2015-01-03'
+        self.end = '2015-04-07'
+        self.year = 2014
+        self.quarter = 4
+        
+    def test_get_hist_data(self):
+        self.set_data()
+        print(fd.get_hist_data(self.code, self.start))
+        
+    def test_get_tick_data(self):
+        self.set_data()
+        print(fd.get_tick_data(self.code, self.end))
+    
+    def test_get_today_all(self):
+        print(fd.get_today_all()) 
+        
+    def test_get_realtime_quotesa(self):
+        self.set_data()
+        print(fd.get_realtime_quotes(self.code)) 
+        
+    def test_get_h_data(self):
+        self.set_data()
+        print(fd.get_h_data(self.code, self.start, self.end))   
+
+if __name__ == "__main__":
+    #import sys;sys.argv = ['', 'Test.testName']
+    unittest.main()
