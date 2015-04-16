@@ -38,7 +38,9 @@ class Test(unittest.TestCase):
         
     def test_get_sz50s(self):
         print(fd.get_sz50s()) 
-        
+      
+    def test_get_zz500s(self):
+        print(fd.get_zz500s())   
         
 if __name__ == "__main__":
     unittest.main()

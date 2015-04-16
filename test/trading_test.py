@@ -32,7 +32,11 @@ class Test(unittest.TestCase):
         
     def test_get_h_data(self):
         self.set_data()
-        print(fd.get_h_data(self.code, self.start, self.end))   
+        print(fd.get_h_data(self.code, self.start, self.end))
+        
+    def test_get_today_ticks(self):
+        self.set_data()
+        print(fd.get_today_ticks(self.code))    
 
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

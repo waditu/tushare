@@ -4,7 +4,6 @@ DP_URL = '%sapp.finance.%s/data/stock/%s?day=&page=%s'
 DP_163_URL = '%squotes.%s/data/caibao/%s?reportdate=%s&sort=declaredate&order=desc&page=%s'
 DP_COLS = ['report_date', 'quarter', 'code', 'name', 'plan']
 DP_163_COLS = ['code', 'name', 'year', 'plan', 'report_date']
-DP_MSG = 'crawling the data %s ...'
 XSG_URL = '%sdatainterface.%s/EM_DataCenter/%s?type=FD&sty=BST&st=3&sr=true&fd=%s&stat=%s'
 XSG_COLS = ['code', 'name', 'date', 'count', 'ratio']
 QUARTS_DIC = {'1':('%s-12-31', '%s-03-31'), '2':('%s-03-31', '%s-06-30'), 

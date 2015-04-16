@@ -8,15 +8,20 @@ Created on 2015/02/07
 @contact: jimmysoa@sina.cn
 """
 
-import urllib2
 from tushare.stock import cons as ct
 from tushare.stock import news_vars as nv
-from tushare.util import demjson
 import pandas as pd
 from datetime import datetime
 import lxml.html
 from lxml import etree
 import re
+import json
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
+
+
 
 def get_latest_news(top=None, show_content=False):
     """
@@ -38,13 +43,16 @@ def get_latest_news(top=None, show_content=False):
     """
     top = ct.PAGE_NUM[2] if top is None else top
     try:
-        request = urllib2.Request(nv.LATEST_URL % (ct.P_TYPE['http'], ct.DOMAINS['sina'],
+        request = Request(nv.LATEST_URL % (ct.P_TYPE['http'], ct.DOMAINS['sina'],
                                                    ct.PAGES['lnews'], top,
                                                    _random()))
-        data_str = urllib2.urlopen(request, timeout=10).read()
+        data_str = urlopen(request, timeout=10).read()
         data_str = data_str.decode('GBK')
         data_str = data_str.split('=')[1][:-1]
-        data_str = demjson.decode(data_str)
+        data_str = eval(data_str, type('Dummy', (dict,), 
+                                       dict(__getitem__ = lambda s, n:n))())
+        data_str = json.dumps(data_str)
+        data_str = json.loads(data_str)
         data_str = data_str['list']
         data = []
         for r in data_str:
@@ -57,7 +65,7 @@ def get_latest_news(top=None, show_content=False):
         df = pd.DataFrame(data, columns=nv.LATEST_COLS_C if show_content else nv.LATEST_COLS)
         return df
     except Exception as er:
-        print str(er)
+        print(str(er))
 
 
 def latest_content(url):
@@ -74,13 +82,16 @@ def latest_content(url):
     try:
         html = lxml.html.parse(url)
         res = html.xpath('//div[@id=\"artibody\"]/p')
-        sarr = [etree.tostring(node) for node in res]
+        if ct.PY3:
+            sarr = [etree.tostring(node).decode('utf-8') for node in res]
+        else:
+            sarr = [etree.tostring(node) for node in res]
         sarr = ''.join(sarr).replace('&#12288;', '')#.replace('\n\n', '\n').
         html_content = lxml.html.fromstring(sarr)
         content = html_content.text_content()
         return content
     except Exception as er:
-        print str(er)  
+        print(str(er))  
 
 
 def get_notices(code=None, date=None):
@@ -134,7 +145,7 @@ def notice_content(url):
         res = html.xpath('//div[@id=\"content\"]/pre/text()')[0]
         return res.strip()
     except Exception as er:
-        print str(er)  
+        print(str(er))  
 
 
 def guba_sina(show_content=False):
@@ -178,14 +189,17 @@ def guba_sina(show_content=False):
         df['rcounts'] = df['rcounts'].astype(float)
         return df if show_content is True else df.drop('content', axis=1)
     except Exception as er:
-        print str(er)  
+        print(str(er))  
     
     
 def _guba_content(url):
     try:
         html = lxml.html.parse(url)
         res = html.xpath('//div[@class=\"ilt_p\"]/p')
-        sarr = [etree.tostring(node) for node in res]
+        if ct.PY3:
+            sarr = [etree.tostring(node).decode('utf-8') for node in res]
+        else:
+            sarr = [etree.tostring(node) for node in res]
         sarr = ''.join(sarr).replace('&#12288;', '')#.replace('\n\n', '\n').
         html_content = lxml.html.fromstring(sarr)
         content = html_content.text_content()
@@ -204,3 +218,5 @@ def _random(n=16):
     end = (10 ** n) - 1
     return str(randint(start, end))
 
+if __name__ == "__main__":
+    print(get_latest_news(show_content=True))

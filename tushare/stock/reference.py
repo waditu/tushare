@@ -6,7 +6,7 @@ Created on 2015/03/21
 @group : waditu
 @contact: jimmysoa@sina.cn
 """
-
+from __future__ import division
 from tushare.stock import cons as ct
 from tushare.stock import ref_vars as rv
 from tushare.util import dateu as dt
@@ -18,6 +18,8 @@ from pandas.io.common import urlopen
 import re
 import json
 from pandas.util.testing import _network_error_classes
+from pandas.compat import StringIO
+
 
 def profit_data(year=2014, top=25, 
               retry_count=3, pause=0.001):
@@ -46,40 +48,65 @@ def profit_data(year=2014, top=25,
         df, pages = _dist_cotent(year, 0, retry_count, pause)
         return df.head(top)
     elif top == 'all':
+        ct._write_head()
         df, pages = _dist_cotent(year, 0, retry_count, pause)
-        for idx in xrange(1,int(pages)):
+        for idx in range(1,int(pages)):
             df = df.append(_dist_cotent(year, idx, retry_count,
                                         pause), ignore_index=True)
         return df
     else:
         if isinstance(top, int):
+            ct._write_head()
             allPages = top/25+1 if top%25>0 else top/25
             df, pages = _dist_cotent(year, 0, retry_count, pause)
-            if allPages < pages:
+            if int(allPages) < int(pages):
                 pages = allPages
-            for idx in xrange(1, int(pages)):
+            for idx in range(1, int(pages)):
                 df = df.append(_dist_cotent(year, idx, retry_count,
                                             pause), ignore_index=True)
             return df.head(top)
         else:
-            print 'top有误，请输入整数或all.'
+            print('top有误，请输入整数或all.')
     
 
 def _fun_divi(x):
-    reg = re.compile(ur'分红(.*?)元', re.UNICODE)
-    res = reg.findall(x)
-    return 0 if len(res)<1 else float(res[0])
-
+    if ct.PY3:
+        reg = re.compile(r'分红(.*?)元', re.UNICODE)
+        res = reg.findall(x)
+        return 0 if len(res)<1 else float(res[0]) 
+    else:
+        if isinstance(x, unicode):
+            s1 = unicode('分红','utf-8')
+            s2 = unicode('元','utf-8')
+            reg = re.compile(r'%s(.*?)%s'%(s1, s2), re.UNICODE)
+            res = reg.findall(x)
+            return 0 if len(res)<1 else float(res[0])
+        else:
+            return 0
 
 def _fun_into(x):
-    reg1 = re.compile(ur'转增(.*?)股', re.UNICODE)
-    reg2 = re.compile(ur'送股(.*?)股', re.UNICODE)
-    res1 = reg1.findall(x)
-    res2 = reg2.findall(x)
-    res1 = 0 if len(res1)<1 else float(res1[0])
-    res2 = 0 if len(res2)<1 else float(res2[0])
-    return res1 + res2
-    
+    if ct.PY3:
+            reg1 = re.compile(r'转增(.*?)股', re.UNICODE)
+            reg2 = re.compile(r'送股(.*?)股', re.UNICODE)
+            res1 = reg1.findall(x)
+            res2 = reg2.findall(x)
+            res1 = 0 if len(res1)<1 else float(res1[0])
+            res2 = 0 if len(res2)<1 else float(res2[0])
+            return res1 + res2
+    else:
+        if isinstance(x, unicode):
+            s1 = unicode('转增','utf-8')
+            s2 = unicode('送股','utf-8')
+            s3 = unicode('股','utf-8')
+            reg1 = re.compile(r'%s(.*?)%s'%(s1, s3), re.UNICODE)
+            reg2 = re.compile(r'%s(.*?)%s'%(s2, s3), re.UNICODE)
+            res1 = reg1.findall(x)
+            res2 = reg2.findall(x)
+            res1 = 0 if len(res1)<1 else float(res1[0])
+            res2 = 0 if len(res2)<1 else float(res2[0])
+            return res1 + res2
+        else:
+            return 0
     
 def _dist_cotent(year, pageNo, retry_count, pause):
     url = rv.DP_163_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
@@ -87,11 +114,14 @@ def _dist_cotent(year, pageNo, retry_count, pause):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            if pageNo>0:
-                print rv.DP_MSG%pageNo
+            if pageNo > 0:
+                ct._write_console()
             html = lxml.html.parse(url)  
             res = html.xpath('//div[@class=\"fn_rp_list\"]/table')
-            sarr = [etree.tostring(node) for node in res]
+            if ct.PY3:
+                sarr = [etree.tostring(node).decode('utf-8') for node in res]
+            else:
+                sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             df = pd.read_html(sarr, skiprows=[0])[0]
             df = df.drop(df.columns[0], axis=1)
@@ -136,6 +166,7 @@ def forecast_data(year, quarter):
         
     """
     if _check_input(year,quarter) is True:
+        ct._write_head()
         data =  _get_forecast_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.FORECAST_COLS)
         return df
@@ -144,7 +175,7 @@ def forecast_data(year, quarter):
 def _get_forecast_data(year, quarter, pageNo, dataArr):
     url = ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
                            quarter, pageNo, ct.PAGE_NUM[1])
-    print 'getting data %s ...'%pageNo
+    ct._write_console()
     try:
         html = lxml.html.parse(url)
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
@@ -198,6 +229,7 @@ def xsg_data(year=None, month=None,
             with urlopen(rv.XSG_URL%(ct.P_TYPE['http'], ct.DOMAINS['em'],
                                      ct.PAGES['emxsg'], year, month)) as resp:
                 lines = resp.read()
+                lines = lines.decode('utf-8') if ct.PY3 else lines
         except _network_error_classes:
             pass
         else:
@@ -250,11 +282,12 @@ def fund_holdings(year, quarter,
         end = end%year
     else:
         start, end = start%year, end%year
+    ct._write_head()
     df, pages = _holding_cotent(start, end, 0, retry_count, pause)
-    for idx in xrange(1, pages):
+    for idx in range(1, pages):
         df = df.append(_holding_cotent(start, end, idx, retry_count, pause),
                   ignore_index=True)
-    print df
+    return df
 
 def _holding_cotent(start, end, pageNo, retry_count, pause):
     url = rv.FUND_HOLDS_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
@@ -263,10 +296,11 @@ def _holding_cotent(start, end, pageNo, retry_count, pause):
     for _ in range(retry_count):
         time.sleep(pause)
         if pageNo>0:
-                print rv.DP_MSG%pageNo
+                ct._write_console()
         try:
             with urlopen(url) as resp:
                 lines = resp.read()
+                lines = lines.decode('utf-8') if ct.PY3 else lines
                 lines = lines.replace('--', '0')
                 lines = json.loads(lines)
                 data = lines['list']
@@ -322,6 +356,7 @@ def new_stocks(retry_count=3, pause=0.001):
     ballot:网上中签率(%)
     """
     data = pd.DataFrame()
+    ct._write_head()
     df = _newstocks(data, 1, retry_count,
                     pause)
     return df
@@ -330,28 +365,31 @@ def new_stocks(retry_count=3, pause=0.001):
 def _newstocks(data, pageNo, retry_count, pause):
     for _ in range(retry_count):
         time.sleep(pause)
-        print 'getting data %s' % pageNo
+        ct._write_console()
         try:
             html = lxml.html.parse(rv.NEW_STOCKS_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],
                          ct.PAGES['newstock'], pageNo))
             res = html.xpath('//table[@id=\"NewStockTable\"]/tr')
-            sarr = [etree.tostring(node) for node in res]
+            if ct.PY3:
+                sarr = [etree.tostring(node).decode('utf-8') for node in res]
+            else:
+                sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             sarr = sarr.replace('<font color="red">*</font>', '')
             sarr = '<table>%s</table>'%sarr
-            df = pd.read_html(sarr, skiprows=[0, 1])[0]
+            df = pd.read_html(StringIO(sarr), skiprows=[0, 1])[0]
             df = df.drop([df.columns[idx] for idx in [1, 12, 13, 14]], axis=1)
             df.columns = rv.NEW_STOCKS_COLS
             df['code'] = df['code'].map(lambda x : str(x).zfill(6))
-            
             res = html.xpath('//table[@class=\"table2\"]/tr[1]/td[1]/a/text()')
-            hasNext = True if u'下一页' in res else False 
+            tag = '下一页' if ct.PY3 else unicode('下一页','utf-8')
+            hasNext = True if tag in res else False 
             data = data.append(df, ignore_index=True)
             pageNo += 1
             if hasNext:
                 data = _newstocks(data, pageNo, retry_count, pause)
         except Exception as ex:
-            print ex
+            print(ex)
         else:
             return data 
 
@@ -371,4 +409,3 @@ def _check_input(year, quarter):
     else:
         return True   
     
-

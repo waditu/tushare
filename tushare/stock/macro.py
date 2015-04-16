@@ -8,12 +8,16 @@ Created on 2015/01/24
 @contact: jimmysoa@sina.cn
 """
 
-import macro_vars as vs
 import pandas as pd
 import numpy as np
-import urllib2
 import re
 import json
+from tushare.stock import macro_vars as vs
+from tushare.stock import cons as ct
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
 
 
 def get_gdp_year():
@@ -37,9 +41,9 @@ def get_gdp_year():
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'], rdint, vs.MACRO_TYPE[0],
                         0, 70, rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request, timeout=10).read()
-
+    request = Request(url)
+    text = urlopen(request, timeout=10).read()
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -70,9 +74,9 @@ def get_gdp_quarter():
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'], rdint, vs.MACRO_TYPE[0],
                         1, 250, rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
-
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -101,9 +105,9 @@ def get_gdp_for():
     """
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],4,80,rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
-
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -129,9 +133,9 @@ def get_gdp_pull():
     """
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],5,60,rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
-
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -157,9 +161,9 @@ def get_gdp_contrib():
     """
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],6,60,rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
-
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -181,9 +185,9 @@ def get_cpi():
     """
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[1],0,600,rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
-
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -213,9 +217,9 @@ def get_ppi():
     """
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[1],3,600,rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
- 
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -240,8 +244,8 @@ def get_deposit_rate():
     """
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[2],2,600,rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
@@ -265,8 +269,8 @@ def get_loan_rate():
     """
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[2],3,800,rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
@@ -291,8 +295,8 @@ def get_rrr():
     """
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[2],4,100,rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
@@ -330,8 +334,8 @@ def get_money_supply():
     """
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[2],1,600,rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
@@ -361,8 +365,8 @@ def get_money_supply_bal():
     """
     rdint = vs.random()
     url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[2],0,200,rdint)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request,timeout=10).read()
+    request = Request(url)
+    text = urlopen(request,timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
@@ -373,8 +377,3 @@ def get_money_supply_bal():
     for i in df.columns:
         df[i] = df[i].apply(lambda x:np.where(x is None,'--',x))
     return df
-
-
-if __name__ == '__main__':
-    print get_money_supply_bal()
-

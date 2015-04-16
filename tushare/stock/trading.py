@@ -10,17 +10,19 @@ from __future__ import division
 
 import time
 import json
-import urllib2
 import lxml.html
 from lxml import etree
 import pandas as pd
 import numpy as np
 from tushare.stock import cons as ct
-from pandas.io.common import urlopen
 from pandas.util.testing import _network_error_classes
 import re
-from StringIO import StringIO
+from pandas.compat import StringIO
 from tushare.util import dateu as du
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
 
 
 def get_hist_data(code=None, start=None, end=None,
@@ -61,12 +63,12 @@ def get_hist_data(code=None, start=None, end=None,
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            with urlopen(url) as resp:
-                lines = resp.read()
+            request = Request(url)
+            lines = urlopen(request, timeout=10).read()
         except _network_error_classes:
             pass
         else:
-            js = json.loads(lines)
+            js = json.loads(lines.decode('utf-8') if ct.PY3 else lines)
             cols = []
             if (code in ct.INDEX_LABELS) & (ktype.upper() in ct.K_LABELS):
                 cols = ct.INX_DAY_PRICE_COLUMNS
@@ -75,7 +77,7 @@ def get_hist_data(code=None, start=None, end=None,
             if len(js['record'][0]) == 14:
                 cols = ct.INX_DAY_PRICE_COLUMNS
             df = pd.DataFrame(js['record'], columns=cols)
-            if ktype.upper() in ['D','W','M']:
+            if ktype.upper() in ['D', 'W', 'M']:
                 df = df.applymap(lambda x: x.replace(u',', u''))
             for col in cols[1:]:
                 df[col] = df[col].astype(float)
@@ -100,19 +102,21 @@ def _parsing_dayprice_json(pageNum=1):
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
     """
-    print 'getting page %s ...'%pageNum
+    ct._write_console()
     url = ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                  ct.PAGES['jv'], pageNum)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request, timeout=10).read()
+    request = Request(url)
+    text = urlopen(request, timeout=10).read()
     if text == 'null':
         return None
     reg = re.compile(r'\,(.*?)\:') 
-    #修改成read_json能读入的json格式
-    text = reg.sub(r',"\1":', text) 
+    text = reg.sub(r',"\1":', text.decode('gbk') if ct.PY3 else text) 
     text = text.replace('"{symbol', '{"symbol')
     text = text.replace('{symbol', '{"symbol"')
-    jstr = json.dumps(text, encoding='GBK')
+    if ct.PY3:
+        jstr = json.dumps(text)
+    else:
+        jstr = json.dumps(text, encoding='GBK')
     js = json.loads(jstr)
     df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),
                       columns=ct.DAY_TRADING_COLUMNS)
@@ -144,13 +148,12 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
     if code is None or len(code)!=6 or date is None:
         return None
     symbol = _code_to_symbol(code)
-    url = ct.TICK_PRICE_URL % (ct.P_TYPE['http'], ct.DOMAINS['sf'], ct.PAGES['dl'],
-                                date, symbol)
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            re = urllib2.Request(url)
-            lines = urllib2.urlopen(re, timeout=10).read()
+            re = Request(ct.TICK_PRICE_URL % (ct.P_TYPE['http'], ct.DOMAINS['sf'], ct.PAGES['dl'],
+                                date, symbol))
+            lines = urlopen(re, timeout=10).read()
             lines = lines.decode('GBK') 
             df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
                                skiprows=[0])      
@@ -158,8 +161,76 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
             pass
         else:
             return df
-    raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
-    
+    raise IOError("获取失败，请检查网络")
+
+def get_today_ticks(code=None, retry_count=3, pause=0.001):
+    """
+        获取当日分笔明细数据
+    Parameters
+    ------
+        code:string
+                  股票代码 e.g. 600848
+        retry_count : int, 默认 3
+                  如遇网络等问题重复执行的次数
+        pause : int, 默认 0
+                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+     return
+     -------
+        DataFrame 当日所有股票交易数据(DataFrame)
+              属性:成交时间、成交价格、价格变动，成交手、成交金额(元)，买卖类型
+    """
+    import tushare.util.dateu as du
+    if code is None or len(code)!=6 :
+        return None
+    symbol = _code_to_symbol(code)
+    date = du.today()
+    try:
+        request = Request(ct.TODAY_TICKS_PAGE_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                                   ct.PAGES['jv'], date,
+                                                   symbol))
+        data_str = urlopen(request, timeout=10).read()
+        data_str = data_str.decode('GBK')
+        data_str = data_str[1:-1]
+        data_str = eval(data_str, type('Dummy', (dict,), 
+                                       dict(__getitem__ = lambda s, n:n))())
+        data_str = json.dumps(data_str)
+        data_str = json.loads(data_str)
+        pages = len(data_str['detailPages'])
+        data = pd.DataFrame()
+        ct._write_head()
+        for pNo in range(1,pages):
+            data = data.append(_today_ticks(symbol, date, pNo, retry_count, pause), ignore_index=True)
+    except Exception as er:
+        print(str(er))
+    return data
+
+
+def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
+    ct._write_console()
+    for _ in range(retry_count):
+        time.sleep(pause)
+        try:
+            html = lxml.html.parse(ct.TODAY_TICKS_URL % (ct.P_TYPE['http'],
+                                                         ct.DOMAINS['vsf'], ct.PAGES['t_ticks'],
+                                                         symbol, tdate, pageNo
+                                ))  
+            res = html.xpath('//table[@id=\"datatbl\"]/tbody/tr')
+            if ct.PY3:
+                sarr = [etree.tostring(node).decode('utf-8') for node in res]
+            else:
+                sarr = [etree.tostring(node) for node in res]
+            sarr = ''.join(sarr)
+            sarr = '<table>%s</table>'%sarr
+            sarr = sarr.replace('--', '0')
+            df = pd.read_html(StringIO(sarr), parse_dates=False)[0]
+            df.columns = ct.TODAY_TICK_COLUMNS
+            df['pchange'] = df['pchange'].map(lambda x : x.replace('%',''))
+        except _network_error_classes:
+            pass
+        else:
+            return df
+    raise IOError("获取失败，请检查网络" )
+        
     
 def get_today_all():
     """
@@ -169,6 +240,7 @@ def get_today_all():
       DataFrame
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率
     """
+    ct._write_head()
     df = _parsing_dayprice_json(1)
     if df is not None:
         for i in range(2,ct.PAGE_NUM[0]):
@@ -222,9 +294,9 @@ def get_realtime_quotes(symbols=None):
         symbols_list = _code_to_symbol(symbols)
         
     symbols_list = symbols_list[:-1] if len(symbols_list) > 8 else symbols_list 
-    request = urllib2.Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['sinahq'],
+    request = Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['sinahq'],
                                                 _random(), symbols_list))
-    text = urllib2.urlopen(request,timeout=10).read()
+    text = urlopen(request,timeout=10).read()
     text = text.decode('GBK')
     reg = re.compile(r'\="(.*?)\";')
     data = reg.findall(text)
@@ -277,13 +349,13 @@ def get_h_data(code, start=None, end=None, autype='qfq',
     end = du.today() if end is None else end
     qs = du.get_quarts(start, end)
     qt = qs[0]
-    print ct.FQ_PRINTING%(qt[0], qt[1])
+    ct._write_head()
     data = _parse_fq_data(ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                               code, qt[0], qt[1]), retry_count, pause)
     if len(qs)>1:
         for d in range(1, len(qs)):
             qt = qs[d]
-            print ct.FQ_PRINTING%(qt[0], qt[1])
+            ct._write_console()
             url = ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                   code, qt[0], qt[1])
             df = _parse_fq_data(url, retry_count, pause)
@@ -334,15 +406,20 @@ def get_h_data(code, start=None, end=None, autype='qfq',
 
 
 def _parase_fq_factor(code, start, end):
-    from tushare.util import demjson
     symbol = _code_to_symbol(code)
     url = ct.HIST_FQ_FACTOR_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], symbol)
-    request = urllib2.Request(url)
-    text = urllib2.urlopen(request, timeout=10).read()
+    request = Request(url)
+    text = urlopen(request, timeout=10).read()
     text = text[1:len(text)-1]
-    text = demjson.decode(text)
-    df = pd.DataFrame({'date':text['data'].keys(), 'factor':text['data'].values()})
-    df['date'] = df['date'].map(lambda x:x[1:].replace('_', '-'))
+    text = text.decode('utf-8') if ct.PY3 else text
+    text = text.replace('{_', '{"')
+    text = text.replace('total', '"total"')
+    text = text.replace('data', '"data"')
+    text = text.replace(':"', '":"')
+    text = text.replace('",_', '","')
+    text = text.replace('_', '-')
+    text = json.loads(text)
+    df = pd.DataFrame({'date':list(text['data'].keys()), 'factor':list(text['data'].values())})
     if df['date'].dtypes == np.object:
         df['date'] = df['date'].astype(np.datetime64)
     df = df.drop_duplicates('date')
@@ -356,7 +433,10 @@ def _parse_fq_data(url, retry_count, pause):
         try:
             html = lxml.html.parse(url)  
             res = html.xpath('//table[@id=\"FundHoldSharesTable\"]')
-            sarr = [etree.tostring(node) for node in res]
+            if ct.PY3:
+                sarr = [etree.tostring(node).decode('utf-8') for node in res]
+            else:
+                sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             df = pd.read_html(sarr, skiprows=[0, 1])[0]
             df.columns = ct.HIST_FQ_COLS
@@ -367,7 +447,7 @@ def _parse_fq_data(url, retry_count, pause):
             pass
         else:
             return df
-    raise IOError("获取失败，请检查网络和URL:%s" % url)
+    raise IOError("获取失败，请检查网络")
 
 
 def _random(n=13):
@@ -389,3 +469,5 @@ def _code_to_symbol(code):
         else:
             return 'sh%s'%code if code[:1] == '6' else 'sz%s'%code
 
+if __name__ == "__main__":
+    print(get_today_ticks('601333'))

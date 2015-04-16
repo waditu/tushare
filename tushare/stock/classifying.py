@@ -10,12 +10,15 @@ Created on 2015/02/01
 
 import pandas as pd
 from tushare.stock import cons as ct
-import urllib2
 import json
 import re
 from pandas.util.testing import _network_error_classes
 import time
 import tushare.stock.fundamental as fd
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
 
 
 def get_industry_classified():
@@ -31,6 +34,7 @@ def get_industry_classified():
     df = _get_type_data(ct.SINA_INDUSTRY_INDEX_URL%(ct.P_TYPE['http'],
                                                     ct.DOMAINS['vsf'], ct.PAGES['ids']))
     data = []
+    ct._write_head()
     for row in df.values:
         rowDf =  _get_detail(row[0])
         rowDf['c_name'] = row[1]
@@ -49,6 +53,7 @@ def get_concept_classified():
         name :股票名称
         c_name :概念名称
     """
+    ct._write_head()
     df = _get_type_data(ct.SINA_CONCEPTS_INDEX_URL%(ct.P_TYPE['http'],
                                                     ct.DOMAINS['sf'], ct.PAGES['cpt']))
     data = []
@@ -127,15 +132,16 @@ def get_st_classified(file_path=None):
     return df 
 
 
-def _get_detail(tag,retry_count=3,pause=0.001):
+def _get_detail(tag, retry_count=3, pause=0.001):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            print 'getting tag : %s'%tag
-            request = urllib2.Request(ct.SINA_DATA_DETAIL_URL%(ct.P_TYPE['http'],
+            ct._write_console()
+            request = Request(ct.SINA_DATA_DETAIL_URL%(ct.P_TYPE['http'],
                                                                ct.DOMAINS['vsf'], ct.PAGES['jv'],
                                                                tag))
-            text = urllib2.urlopen(request, timeout=10).read()
+            text = urlopen(request, timeout=10).read()
+            text = text.decode('gbk')
         except _network_error_classes:
             pass
         else:
@@ -143,18 +149,19 @@ def _get_detail(tag,retry_count=3,pause=0.001):
             text = reg.sub(r',"\1":', text) 
             text = text.replace('"{symbol', '{"symbol')
             text = text.replace('{symbol', '{"symbol"')
-            jstr = json.dumps(text, encoding='GBK')
+            jstr = json.dumps(text)
             js = json.loads(jstr)
+            print(js)
             df = pd.DataFrame(pd.read_json(js, dtype={'code':object}), columns=ct.THE_FIELDS)
             df = df[ct.FOR_CLASSIFY_B_COLS]
             return df
-        raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
+        raise IOError("数据获取失败，请检查网络和URL")
     
 
 def _get_type_data(url):
     try:
-        request = urllib2.Request(url)
-        data_str = urllib2.urlopen(request, timeout=10).read()
+        request = Request(url)
+        data_str = urlopen(request, timeout=10).read()
         data_str = data_str.decode('GBK')
         data_str = data_str.split('=')[1]
         data_json = json.loads(data_str)
@@ -162,7 +169,7 @@ def _get_type_data(url):
                           columns=['tag', 'name'])
         return df
     except Exception as er:
-        print str(er)
+        print(str(er))
 
 
 def get_hs300s():
@@ -187,7 +194,7 @@ def get_hs300s():
         wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
         return pd.merge(df,wt)
     except Exception as er:
-        print str(er)
+        print(str(er))
 
 
 def get_sz50s():
@@ -206,5 +213,24 @@ def get_sz50s():
         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
         return df
     except Exception as er:
-        print str(er)      
-        
+        print(str(er))      
+
+
+def get_zz500s():
+    """
+    获取中证500成份股
+    Return
+    --------
+    DataFrame
+        code :股票代码
+        name :股票名称
+    """
+    try:
+        df = pd.read_excel(ct.HS300_CLASSIFY_URL%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
+                                                  ct.INDEX_C_COMM, ct.PAGES['zz500b']), parse_cols=[0,1])
+        df.columns = ct.FOR_CLASSIFY_B_COLS
+        df['code'] = df['code'].map(lambda x :str(x).zfill(6))
+        return df
+    except Exception as er:
+        print(str(er)) 
+

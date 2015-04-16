@@ -11,7 +11,6 @@ from tushare.stock import cons as ct
 import lxml.html
 import re
 
-
 def get_stock_basics(file_path=None):
     """
         获取沪深上市公司基本情况
@@ -70,6 +69,7 @@ def get_report_data(year, quarter):
         report_date,发布日期
     """
     if _check_input(year,quarter) is True:
+        ct._write_head()
         data =  _get_report_data(year, quarter, 1, [])
         df = pd.DataFrame(data, columns=ct.REPORT_COLS)
         df = df.drop_duplicates('code')
@@ -79,7 +79,7 @@ def get_report_data(year, quarter):
 def _get_report_data(year, quarter, pageNo, dataArr):
     url = ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
                          year, quarter, pageNo, ct.PAGE_NUM[1])
-    print 'getting page %s ...'%pageNo
+    ct._write_console()
     try:
         html = lxml.html.parse(url)
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
@@ -135,6 +135,7 @@ def get_profit_data(year, quarter):
     """
     if _check_input(year, quarter) is True:
         data =  _get_profit_data(year, quarter, 1, [])
+        ct._write_head()
         df = pd.DataFrame(data, columns=ct.PROFIT_COLS)
         df = df.drop_duplicates('code')
         return df
@@ -143,7 +144,7 @@ def get_profit_data(year, quarter):
 def _get_profit_data(year, quarter, pageNo, dataArr):
     url = ct.PROFIT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
                          quarter, pageNo, ct.PAGE_NUM[1])
-    print 'getting page %s ...'%pageNo
+    ct._write_console()
     try:
         html = lxml.html.parse(url)
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
@@ -198,6 +199,7 @@ def get_operation_data(year, quarter):
         currentasset_days,流动资产周转天数(天)
     """
     if _check_input(year, quarter) is True:
+        ct._write_head()
         data =  _get_operation_data(year, quarter, 1, [])
         df = pd.DataFrame(data, columns=ct.OPERATION_COLS)
         df = df.drop_duplicates('code')
@@ -207,7 +209,7 @@ def get_operation_data(year, quarter):
 def _get_operation_data(year, quarter, pageNo, dataArr):
     url = ct.OPERATION_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
                             quarter, pageNo, ct.PAGE_NUM[1])
-    print 'getting page %s ...'%pageNo
+    ct._write_console()
     try:
         html = lxml.html.parse(url)
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
@@ -260,6 +262,7 @@ def get_growth_data(year, quarter):
         seg,股东权益增长率
     """
     if _check_input(year, quarter) is True:
+        ct._write_head()
         data =  _get_growth_data(year, quarter, 1, [])
         df = pd.DataFrame(data, columns=ct.GROWTH_COLS)
         df = df.drop_duplicates('code')
@@ -269,7 +272,7 @@ def get_growth_data(year, quarter):
 def _get_growth_data(year, quarter, pageNo, dataArr):
     url = ct.GROWTH_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
                          quarter, pageNo, ct.PAGE_NUM[1])
-    print 'getting page %s ...'%pageNo
+    ct._write_console()
     try:
         html = lxml.html.parse(url)
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
@@ -320,7 +323,8 @@ def get_debtpaying_data(year, quarter):
         sheqratio,股东权益比率
         adratio,股东权益增长率
     """
-    if _check_input(year, uarter) is True:
+    if _check_input(year, quarter) is True:
+        ct._write_head()
         data =  _get_debtpaying_data(year, quarter, 1, [])
         df = pd.DataFrame(data, columns=ct.DEBTPAYING_COLS)
         df = df.drop_duplicates('code')
@@ -330,7 +334,7 @@ def get_debtpaying_data(year, quarter):
 def _get_debtpaying_data(year, quarter, pageNo, dataArr):
     url = ct.DEBTPAYING_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
                              quarter, pageNo, ct.PAGE_NUM[1])
-    print 'getting page %s ...'%pageNo
+    ct._write_console()
     try:
         html = lxml.html.parse(url)
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
@@ -382,6 +386,7 @@ def get_cashflow_data(year, quarter):
         cashflowratio,现金流量比率
     """
     if _check_input(year, quarter) is True:
+        ct._write_head()
         data =  _get_cashflow_data(year, quarter, 1, [])
         df = pd.DataFrame(data, columns=ct.CASHFLOW_COLS)
         df = df.drop_duplicates('code')
@@ -391,7 +396,7 @@ def get_cashflow_data(year, quarter):
 def _get_cashflow_data(year, quarter, pageNo, dataArr):
     url = ct.CASHFLOW_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
                            quarter, pageNo, ct.PAGE_NUM[1])
-    print 'getting page %s ...'%pageNo
+    ct._write_console()
     try:
         html = lxml.html.parse(url)
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
@@ -436,6 +441,3 @@ def _data_path():
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
 
-
-if __name__ == '__main__':
-    print get_report_data(2014, 1)

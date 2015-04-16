@@ -37,8 +37,7 @@ class Store(object):
                     file_path = file_path%(path, '/', name, to)
                 except:
                     pass
-            print file_path
             
         else:
-            print 'input error'
+            print('input error')
 

@@ -27,8 +27,10 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'hs300w':'000300closeweight.xls','sz50b':'000016cons.xls',
          'dp':'all_fpya.php', '163dp':'fpyg.html',
          'emxsg':'JS.aspx', '163fh':'jjcgph.php',
-         'newstock':'vRPD_NewStockIssue.php'}
+         'newstock':'vRPD_NewStockIssue.php', 'zz500b':'000905cons.xls',
+         't_ticks':'vMS_tradedetail.php'}
 TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
+TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
 DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
                        'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
 REPORT_COLS = ['code', 'name', 'eps', 'eps_yoy', 'bvps', 'roe',
@@ -54,6 +56,8 @@ FOR_CLASSIFY_B_COLS = ['code','name']
 FOR_CLASSIFY_W_COLS = ['date','code','weight']
 THE_FIELDS = ['code','symbol','name','changepercent','trade','open','high','low','settlement','volume','turnoverratio']
 TICK_PRICE_URL = '%smarket.%s/%s?date=%s&symbol=%s'
+TODAY_TICKS_PAGE_URL = '%s%s/quotes_service/api/%s/CN_Transactions.getAllPageTime?date=%s&symbol=%s'
+TODAY_TICKS_URL = '%s%s/quotes_service/view/%s?symbol=%s&date=%s&page=%s'
 DAY_PRICE_URL = '%sapi.finance.%s/%s/?code=%s&type=last'
 LIVE_DATA_URL = '%shq.%s/rn=%s&list=%s'
 DAY_PRICE_MIN_URL = '%sapi.finance.%s/akmin?scode=%s&type=%s'
@@ -75,4 +79,13 @@ HIST_FQ_URL = '%s%s/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml?year=%s
 HIST_FQ_FACTOR_URL = '%s%s/api/json.php/BasicStockSrv.getStockFuQuanData?symbol=%s&type=qfq'
 HIST_FQ_COLS = ['date', 'open', 'high', 'close', 'low', 'volumn', 'amount', 'factor']
 HIST_FQ_FACTOR_COLS = ['code','value']
-FQ_PRINTING = 'crawling the data of %sQ%s ...'
+
+import sys
+PY3 = (sys.version_info[0] >= 3)
+def _write_head():
+    sys.stdout.write("[Getting data:]")
+    sys.stdout.flush()
+
+def _write_console():
+    sys.stdout.write("#")
+    sys.stdout.flush()

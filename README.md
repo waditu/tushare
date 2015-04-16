@@ -9,7 +9,7 @@ TuShare是实现对股票/期货等金融数据从**数据采集**、**清洗加
 
 Dependencies
 =========
-python 2.7   
+python 2.x/3.x   
 
 [pandas](http://pandas.pydata.org/ "pandas")
 
@@ -173,6 +173,14 @@ Quick Start
  
 Change Logs
 ------
+
+0.2.5 2015/04/16
+===========
+- 完成python2.x和python3.x兼容性支持
+- 部分算法优化和代码重构
+- 新增中证500成份股
+- 新增当日分笔交易明细
+- 修正分配预案（高送转）bug
 
 0.2.3 2015/04/11
 ===========
