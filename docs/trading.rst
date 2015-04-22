@@ -156,14 +156,14 @@
 -  **high** : 最高价
 -  **close** : 收盘价
 -  **low** : 最低价
--  **volumn** : 成交量
+-  **volume** : 成交量
 -  **amount** : 成交金额
 
 结果：
 
 ::
 
-                open   high  close    low     volumn      amount
+                open   high  close    low     volume      amount
     date                                                         
     2015-03-16  13.27  13.45  13.39  13.00   81212976  1073862784
     2015-03-13  13.04  13.38  13.37  13.00   40548836   532739744
