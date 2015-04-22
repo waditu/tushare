@@ -64,7 +64,7 @@ def get_hist_data(code=None, start=None, end=None,
         time.sleep(pause)
         try:
             request = Request(url)
-            lines = urlopen(request, timeout=10).read()
+            lines = urlopen(request, timeout = 10).read()
         except _network_error_classes:
             pass
         else:
@@ -89,7 +89,7 @@ def get_hist_data(code=None, start=None, end=None,
                 df = df.drop('turnover', axis=1)
             df = df.set_index('date')
             return df
-    raise IOError("%s获取失败，请检查网络和URL:%s" % (code, url))
+    raise IOError("获取失败，请检查网络和URL")
 
 
 def _parsing_dayprice_json(pageNum=1):
@@ -341,7 +341,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
           high  最高价
           close 收盘价
           low 最低价
-          volumn 成交量
+          volume 成交量
           amount 成交金额
     '''
     
@@ -407,8 +407,8 @@ def get_h_data(code, start=None, end=None, autype='qfq',
 
 def _parase_fq_factor(code, start, end):
     symbol = _code_to_symbol(code)
-    url = ct.HIST_FQ_FACTOR_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], symbol)
-    request = Request(url)
+    request = Request(ct.HIST_FQ_FACTOR_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['vsf'], symbol))
     text = urlopen(request, timeout=10).read()
     text = text[1:len(text)-1]
     text = text.decode('utf-8') if ct.PY3 else text
@@ -420,11 +420,20 @@ def _parase_fq_factor(code, start, end):
     text = text.replace('_', '-')
     text = json.loads(text)
     df = pd.DataFrame({'date':list(text['data'].keys()), 'factor':list(text['data'].values())})
+    # Thank Jfish(from xi'an) for reported this bug,Solved on 18/04/2015
+    df['date'] = df['date'].map(_fun_except) # for null case
     if df['date'].dtypes == np.object:
         df['date'] = df['date'].astype(np.datetime64)
     df = df.drop_duplicates('date')
     df['factor'] = df['factor'].astype(float)
     return df
+
+
+def _fun_except(x):
+    if len(x) > 10:
+        return x[-10:]
+    else:
+        return x
 
 
 def _parse_fq_data(url, retry_count, pause):
@@ -438,7 +447,7 @@ def _parse_fq_data(url, retry_count, pause):
             else:
                 sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
-            df = pd.read_html(sarr, skiprows=[0, 1])[0]
+            df = pd.read_html(sarr, skiprows = [0, 1])[0]
             df.columns = ct.HIST_FQ_COLS
             if df['date'].dtypes == np.object:
                 df['date'] = df['date'].astype(np.datetime64)
@@ -468,6 +477,3 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] == '6' else 'sz%s'%code
-
-if __name__ == "__main__":
-    print(get_today_ticks('601333'))

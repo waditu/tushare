@@ -151,7 +151,6 @@ def _get_detail(tag, retry_count=3, pause=0.001):
             text = text.replace('{symbol', '{"symbol"')
             jstr = json.dumps(text)
             js = json.loads(jstr)
-            print(js)
             df = pd.DataFrame(pd.read_json(js, dtype={'code':object}), columns=ct.THE_FIELDS)
             df = df[ct.FOR_CLASSIFY_B_COLS]
             return df

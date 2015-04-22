@@ -68,7 +68,7 @@ def get_report_data(year, quarter):
         distrib,分配方案
         report_date,发布日期
     """
-    if _check_input(year,quarter) is True:
+    if ct._check_input(year,quarter) is True:
         ct._write_head()
         data =  _get_report_data(year, quarter, 1, [])
         df = pd.DataFrame(data, columns=ct.REPORT_COLS)
@@ -133,7 +133,7 @@ def get_profit_data(year, quarter):
         business_income,营业收入(百万元)
         bips,每股主营业务收入(元)
     """
-    if _check_input(year, quarter) is True:
+    if ct._check_input(year, quarter) is True:
         data =  _get_profit_data(year, quarter, 1, [])
         ct._write_head()
         df = pd.DataFrame(data, columns=ct.PROFIT_COLS)
@@ -198,7 +198,7 @@ def get_operation_data(year, quarter):
         currentasset_turnover,流动资产周转率(次)
         currentasset_days,流动资产周转天数(天)
     """
-    if _check_input(year, quarter) is True:
+    if ct._check_input(year, quarter) is True:
         ct._write_head()
         data =  _get_operation_data(year, quarter, 1, [])
         df = pd.DataFrame(data, columns=ct.OPERATION_COLS)
@@ -261,7 +261,7 @@ def get_growth_data(year, quarter):
         epsg,每股收益增长率
         seg,股东权益增长率
     """
-    if _check_input(year, quarter) is True:
+    if ct._check_input(year, quarter) is True:
         ct._write_head()
         data =  _get_growth_data(year, quarter, 1, [])
         df = pd.DataFrame(data, columns=ct.GROWTH_COLS)
@@ -323,7 +323,7 @@ def get_debtpaying_data(year, quarter):
         sheqratio,股东权益比率
         adratio,股东权益增长率
     """
-    if _check_input(year, quarter) is True:
+    if ct._check_input(year, quarter) is True:
         ct._write_head()
         data =  _get_debtpaying_data(year, quarter, 1, [])
         df = pd.DataFrame(data, columns=ct.DEBTPAYING_COLS)
@@ -385,7 +385,7 @@ def get_cashflow_data(year, quarter):
         cf_liabilities,经营现金净流量对负债比率
         cashflowratio,现金流量比率
     """
-    if _check_input(year, quarter) is True:
+    if ct._check_input(year, quarter) is True:
         ct._write_head()
         data =  _get_cashflow_data(year, quarter, 1, [])
         df = pd.DataFrame(data, columns=ct.CASHFLOW_COLS)
@@ -425,15 +425,6 @@ def _get_cashflow_data(year, quarter, pageNo, dataArr):
         pass
        
        
-def _check_input(year, quarter):
-    if type(year) is str or year < 1989 :
-        raise TypeError('年度输入错误：请输入1989年以后的年份数字，格式：YYYY')
-    elif quarter is None or type(quarter) is str or quarter not in [1, 2, 3, 4]:
-        raise TypeError('季度输入错误：请输入1、2、3或4数字')
-    else:
-        return True
-
-
 def _data_path():
     import os
     import inspect

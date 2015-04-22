@@ -14,11 +14,16 @@ import pandas as pd
 import time
 import lxml.html
 from lxml import etree
-from pandas.io.common import urlopen
 import re
 import json
 from pandas.util.testing import _network_error_classes
 from pandas.compat import StringIO
+from tushare.util import dateu as du
+from tushare.util.netbase import Client
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
 
 
 def profit_data(year=2014, top=25, 
@@ -84,6 +89,7 @@ def _fun_divi(x):
         else:
             return 0
 
+
 def _fun_into(x):
     if ct.PY3:
             reg1 = re.compile(r'转增(.*?)股', re.UNICODE)
@@ -107,6 +113,7 @@ def _fun_into(x):
             return res1 + res2
         else:
             return 0
+    
     
 def _dist_cotent(year, pageNo, retry_count, pause):
     url = rv.DP_163_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
@@ -142,7 +149,7 @@ def _dist_cotent(year, pageNo, retry_count, pause):
                 return df, pages[0]
             else:
                 return df
-    raise IOError("获取失败，请检查网络和URL:%s" % url)    
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)    
 
 
 def forecast_data(year, quarter):
@@ -165,7 +172,7 @@ def forecast_data(year, quarter):
         range,业绩变动范围
         
     """
-    if _check_input(year,quarter) is True:
+    if ct._check_input(year,quarter) is True:
         ct._write_head()
         data =  _get_forecast_data(year,quarter,1,[])
         df = pd.DataFrame(data,columns=ct.FORECAST_COLS)
@@ -226,10 +233,10 @@ def xsg_data(year=None, month=None,
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            with urlopen(rv.XSG_URL%(ct.P_TYPE['http'], ct.DOMAINS['em'],
-                                     ct.PAGES['emxsg'], year, month)) as resp:
-                lines = resp.read()
-                lines = lines.decode('utf-8') if ct.PY3 else lines
+            request = Request(rv.XSG_URL%(ct.P_TYPE['http'], ct.DOMAINS['em'],
+                                     ct.PAGES['emxsg'], year, month))
+            lines = urlopen(request, timeout = 10).read()
+            lines = lines.decode('utf-8') if ct.PY3 else lines
         except _network_error_classes:
             pass
         else:
@@ -247,7 +254,7 @@ def xsg_data(year=None, month=None,
             df[6] = df[6].map(ct.FORMAT)
             df.columns = rv.XSG_COLS
             return df
-    raise IOError("获取失败，请检查网络和URL")   
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)   
 
 
 def fund_holdings(year, quarter,
@@ -289,6 +296,7 @@ def fund_holdings(year, quarter,
                   ignore_index=True)
     return df
 
+
 def _holding_cotent(start, end, pageNo, retry_count, pause):
     url = rv.FUND_HOLDS_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
                      ct.PAGES['163fh'], ct.PAGES['163fh'],
@@ -327,7 +335,7 @@ def _holding_cotent(start, end, pageNo, retry_count, pause):
                 return df, int(lines['pagecount'])
             else:
                 return df
-    raise IOError("获取失败，请检查网络和URL:%s" % url)    
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)    
     
 
 def new_stocks(retry_count=3, pause=0.001):
@@ -394,18 +402,301 @@ def _newstocks(data, pageNo, retry_count, pause):
             return data 
 
 
+def sh_margins(start=None, end=None, retry_count=3, pause=0.001):
+    """
+    获取沪市融资融券数据列表
+    Parameters
+    --------
+    start:string
+                  开始日期 format：YYYY-MM-DD 为空时取去年今日
+    end:string
+                  结束日期 format：YYYY-MM-DD 为空时取当前日期
+    retry_count : int, 默认 3
+                 如遇网络等问题重复执行的次数 
+    pause : int, 默认 0
+                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    
+    Return
+    ------
+    DataFrame
+    date:信用交易日期
+    rzye:本日融资余额(元)
+    rzmre: 本日融资买入额(元)
+    rqyl: 本日融券余量
+    rqylje: 本日融券余量金额(元)
+    rqmcl: 本日融券卖出量
+    rzrqjyzl:本日融资融券余额(元)
+    """
+    start = du.today_last_year() if start is None else start
+    end = du.today() if end is None else end
+    if du.diff_day(start, end) < 0:
+        return None
+    start, end = start.replace('-', ''), end.replace('-', '')
+    data = pd.DataFrame()
+    ct._write_head()
+    df = _sh_hz(data, start=start, end=end,
+                retry_count=retry_count,
+                pause=pause)
+    return df
+
+
+def _sh_hz(data, start=None, end=None, 
+           pageNo='', beginPage='',
+           endPage='',
+           retry_count=3, pause=0.001):
+    for _ in range(retry_count):
+        time.sleep(pause)
+        ct._write_console()
+        try:
+            tail = rv.MAR_SH_HZ_TAIL_URL%(pageNo,
+                                    beginPage, endPage)
+            if pageNo == '':
+                pageNo = 6
+                tail = ''
+            else:
+                pageNo += 5
+            beginPage = pageNo
+            endPage = pageNo + 4
+            url = rv.MAR_SH_HZ_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
+                                    ct.PAGES['qmd'], _random(5),
+                                    start, end, tail,
+                                    _random())
+            ref = rv.MAR_SH_HZ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
+            clt = Client(url, ref=ref, cookie=rv.MAR_SH_COOKIESTR)
+            lines = clt.gvalue()
+            lines = lines.decode('utf-8') if ct.PY3 else lines
+            lines = lines[19:-1]
+            lines = json.loads(lines)
+            pagecount = int(lines['pageHelp'].get('pageCount'))
+            datapage = int(pagecount/5+1 if pagecount%5>0 else pagecount/5)
+            df = pd.DataFrame(lines['result'], columns=rv.MAR_SH_HZ_COLS)
+            df['date'] = df['date'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
+            data = data.append(df, ignore_index=True)
+            if beginPage < datapage*5:
+                data = _sh_hz(data, start=start, end=end, pageNo=pageNo, 
+                       beginPage=beginPage, endPage=endPage, 
+                       retry_count=retry_count, pause=pause)
+        except _network_error_classes:
+            pass
+        else:
+            return data
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
+
+def sh_margin_details(date='', symbol='', 
+                      start='', end='',
+                      retry_count=3, pause=0.001):
+    """
+    获取沪市融资融券明细列表
+    Parameters
+    --------
+    date:string
+                明细数据日期 format：YYYY-MM-DD 默认为空''
+    symbol：string
+                标的代码，6位数字e.g.600848，默认为空  
+    start:string
+                  开始日期 format：YYYY-MM-DD 默认为空''
+    end:string
+                  结束日期 format：YYYY-MM-DD 默认为空''
+    retry_count : int, 默认 3
+                 如遇网络等问题重复执行的次数 
+    pause : int, 默认 0
+                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    
+    Return
+    ------
+    DataFrame
+    date:信用交易日期
+    code:标的证券代码
+    name:标的证券简称
+    rzye:本日融资余额(元)
+    rzmre: 本日融资买入额(元)
+    rzche:本日融资偿还额(元)
+    rqyl: 本日融券余量
+    rqmcl: 本日融券卖出量
+    rqchl: 本日融券偿还量
+    """
+    date = date if date == '' else date.replace('-', '')
+    start = start if start == '' else start.replace('-','')
+    end = end if end == '' else end.replace('-','')
+    if (start != '') & (end != ''):
+        date = ''
+    data = pd.DataFrame()
+    ct._write_head()
+    df = _sh_mx(data, date=date, start=start,
+                end=end, symbol=symbol,
+                retry_count=retry_count,
+                pause=pause)
+    return df
+
+
+def _sh_mx(data, date='', start='', end='', 
+           symbol='',
+           pageNo='', beginPage='',
+           endPage='',
+           retry_count=3, pause=0.001):
+    for _ in range(retry_count):
+        time.sleep(pause)
+        ct._write_console()
+        try:
+            tail = '&pageHelp.pageNo=%s&pageHelp.beginPage=%s&pageHelp.endPage=%s'%(pageNo,
+                                    beginPage, endPage)
+            if pageNo == '':
+                pageNo = 6
+                tail = ''
+            else:
+                pageNo += 5
+            beginPage = pageNo
+            endPage = pageNo + 4
+            url = rv.MAR_SH_MX_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
+                                    ct.PAGES['qmd'], _random(5), date, 
+                                    symbol, start, end, tail,
+                                    _random())
+            ref = rv.MAR_SH_HZ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
+            clt = Client(url, ref=ref, cookie=rv.MAR_SH_COOKIESTR)
+            lines = clt.gvalue()
+            lines = lines.decode('utf-8') if ct.PY3 else lines
+            lines = lines[19:-1]
+            lines = json.loads(lines)
+            pagecount = int(lines['pageHelp'].get('pageCount'))
+            datapage = int(pagecount/5+1 if pagecount%5>0 else pagecount/5)
+            if pagecount == 0:
+                return data
+            if pageNo == 6:
+                ct._write_tips(lines['pageHelp'].get('total'))
+            df = pd.DataFrame(lines['result'], columns=rv.MAR_SH_MX_COLS)
+            df['date'] = df['date'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
+            df = df.set_index('date')
+            data = data.append(df, ignore_index=True)
+            if beginPage < datapage*5:
+                data = _sh_mx(data, start=start, end=end, pageNo=pageNo, 
+                       beginPage=beginPage, endPage=endPage, 
+                       retry_count=retry_count, pause=pause)
+        except _network_error_classes:
+            pass
+        else:
+            return data
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
+
+def sz_margins(start=None, end=None, retry_count=3, pause=0.001):
+    """
+    获取深市融资融券数据列表
+    Parameters
+    --------
+    start:string
+                  开始日期 format：YYYY-MM-DD 默认为上一周的今天
+    end:string
+                  结束日期 format：YYYY-MM-DD 默认为今日
+    retry_count : int, 默认 3
+                 如遇网络等问题重复执行的次数 
+    pause : int, 默认 0
+                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    
+    Return
+    ------
+    DataFrame
+    date:信用交易日期(index)
+    rzmre: 融资买入额(元)
+    rzye:融资余额(元)
+    rqmcl: 融券卖出量
+    rqyl: 融券余量
+    rqye: 融券余量(元)
+    rzrqye:融资融券余额(元)
+    """
+    data = pd.DataFrame()
+    if start is None and end is None:
+        end = du.today()
+        start = du.day_last_week()
+    if start is None or end is None:
+        ct._write_msg(rv.MAR_SZ_HZ_MSG2)
+        return None
+    try:
+        date_range = pd.date_range(start=start, end=end, freq='B')
+        if len(date_range)>261:
+            ct._write_msg(rv.MAR_SZ_HZ_MSG)
+        else:
+            ct._write_head()
+            for date in date_range:
+                data = data.append(_sz_hz(str(date.date()), retry_count, pause) )
+    except:
+        ct._write_msg(ct.DATA_INPUT_ERROR_MSG)
+    else:
+        return data
+        
+
+def _sz_hz(date='', retry_count=3, pause=0.001):
+    for _ in range(retry_count):
+        time.sleep(pause)
+        ct._write_console()
+        try:
+            url = rv.MAR_SZ_HZ_URL%(ct.P_TYPE['http'], ct.DOMAINS['szse'],
+                                    ct.PAGES['szsefc'], date)
+            request = Request(url)
+            lines = urlopen(request, timeout = 10).read()
+            if len(lines) <= 200:
+                return pd.DataFrame()
+            df = pd.read_html(lines, skiprows=[0])[0]
+            df.columns = rv.MAR_SZ_HZ_COLS
+            df['date'] = date
+            df = df.set_index('date')
+        except:
+            pass
+        else:
+            return df
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
+
+def sz_margin_details(date='', retry_count=3, pause=0.001):
+    """
+    获取深市融资融券明细列表
+    Parameters
+    --------
+    date:string
+                明细数据日期 format：YYYY-MM-DD 默认为空''
+    symbol：string
+                标的代码，6位数字e.g.600848，默认为空  
+    retry_count : int, 默认 3
+                 如遇网络等问题重复执行的次数 
+    pause : int, 默认 0
+                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    
+    Return
+    ------
+    DataFrame
+    date:信用交易日期
+    code:标的证券代码
+    name:标的证券简称
+    rzmre: 融资买入额(元)
+    rzye:融资余额(元)
+    rqmcl: 融券卖出量
+    rqyl: 融券余量
+    rqye: 融券余量(元)
+    rzrqye:融资融券余额(元)
+    """
+    for _ in range(retry_count):
+        time.sleep(pause)
+        try:
+            url = rv.MAR_SZ_MX_URL%(ct.P_TYPE['http'], ct.DOMAINS['szse'],
+                                    ct.PAGES['szsefc'], date)
+            request = Request(url)
+            lines = urlopen(request, timeout = 10).read()
+            if len(lines) <= 200:
+                return pd.DataFrame()
+            df = pd.read_html(lines, skiprows=[0])[0]
+            df.columns = rv.MAR_SZ_MX_COLS
+            df['code'] = df['code'].map(lambda x:str(x).zfill(6))
+            df['date'] = date
+        except:
+            pass
+        else:
+            return df
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
+
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))  
 
-    
-def _check_input(year, quarter):
-    if type(year) is str or year < 1989 :
-        raise TypeError('年度输入错误：请输入1989年以后的年份数字，格式：YYYY')
-    elif quarter is None or type(quarter) is str or quarter not in [1, 2, 3, 4]:
-        raise TypeError('季度输入错误：请输入1、2、3或4数字')
-    else:
-        return True   
-    

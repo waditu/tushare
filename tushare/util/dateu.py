@@ -38,6 +38,15 @@ def today_last_year():
     lasty = datetime.datetime.today().date() + datetime.timedelta(-365)
     return str(lasty)
 
+def day_last_week(days=-7):
+    lasty = datetime.datetime.today().date() + datetime.timedelta(days)
+    return str(lasty)
+
+def diff_day(start=None, end=None):
+    d1 = datetime.datetime.strptime(end, '%Y-%m-%d')
+    d2 = datetime.datetime.strptime(start, '%Y-%m-%d')
+    delta = d1 - d2
+    return delta.days
 
 def get_quarts(start,end):
     idx = pd.period_range('Q'.join(year_qua(start)), 'Q'.join(year_qua(end)),

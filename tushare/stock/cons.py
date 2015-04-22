@@ -6,7 +6,7 @@ Created on 2014/07/31
 @contact: jimmysoa@sina.cn
 """
 
-VERSION = '0.2.1'
+VERSION = '0.2.6'
 K_LABELS = ['D', 'W', 'M']
 K_MIN_LABELS = ['5', '15', '30', '60']
 K_TYPE = {'D': 'akdaily', 'W': 'akweekly', 'M': 'akmonthly'}
@@ -20,7 +20,9 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'ifeng': 'ifeng.com', 'sf': 'finance.sina.com.cn',
            'vsf': 'vip.stock.finance.sina.com.cn', 
            'idx':'www.csindex.com.cn', '163':'money.163.com',
-           'em':'eastmoney.com'}
+           'em':'eastmoney.com', 'sseq':'query.sse.com.cn',
+           'sse':'www.sse.com.cn', 'szse':'www.szse.cn',
+           'oss':'tudata.oss-cn-beijing.aliyuncs.com'}
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
          'ntinfo':'vCB_BulletinGather.php', 'hs300b':'000300cons.xls',
@@ -28,7 +30,8 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'dp':'all_fpya.php', '163dp':'fpyg.html',
          'emxsg':'JS.aspx', '163fh':'jjcgph.php',
          'newstock':'vRPD_NewStockIssue.php', 'zz500b':'000905cons.xls',
-         't_ticks':'vMS_tradedetail.php'}
+         't_ticks':'vMS_tradedetail.php',
+         'qmd':'queryMargin.do', 'szsefc':'FrontController.szse'}
 TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
 TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
 DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
@@ -77,15 +80,39 @@ INDEX_C_COMM = 'sseportal/ps/zhs/hqjt/csi'
 HS300_CLASSIFY_URL = '%s%s/%s/%s'
 HIST_FQ_URL = '%s%s/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml?year=%s&jidu=%s'
 HIST_FQ_FACTOR_URL = '%s%s/api/json.php/BasicStockSrv.getStockFuQuanData?symbol=%s&type=qfq'
-HIST_FQ_COLS = ['date', 'open', 'high', 'close', 'low', 'volumn', 'amount', 'factor']
+ALL_STK_URL = '%s%s/all.csv'
+HIST_FQ_COLS = ['date', 'open', 'high', 'close', 'low', 'volume', 'amount', 'factor']
 HIST_FQ_FACTOR_COLS = ['code','value']
+DATA_GETTING_TIPS = '[Getting data:]'
+DATA_GETTING_FLAG = '#'
+DATA_ROWS_TIPS = '%s rows data found.Please wait for a moment.'
+DATA_INPUT_ERROR_MSG = 'date input error.'
+NETWORK_URL_ERROR_MSG = '获取失败，请检查网络和URL'
+DATE_CHK_MSG = '年度输入错误：请输入1989年以后的年份数字，格式：YYYY'
+DATE_CHK_Q_MSG = '季度输入错误：请输入1、2、3或4数字'
 
 import sys
 PY3 = (sys.version_info[0] >= 3)
 def _write_head():
-    sys.stdout.write("[Getting data:]")
+    sys.stdout.write(DATA_GETTING_TIPS)
     sys.stdout.flush()
 
 def _write_console():
-    sys.stdout.write("#")
+    sys.stdout.write(DATA_GETTING_FLAG)
     sys.stdout.flush()
+    
+def _write_tips(tip):
+    sys.stdout.write(DATA_ROWS_TIPS%tip)
+    sys.stdout.flush()
+
+def _write_msg(msg):
+    sys.stdout.write(msg)
+    sys.stdout.flush()
+    
+def _check_input(year, quarter):
+    if type(year) is str or year < 1989 :
+        raise TypeError(DATE_CHK_MSG)
+    elif quarter is None or type(quarter) is str or quarter not in [1, 2, 3, 4]:
+        raise TypeError(DATE_CHK_Q_MSG)
+    else:
+        return True

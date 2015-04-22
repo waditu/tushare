@@ -1,4 +1,4 @@
-__version__ = '0.2.5'
+__version__ = '0.2.6'
 __author__ = 'Jimmy Liu'
 
 """
@@ -41,6 +41,11 @@ from tushare.stock.newsevent import (get_latest_news, latest_content,
                                      get_notices, notice_content,
                                      guba_sina)
 
+"""
+for reference
+"""
 from tushare.stock.reference import (profit_data, forecast_data,
                                      xsg_data, fund_holdings,
-                                     new_stocks)
+                                     new_stocks, sh_margins,
+                                     sh_margin_details,
+                                     sz_margins, sz_margin_details)

@@ -218,5 +218,3 @@ def _random(n=16):
     end = (10 ** n) - 1
     return str(randint(start, end))
 
-if __name__ == "__main__":
-    print(get_latest_news(show_content=True))
