@@ -20,9 +20,9 @@ FUND_HOLDS_COLS = ['count', 'clast', 'date', 'ratio', 'amount', 'nums','nlast', 
 NEW_STOCKS_COLS = ['code', 'name', 'ipo_date', 'issue_date', 'amount', 'markets', 'price', 'pe',
                    'limit', 'funds', 'ballot']
 MAR_SH_COOKIESTR = '_gscu_1808689395=27850607moztu036'
-MAR_SH_HZ_COLS = ['date', 'rzye', 'rzmre', 'rqyl', 'rqylje', 'rqmcl', 'rzrqjyzl']
-MAR_SH_MX_COLS = ['date', 'code', 'name', 'rzye', 'rzmre', 'rzche', 'rqyl', 'rqmcl', 'rqchl']
+MAR_SH_HZ_COLS = ['opDate', 'rzye', 'rzmre', 'rqyl', 'rqylje', 'rqmcl', 'rzrqjyzl']
+MAR_SH_MX_COLS = ['opDate', 'stockCode', 'securityAbbr', 'rzye', 'rzmre', 'rzche', 'rqyl', 'rqmcl', 'rqchl']
 MAR_SZ_HZ_COLS = ['rzmre', 'rzye', 'rqmcl', 'rqyl', 'rqye', 'rzrqye']
-MAR_SZ_MX_COLS = ['code', 'name', 'rzmre', 'rzye', 'rqmcl', 'rqyl', 'rqye', 'rzrqye']
+MAR_SZ_MX_COLS = ['stockCode', 'securityAbbr', 'rzmre', 'rzye', 'rqmcl', 'rqyl', 'rqye', 'rzrqye']
 MAR_SZ_HZ_MSG = 'please do not input more than a year,you can obtaining the data year by year.'
 MAR_SZ_HZ_MSG2 = 'start and end date all need input.'

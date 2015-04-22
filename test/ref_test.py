@@ -34,6 +34,23 @@ class Test(unittest.TestCase):
      
     def test_new_stocksa(self):
         print(fd.new_stocks())  
+        
+    
+    def test_sh_margin_details(self):
+        self.set_data()
+        print(fd.sh_margin_details(self.start, self.end, self.code)) 
                
+    def test_sh_margins(self):
+        self.set_data()
+        print(fd.sh_margins(self.start, self.end)) 
+      
+    def test_sz_margins(self):
+        self.set_data()
+        print(fd.sz_margins(self.start, self.end))   
+        
+    def test_sz_margin_details(self):
+        self.set_data()
+        print(fd.sz_margin_details(self.end))   
+    
 if __name__ == "__main__":
     unittest.main()

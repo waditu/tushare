@@ -306,27 +306,27 @@ def _holding_cotent(start, end, pageNo, retry_count, pause):
         if pageNo>0:
                 ct._write_console()
         try:
-            with urlopen(url) as resp:
-                lines = resp.read()
-                lines = lines.decode('utf-8') if ct.PY3 else lines
-                lines = lines.replace('--', '0')
-                lines = json.loads(lines)
-                data = lines['list']
-                df = pd.DataFrame(data)
-                df = df.drop(['CODE', 'ESYMBOL', 'EXCHANGE', 'NAME', 'RN', 'SHANGQIGUSHU',
+            request = Request(url)
+            lines = urlopen(request, timeout = 10).read()
+            lines = lines.decode('utf-8') if ct.PY3 else lines
+            lines = lines.replace('--', '0')
+            lines = json.loads(lines)
+            data = lines['list']
+            df = pd.DataFrame(data)
+            df = df.drop(['CODE', 'ESYMBOL', 'EXCHANGE', 'NAME', 'RN', 'SHANGQIGUSHU',
                               'SHANGQISHIZHI', 'SHANGQISHULIANG'], axis=1)
-                for col in ['GUSHU', 'GUSHUBIJIAO', 'SHIZHI', 'SCSTC27']:
-                    df[col] = df[col].astype(float)
-                df['SCSTC27'] = df['SCSTC27']*100
-                df['GUSHU'] = df['GUSHU']/10000
-                df['GUSHUBIJIAO'] = df['GUSHUBIJIAO']/10000
-                df['SHIZHI'] = df['SHIZHI']/10000
-                df['GUSHU'] = df['GUSHU'].map(ct.FORMAT)
-                df['GUSHUBIJIAO'] = df['GUSHUBIJIAO'].map(ct.FORMAT)
-                df['SHIZHI'] = df['SHIZHI'].map(ct.FORMAT)
-                df['SCSTC27'] = df['SCSTC27'].map(ct.FORMAT)
-                df.columns = rv.FUND_HOLDS_COLS
-                df = df[['code', 'name', 'date', 'nums', 'nlast', 'count', 
+            for col in ['GUSHU', 'GUSHUBIJIAO', 'SHIZHI', 'SCSTC27']:
+                df[col] = df[col].astype(float)
+            df['SCSTC27'] = df['SCSTC27']*100
+            df['GUSHU'] = df['GUSHU']/10000
+            df['GUSHUBIJIAO'] = df['GUSHUBIJIAO']/10000
+            df['SHIZHI'] = df['SHIZHI']/10000
+            df['GUSHU'] = df['GUSHU'].map(ct.FORMAT)
+            df['GUSHUBIJIAO'] = df['GUSHUBIJIAO'].map(ct.FORMAT)
+            df['SHIZHI'] = df['SHIZHI'].map(ct.FORMAT)
+            df['SCSTC27'] = df['SCSTC27'].map(ct.FORMAT)
+            df.columns = rv.FUND_HOLDS_COLS
+            df = df[['code', 'name', 'date', 'nums', 'nlast', 'count', 
                          'clast', 'amount', 'ratio']]
         except _network_error_classes:
             pass
@@ -419,7 +419,7 @@ def sh_margins(start=None, end=None, retry_count=3, pause=0.001):
     Return
     ------
     DataFrame
-    date:信用交易日期
+    opDate:信用交易日期
     rzye:本日融资余额(元)
     rzmre: 本日融资买入额(元)
     rqyl: 本日融券余量
@@ -470,7 +470,7 @@ def _sh_hz(data, start=None, end=None,
             pagecount = int(lines['pageHelp'].get('pageCount'))
             datapage = int(pagecount/5+1 if pagecount%5>0 else pagecount/5)
             df = pd.DataFrame(lines['result'], columns=rv.MAR_SH_HZ_COLS)
-            df['date'] = df['date'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
+            df['opDate'] = df['opDate'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
             data = data.append(df, ignore_index=True)
             if beginPage < datapage*5:
                 data = _sh_hz(data, start=start, end=end, pageNo=pageNo, 
@@ -506,9 +506,9 @@ def sh_margin_details(date='', symbol='',
     Return
     ------
     DataFrame
-    date:信用交易日期
-    code:标的证券代码
-    name:标的证券简称
+    opDate:信用交易日期
+    stockCode:标的证券代码
+    securityAbbr:标的证券简称
     rzye:本日融资余额(元)
     rzmre: 本日融资买入额(元)
     rzche:本日融资偿还额(元)
@@ -565,8 +565,8 @@ def _sh_mx(data, date='', start='', end='',
             if pageNo == 6:
                 ct._write_tips(lines['pageHelp'].get('total'))
             df = pd.DataFrame(lines['result'], columns=rv.MAR_SH_MX_COLS)
-            df['date'] = df['date'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
-            df = df.set_index('date')
+            df['opDate'] = df['opDate'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
+            df = df.set_index('opDate')
             data = data.append(df, ignore_index=True)
             if beginPage < datapage*5:
                 data = _sh_mx(data, start=start, end=end, pageNo=pageNo, 
@@ -596,7 +596,7 @@ def sz_margins(start=None, end=None, retry_count=3, pause=0.001):
     Return
     ------
     DataFrame
-    date:信用交易日期(index)
+    opDate:信用交易日期(index)
     rzmre: 融资买入额(元)
     rzye:融资余额(元)
     rqmcl: 融券卖出量
@@ -638,8 +638,8 @@ def _sz_hz(date='', retry_count=3, pause=0.001):
                 return pd.DataFrame()
             df = pd.read_html(lines, skiprows=[0])[0]
             df.columns = rv.MAR_SZ_HZ_COLS
-            df['date'] = date
-            df = df.set_index('date')
+            df['opDate'] = date
+            df = df.set_index('opDate')
         except:
             pass
         else:
@@ -664,9 +664,9 @@ def sz_margin_details(date='', retry_count=3, pause=0.001):
     Return
     ------
     DataFrame
-    date:信用交易日期
-    code:标的证券代码
-    name:标的证券简称
+    opDate:信用交易日期
+    stockCode:标的证券代码
+    securityAbbr:标的证券简称
     rzmre: 融资买入额(元)
     rzye:融资余额(元)
     rqmcl: 融券卖出量
@@ -685,8 +685,8 @@ def sz_margin_details(date='', retry_count=3, pause=0.001):
                 return pd.DataFrame()
             df = pd.read_html(lines, skiprows=[0])[0]
             df.columns = rv.MAR_SZ_MX_COLS
-            df['code'] = df['code'].map(lambda x:str(x).zfill(6))
-            df['date'] = date
+            df['stockCode'] = df['stockCode'].map(lambda x:str(x).zfill(6))
+            df['opDate'] = date
         except:
             pass
         else:
