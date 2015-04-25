@@ -517,8 +517,8 @@ def sh_margin_details(date='', symbol='',
     rqchl: 本日融券偿还量
     """
     date = date if date == '' else date.replace('-', '')
-    start = start if start == '' else start.replace('-','')
-    end = end if end == '' else end.replace('-','')
+    start = start if start == '' else start.replace('-', '')
+    end = end if end == '' else end.replace('-', '')
     if (start != '') & (end != ''):
         date = ''
     data = pd.DataFrame()
@@ -566,7 +566,6 @@ def _sh_mx(data, date='', start='', end='',
                 ct._write_tips(lines['pageHelp'].get('total'))
             df = pd.DataFrame(lines['result'], columns=rv.MAR_SH_MX_COLS)
             df['opDate'] = df['opDate'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
-            df = df.set_index('opDate')
             data = data.append(df, ignore_index=True)
             if beginPage < datapage*5:
                 data = _sh_mx(data, start=start, end=end, pageNo=pageNo, 
@@ -639,7 +638,6 @@ def _sz_hz(date='', retry_count=3, pause=0.001):
             df = pd.read_html(lines, skiprows=[0])[0]
             df.columns = rv.MAR_SZ_HZ_COLS
             df['opDate'] = date
-            df = df.set_index('opDate')
         except:
             pass
         else:
@@ -700,3 +698,5 @@ def _random(n=13):
     end = (10**n)-1
     return str(randint(start, end))  
 
+if __name__ == "__main__":
+    print(sh_margin_details())
