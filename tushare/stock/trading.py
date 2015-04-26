@@ -360,6 +360,8 @@ def get_h_data(code, start=None, end=None, autype='qfq',
                                   code, qt[0], qt[1])
             df = _parse_fq_data(url, retry_count, pause)
             data = data.append(df, ignore_index=True)
+    if len(data) == 0:
+        return None
     data = data.drop_duplicates('date')
     if start is not None:
         data = data[data.date>=start]
@@ -448,6 +450,8 @@ def _parse_fq_data(url, retry_count, pause):
                 sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             df = pd.read_html(sarr, skiprows = [0, 1])[0]
+            if len(df) == 0:
+                return pd.DataFrame()
             df.columns = ct.HIST_FQ_COLS
             if df['date'].dtypes == np.object:
                 df['date'] = df['date'].astype(np.datetime64)
@@ -477,3 +481,10 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] == '6' else 'sz%s'%code
+
+if __name__ == "__main__":
+    for code in ['002135', '601021', '600029', '000520', '300272', '002598', '002591', '002435', '002342', '603099',
+            '601888', '300039', '002434', '002594', '600616', '300005', '002154', '002321', '002173', '002205',
+            '000973', '002136', '603799', '601069', '600832', '600845', '300020', '002232', '300227', '002463',
+            '002402', '300081', '300367', '002210', '002573', '002518', '002523', '002158', '300068', '002112']:
+        print(get_h_data(code, start='2014-01-01', end='2015-04-24'))

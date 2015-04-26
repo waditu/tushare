@@ -10,11 +10,13 @@ Created on 2015/02/01
 
 import pandas as pd
 from tushare.stock import cons as ct
+from tushare.stock import ref_vars as rv
 import json
 import re
 from pandas.util.testing import _network_error_classes
 import time
 import tushare.stock.fundamental as fd
+from tushare.util.netbase import Client
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -232,4 +234,69 @@ def get_zz500s():
         return df
     except Exception as er:
         print(str(er)) 
+
+
+def get_terminated():
+    """
+    获取终止上市股票列表
+    Return
+    --------
+    DataFrame
+        code :股票代码
+        name :股票名称
+        oDate:上市日期
+        tDate:终止上市日期 
+    """
+    try:
+        
+        url = rv.TERMINATED_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
+                                    ct.PAGES['ssecq'], _random(5),
+                                    _random())
+        ref = ct.SSEQ_CQ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
+        clt = Client(url, ref=ref, cookie=rv.MAR_SH_COOKIESTR)
+        lines = clt.gvalue()
+        lines = lines.decode('utf-8') if ct.PY3 else lines
+        lines = lines[19:-1]
+        lines = json.loads(lines)
+        df = pd.DataFrame(lines['result'], columns=rv.TERMINATED_T_COLS)
+        df.columns = rv.TERMINATED_COLS
+        return df
+    except Exception as er:
+        print(str(er))      
+
+
+def get_suspended():
+    """
+    获取暂停上市股票列表
+    Return
+    --------
+    DataFrame
+        code :股票代码
+        name :股票名称
+        oDate:上市日期
+        tDate:终止上市日期 
+    """
+    try:
+        
+        url = rv.SUSPENDED_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
+                                    ct.PAGES['ssecq'], _random(5),
+                                    _random())
+        ref = ct.SSEQ_CQ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
+        clt = Client(url, ref=ref, cookie=rv.MAR_SH_COOKIESTR)
+        lines = clt.gvalue()
+        lines = lines.decode('utf-8') if ct.PY3 else lines
+        lines = lines[19:-1]
+        lines = json.loads(lines)
+        df = pd.DataFrame(lines['result'], columns=rv.TERMINATED_T_COLS)
+        df.columns = rv.TERMINATED_COLS
+        return df
+    except Exception as er:
+        print(str(er))   
+
+
+def _random(n=13):
+    from random import randint
+    start = 10**(n-1)
+    end = (10**n)-1
+    return str(randint(start, end))  
 
