@@ -44,34 +44,6 @@ def get_stock_basics(file_path=None):
     return df
 
 
-def get_dbf_data(file_path=None):
-    """
-    通过通达信下载的base.dbf读取主要基础数据
-    http://www.tdx.com.cn/products/data/data/dbf/base.zip
-    """
-    file_path = file_path if file_path else ct.ALL_STOCK_BASICS_FILE%_data_path()
-    import dbf
-    table=dbf.Table(file_path)
-    table.open()
-    data=[]
-    for record in table:
-        code=record[1]  #股票代码
-        zgb=record.zgb  #总股本
-        jly=record.jly  #净利润
-        zzc=record.zzc  #总资产
-        jzc=record.jzc  #净资产
-        if zgb<>0:
-            eps=jly/zgb
-            bvps=jzc/zgb
-        if jzc<>0:
-            roe=jly/jzc
-        else:
-            roe=0
-        data.append([code,zgb,jly,zzc,jzc,roe,eps,bvps])
-    df=pd.DataFrame(data,columns=['code','zgb','jly','zzc','jzc','roe','eps','bvps'])
-    return df
-
-
 def get_report_data(year, quarter):
     """
         获取业绩报表数据
@@ -460,3 +432,5 @@ def _data_path():
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
 
+if __name__ == '__main__':
+    print(get_dbf_data())
