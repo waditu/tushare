@@ -77,11 +77,10 @@ def get_report_data(year, quarter):
 
 
 def _get_report_data(year, quarter, pageNo, dataArr):
-    url = ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
-                         year, quarter, pageNo, ct.PAGE_NUM[1])
     ct._write_console()
     try:
-        html = lxml.html.parse(url)
+        html = lxml.html.parse(ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
+                         year, quarter, pageNo, ct.PAGE_NUM[1]))
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
         for trs in xtrs:
             code = trs.xpath('td[1]//span/a/text()')[0]
@@ -142,11 +141,10 @@ def get_profit_data(year, quarter):
 
 
 def _get_profit_data(year, quarter, pageNo, dataArr):
-    url = ct.PROFIT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
-                         quarter, pageNo, ct.PAGE_NUM[1])
     ct._write_console()
     try:
-        html = lxml.html.parse(url)
+        html = lxml.html.parse(ct.PROFIT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                         quarter, pageNo, ct.PAGE_NUM[1]))
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
         for trs in xtrs:
             code = trs.xpath('td[1]/a/text()')[0]
@@ -207,11 +205,10 @@ def get_operation_data(year, quarter):
 
 
 def _get_operation_data(year, quarter, pageNo, dataArr):
-    url = ct.OPERATION_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
-                            quarter, pageNo, ct.PAGE_NUM[1])
     ct._write_console()
     try:
-        html = lxml.html.parse(url)
+        html = lxml.html.parse(ct.OPERATION_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                            quarter, pageNo, ct.PAGE_NUM[1]))
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
         for trs in xtrs:
             code = trs.xpath('td[1]/a/text()')[0]
@@ -270,11 +267,10 @@ def get_growth_data(year, quarter):
 
 
 def _get_growth_data(year, quarter, pageNo, dataArr):
-    url = ct.GROWTH_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
-                         quarter, pageNo, ct.PAGE_NUM[1])
     ct._write_console()
     try:
-        html = lxml.html.parse(url)
+        html = lxml.html.parse(ct.GROWTH_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                         quarter, pageNo, ct.PAGE_NUM[1]))
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
         for trs in xtrs:
             code = trs.xpath('td[1]/a/text()')[0]
@@ -332,11 +328,10 @@ def get_debtpaying_data(year, quarter):
 
 
 def _get_debtpaying_data(year, quarter, pageNo, dataArr):
-    url = ct.DEBTPAYING_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
-                             quarter, pageNo, ct.PAGE_NUM[1])
     ct._write_console()
     try:
-        html = lxml.html.parse(url)
+        html = lxml.html.parse(ct.DEBTPAYING_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                             quarter, pageNo, ct.PAGE_NUM[1]))
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
         for trs in xtrs:
             code = trs.xpath('td[1]/a/text()')[0]
@@ -394,11 +389,10 @@ def get_cashflow_data(year, quarter):
 
 
 def _get_cashflow_data(year, quarter, pageNo, dataArr):
-    url = ct.CASHFLOW_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
-                           quarter, pageNo, ct.PAGE_NUM[1])
     ct._write_console()
     try:
-        html = lxml.html.parse(url)
+        html = lxml.html.parse(ct.CASHFLOW_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
+                           quarter, pageNo, ct.PAGE_NUM[1]))
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
         for trs in xtrs:
             code = trs.xpath('td[1]/a/text()')[0]
@@ -432,5 +426,3 @@ def _data_path():
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
 
-if __name__ == '__main__':
-    print(get_dbf_data())

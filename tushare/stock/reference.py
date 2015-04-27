@@ -116,14 +116,13 @@ def _fun_into(x):
     
     
 def _dist_cotent(year, pageNo, retry_count, pause):
-    url = rv.DP_163_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
-                     ct.PAGES['163dp'], year, pageNo)
     for _ in range(retry_count):
         time.sleep(pause)
         try:
             if pageNo > 0:
                 ct._write_console()
-            html = lxml.html.parse(url)  
+            html = lxml.html.parse(rv.DP_163_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
+                     ct.PAGES['163dp'], year, pageNo))  
             res = html.xpath('//div[@class=\"fn_rp_list\"]/table')
             if ct.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -172,19 +171,19 @@ def forecast_data(year, quarter):
         range,业绩变动范围
         
     """
-    if ct._check_input(year,quarter) is True:
+    if ct._check_input(year, quarter) is True:
         ct._write_head()
-        data =  _get_forecast_data(year,quarter,1,[])
-        df = pd.DataFrame(data,columns=ct.FORECAST_COLS)
+        data =  _get_forecast_data(year, quarter, 1, [])
+        df = pd.DataFrame(data, columns=ct.FORECAST_COLS)
         return df
 
 
 def _get_forecast_data(year, quarter, pageNo, dataArr):
-    url = ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'], year,
-                           quarter, pageNo, ct.PAGE_NUM[1])
     ct._write_console()
     try:
-        html = lxml.html.parse(url)
+        html = lxml.html.parse(ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], 
+                                                ct.PAGES['fd'], year,quarter, pageNo,
+                                                ct.PAGE_NUM[1]))
         xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
         for trs in xtrs:
             code = trs.xpath('td[1]//span/a/text()')[0]
@@ -195,11 +194,11 @@ def _get_forecast_data(year, quarter, pageNo, dataArr):
             pre_eps = trs.xpath('td[7]/text()')[0] 
             pre_eps = '0' if pre_eps == '--' else pre_eps
             range = trs.xpath('td[8]/text()')[0] 
-            dataArr.append([code,name,type,report_date,pre_eps,range])
+            dataArr.append([code, name, type, report_date, pre_eps, range])
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
         if len(nextPage)>0:
             pageNo = re.findall(r'\d+',nextPage[0])[0]
-            return _get_forecast_data(year,quarter,pageNo,dataArr)
+            return _get_forecast_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
     except:
@@ -298,15 +297,14 @@ def fund_holdings(year, quarter,
 
 
 def _holding_cotent(start, end, pageNo, retry_count, pause):
-    url = rv.FUND_HOLDS_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
-                     ct.PAGES['163fh'], ct.PAGES['163fh'],
-                     pageNo, start, end, _random(5))
     for _ in range(retry_count):
         time.sleep(pause)
         if pageNo>0:
                 ct._write_console()
         try:
-            request = Request(url)
+            request = Request(rv.FUND_HOLDS_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
+                     ct.PAGES['163fh'], ct.PAGES['163fh'],
+                     pageNo, start, end, _random(5)))
             lines = urlopen(request, timeout = 10).read()
             lines = lines.decode('utf-8') if ct.PY3 else lines
             lines = lines.replace('--', '0')
@@ -548,12 +546,11 @@ def _sh_mx(data, date='', start='', end='',
                 pageNo += 5
             beginPage = pageNo
             endPage = pageNo + 4
-            url = rv.MAR_SH_MX_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
+            ref = rv.MAR_SH_HZ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
+            clt = Client(rv.MAR_SH_MX_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
                                     ct.PAGES['qmd'], _random(5), date, 
                                     symbol, start, end, tail,
-                                    _random())
-            ref = rv.MAR_SH_HZ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
-            clt = Client(url, ref=ref, cookie=rv.MAR_SH_COOKIESTR)
+                                    _random()), ref=ref, cookie=rv.MAR_SH_COOKIESTR)
             lines = clt.gvalue()
             lines = lines.decode('utf-8') if ct.PY3 else lines
             lines = lines[19:-1]
@@ -629,9 +626,8 @@ def _sz_hz(date='', retry_count=3, pause=0.001):
         time.sleep(pause)
         ct._write_console()
         try:
-            url = rv.MAR_SZ_HZ_URL%(ct.P_TYPE['http'], ct.DOMAINS['szse'],
-                                    ct.PAGES['szsefc'], date)
-            request = Request(url)
+            request = Request(rv.MAR_SZ_HZ_URL%(ct.P_TYPE['http'], ct.DOMAINS['szse'],
+                                    ct.PAGES['szsefc'], date))
             lines = urlopen(request, timeout = 10).read()
             if len(lines) <= 200:
                 return pd.DataFrame()
@@ -675,9 +671,8 @@ def sz_margin_details(date='', retry_count=3, pause=0.001):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            url = rv.MAR_SZ_MX_URL%(ct.P_TYPE['http'], ct.DOMAINS['szse'],
-                                    ct.PAGES['szsefc'], date)
-            request = Request(url)
+            request = Request(rv.MAR_SZ_MX_URL%(ct.P_TYPE['http'], ct.DOMAINS['szse'],
+                                    ct.PAGES['szsefc'], date))
             lines = urlopen(request, timeout = 10).read()
             if len(lines) <= 200:
                 return pd.DataFrame()

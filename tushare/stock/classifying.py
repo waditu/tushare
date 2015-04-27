@@ -249,11 +249,10 @@ def get_terminated():
     """
     try:
         
-        url = rv.TERMINATED_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
-                                    ct.PAGES['ssecq'], _random(5),
-                                    _random())
         ref = ct.SSEQ_CQ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
-        clt = Client(url, ref=ref, cookie=rv.MAR_SH_COOKIESTR)
+        clt = Client(rv.TERMINATED_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
+                                    ct.PAGES['ssecq'], _random(5),
+                                    _random()), ref=ref, cookie=rv.MAR_SH_COOKIESTR)
         lines = clt.gvalue()
         lines = lines.decode('utf-8') if ct.PY3 else lines
         lines = lines[19:-1]
@@ -278,11 +277,10 @@ def get_suspended():
     """
     try:
         
-        url = rv.SUSPENDED_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
-                                    ct.PAGES['ssecq'], _random(5),
-                                    _random())
         ref = ct.SSEQ_CQ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
-        clt = Client(url, ref=ref, cookie=rv.MAR_SH_COOKIESTR)
+        clt = Client(rv.SUSPENDED_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
+                                    ct.PAGES['ssecq'], _random(5),
+                                    _random()), ref=ref, cookie=rv.MAR_SH_COOKIESTR)
         lines = clt.gvalue()
         lines = lines.decode('utf-8') if ct.PY3 else lines
         lines = lines[19:-1]

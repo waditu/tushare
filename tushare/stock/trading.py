@@ -103,9 +103,8 @@ def _parsing_dayprice_json(pageNum=1):
         DataFrame 当日所有股票交易数据(DataFrame)
     """
     ct._write_console()
-    url = ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                 ct.PAGES['jv'], pageNum)
-    request = Request(url)
+    request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                 ct.PAGES['jv'], pageNum))
     text = urlopen(request, timeout=10).read()
     if text == 'null':
         return None
@@ -163,6 +162,7 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
             return df
     raise IOError("获取失败，请检查网络")
 
+
 def get_today_ticks(code=None, retry_count=3, pause=0.001):
     """
         获取当日分笔明细数据
@@ -199,7 +199,8 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
         data = pd.DataFrame()
         ct._write_head()
         for pNo in range(1,pages):
-            data = data.append(_today_ticks(symbol, date, pNo, retry_count, pause), ignore_index=True)
+            data = data.append(_today_ticks(symbol, date, pNo,
+                                            retry_count, pause), ignore_index=True)
     except Exception as er:
         print(str(er))
     return data
@@ -224,7 +225,7 @@ def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
             sarr = sarr.replace('--', '0')
             df = pd.read_html(StringIO(sarr), parse_dates=False)[0]
             df.columns = ct.TODAY_TICK_COLUMNS
-            df['pchange'] = df['pchange'].map(lambda x : x.replace('%',''))
+            df['pchange'] = df['pchange'].map(lambda x : x.replace('%', ''))
         except _network_error_classes:
             pass
         else:
@@ -481,10 +482,3 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] == '6' else 'sz%s'%code
-
-if __name__ == "__main__":
-    for code in ['002135', '601021', '600029', '000520', '300272', '002598', '002591', '002435', '002342', '603099',
-            '601888', '300039', '002434', '002594', '600616', '300005', '002154', '002321', '002173', '002205',
-            '000973', '002136', '603799', '601069', '600832', '600845', '300020', '002232', '300227', '002463',
-            '002402', '300081', '300367', '002210', '002573', '002518', '002523', '002158', '300068', '002112']:
-        print(get_h_data(code, start='2014-01-01', end='2015-04-24'))

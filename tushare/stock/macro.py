@@ -39,16 +39,16 @@ def get_gdp_year():
         lbdy :批发零售贸易及餐饮业(亿元)
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'], rdint, vs.MACRO_TYPE[0],
-                        0, 70, rdint)
-    request = Request(url)
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[0], 0, 70,
+                                    rdint))
     text = urlopen(request, timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
-    datastr = datastr.replace('"', '').replace('null','0')
+    datastr = datastr.replace('"', '').replace('null', '0')
     js = json.loads(datastr)
     df = pd.DataFrame(js, columns=vs.GDP_YEAR_COLS)
     df[df==0] = np.NaN
@@ -72,9 +72,9 @@ def get_gdp_quarter():
         ti_yoy :第三产业增加值同比增长(%)
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'], rdint, vs.MACRO_TYPE[0],
-                        1, 250, rdint)
-    request = Request(url)
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[0], 1, 250,
+                                    rdint))
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -104,8 +104,8 @@ def get_gdp_for():
         goods_rate :货物和服务净出口拉动(百分点)
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],4,80,rdint)
-    request = Request(url)
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[0], 4, 80, rdint))
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -117,6 +117,7 @@ def get_gdp_for():
     df = pd.DataFrame(js,columns=vs.GDP_FOR_COLS)
     df[df==0] = np.NaN
     return df
+
 
 def get_gdp_pull():
     """
@@ -132,19 +133,20 @@ def get_gdp_pull():
         ti :第三产业拉动率(%)
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],5,60,rdint)
-    request = Request(url)
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[0], 5, 60, rdint))
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
-    datastr = datastr.replace('"','').replace('null','0')
+    datastr = datastr.replace('"', '').replace('null', '0')
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.GDP_PULL_COLS)
+    df = pd.DataFrame(js, columns=vs.GDP_PULL_COLS)
     df[df==0] = np.NaN
     return df
+
 
 def get_gdp_contrib():
     """
@@ -160,17 +162,17 @@ def get_gdp_contrib():
         ti :第三产业献率(%)
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[0],6,60,rdint)
-    request = Request(url)
-    text = urlopen(request,timeout=10).read()
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'], rdint,
+                                    vs.MACRO_TYPE[0], 6, 60, rdint))
+    text = urlopen(request, timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
-    datastr = datastr.replace('"','').replace('null','0')
+    datastr = datastr.replace('"', '').replace('null', '0')
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.GDP_CONTRIB_COLS)
+    df = pd.DataFrame(js, columns=vs.GDP_CONTRIB_COLS)
     df[df==0] = np.NaN
     return df
 
@@ -184,8 +186,9 @@ def get_cpi():
         cpi :价格指数
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[1],0,600,rdint)
-    request = Request(url)
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[1], 0, 600,
+                                    rdint))
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -193,9 +196,10 @@ def get_cpi():
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.CPI_COLS)
+    df = pd.DataFrame(js, columns=vs.CPI_COLS)
     df['cpi'] = df['cpi'].astype(float)
     return df
+
 
 def get_ppi():
     """
@@ -216,21 +220,23 @@ def get_ppi():
         dcg:耐用消费品价格指数
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[1],3,600,rdint)
-    request = Request(url)
-    text = urlopen(request,timeout=10).read()
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[1], 3, 600,
+                                    rdint))
+    text = urlopen(request, timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.PPI_COLS)
+    df = pd.DataFrame(js, columns=vs.PPI_COLS)
     for i in df.columns:
-        df[i] = df[i].apply(lambda x:np.where(x is None,np.NaN,x))
+        df[i] = df[i].apply(lambda x:np.where(x is None, np.NaN, x))
         if i != 'month':
             df[i] = df[i].astype(float)
     return df
+
 
 def get_deposit_rate():
     """
@@ -243,19 +249,21 @@ def get_deposit_rate():
         rate:利率（%）
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[2],2,600,rdint)
-    request = Request(url)
-    text = urlopen(request,timeout=10).read()
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[2], 2, 600,
+                                    rdint))
+    text = urlopen(request, timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.DEPOSIT_COLS)
+    df = pd.DataFrame(js, columns=vs.DEPOSIT_COLS)
     for i in df.columns:
-        df[i] = df[i].apply(lambda x:np.where(x is None,'--',x))
+        df[i] = df[i].apply(lambda x:np.where(x is None, '--', x))
     return df
+
 
 def get_loan_rate():
     """
@@ -268,19 +276,21 @@ def get_loan_rate():
         rate:利率（%）
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[2],3,800,rdint)
-    request = Request(url)
-    text = urlopen(request,timeout=10).read()
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[2], 3, 800,
+                                    rdint))
+    text = urlopen(request, timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.LOAN_COLS)
+    df = pd.DataFrame(js, columns=vs.LOAN_COLS)
     for i in df.columns:
-        df[i] = df[i].apply(lambda x:np.where(x is None,'--',x))
+        df[i] = df[i].apply(lambda x:np.where(x is None, '--', x))
     return df
+
 
 def get_rrr():
     """
@@ -294,19 +304,21 @@ def get_rrr():
         changed:调整幅度(%)
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[2],4,100,rdint)
-    request = Request(url)
-    text = urlopen(request,timeout=10).read()
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[2], 4, 100,
+                                    rdint))
+    text = urlopen(request, timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.RRR_COLS)
+    df = pd.DataFrame(js, columns=vs.RRR_COLS)
     for i in df.columns:
-        df[i] = df[i].apply(lambda x:np.where(x is None,'--',x))
+        df[i] = df[i].apply(lambda x:np.where(x is None, '--', x))
     return df
+
 
 def get_money_supply():
     """
@@ -333,19 +345,21 @@ def get_money_supply():
         rests_yoy:其他存款同比增长(%)
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[2],1,600,rdint)
-    request = Request(url)
-    text = urlopen(request,timeout=10).read()
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[2], 1, 600,
+                                    rdint))
+    text = urlopen(request, timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.MONEY_SUPPLY_COLS)
+    df = pd.DataFrame(js, columns=vs.MONEY_SUPPLY_COLS)
     for i in df.columns:
-        df[i] = df[i].apply(lambda x:np.where(x is None,'--',x))
+        df[i] = df[i].apply(lambda x:np.where(x is None, '--', x))
     return df
+
 
 def get_money_supply_bal():
     """
@@ -364,8 +378,9 @@ def get_money_supply_bal():
         rests:其他存款(亿元)
     """
     rdint = vs.random()
-    url = vs.MACRO_URL%(vs.P_TYPE['http'],vs.DOMAINS['sina'],rdint,vs.MACRO_TYPE[2],0,200,rdint)
-    request = Request(url)
+    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                    rdint, vs.MACRO_TYPE[2], 0, 200,
+                                    rdint))
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -373,7 +388,7 @@ def get_money_supply_bal():
     datastr = datastr[0]
     datastr = datastr.split('data:')[1]
     js = json.loads(datastr)
-    df = pd.DataFrame(js,columns=vs.MONEY_SUPPLY_BLA_COLS)
+    df = pd.DataFrame(js, columns=vs.MONEY_SUPPLY_BLA_COLS)
     for i in df.columns:
-        df[i] = df[i].apply(lambda x:np.where(x is None,'--',x))
+        df[i] = df[i].apply(lambda x:np.where(x is None, '--', x))
     return df

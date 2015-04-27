@@ -115,7 +115,7 @@ def get_notices(code=None, date=None):
     symbol = 'sh' + code if code[:1] == '6' else 'sz' + code
     url = nv.NOTICE_INFO_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                               ct.PAGES['ntinfo'], symbol)
-    url = url if date is None else '%s&gg_date=%s'%(url,date)
+    url = url if date is None else '%s&gg_date=%s'%(url, date)
     html = lxml.html.parse(url)
     res = html.xpath('//table[@class=\"body_table\"]/tbody/tr')
     data = []
