@@ -65,6 +65,8 @@ def get_hist_data(code=None, start=None, end=None,
         try:
             request = Request(url)
             lines = urlopen(request, timeout = 10).read()
+            if len(lines) < 15: #no data
+                return None
         except _network_error_classes:
             pass
         else:
@@ -89,7 +91,7 @@ def get_hist_data(code=None, start=None, end=None,
                 df = df.drop('turnover', axis=1)
             df = df.set_index('date')
             return df
-    raise IOError("获取失败，请检查网络和URL")
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
 def _parsing_dayprice_json(pageNum=1):
@@ -119,9 +121,7 @@ def _parsing_dayprice_json(pageNum=1):
     js = json.loads(jstr)
     df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),
                       columns=ct.DAY_TRADING_COLUMNS)
-    #删除原始数据的symbol属性
     df = df.drop('symbol', axis=1)
-    #删除停牌的股票
     df = df.ix[df.volume > 0]
     return df
 
@@ -160,7 +160,7 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
             pass
         else:
             return df
-    raise IOError("获取失败，请检查网络")
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
 def get_today_ticks(code=None, retry_count=3, pause=0.001):
@@ -198,7 +198,7 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
         pages = len(data_str['detailPages'])
         data = pd.DataFrame()
         ct._write_head()
-        for pNo in range(1,pages):
+        for pNo in range(1, pages):
             data = data.append(_today_ticks(symbol, date, pNo,
                                             retry_count, pause), ignore_index=True)
     except Exception as er:
@@ -230,7 +230,7 @@ def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
             pass
         else:
             return df
-    raise IOError("获取失败，请检查网络" )
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
         
     
 def get_today_all():
@@ -244,7 +244,7 @@ def get_today_all():
     ct._write_head()
     df = _parsing_dayprice_json(1)
     if df is not None:
-        for i in range(2,ct.PAGE_NUM[0]):
+        for i in range(2, ct.PAGE_NUM[0]):
             newdf = _parsing_dayprice_json(i)
             df = df.append(newdf, ignore_index=True)
     return df
@@ -317,7 +317,7 @@ def get_realtime_quotes(symbols=None):
 
 
 def get_h_data(code, start=None, end=None, autype='qfq',
-               retry_count=3, pause=0.001):
+               index=False, retry_count=3, pause=0.001):
     '''
     获取历史复权数据
     Parameters
@@ -351,16 +351,19 @@ def get_h_data(code, start=None, end=None, autype='qfq',
     qs = du.get_quarts(start, end)
     qt = qs[0]
     ct._write_head()
-    data = _parse_fq_data(ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                              code, qt[0], qt[1]), retry_count, pause)
+    data = _parse_fq_data(_get_index_url(index, code, qt), index,
+                          retry_count, pause)
     if len(qs)>1:
         for d in range(1, len(qs)):
             qt = qs[d]
             ct._write_console()
-            url = ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                  code, qt[0], qt[1])
-            df = _parse_fq_data(url, retry_count, pause)
+            df = _parse_fq_data(_get_index_url(index, code, qt), index,
+                                retry_count, pause)
             data = data.append(df, ignore_index=True)
+    if index:
+        data = data.set_index('date')
+        data = data.sort_index(ascending=False)
+        return data
     if len(data) == 0:
         return None
     data = data.drop_duplicates('date')
@@ -423,7 +426,7 @@ def _parase_fq_factor(code, start, end):
     text = text.replace('_', '-')
     text = json.loads(text)
     df = pd.DataFrame({'date':list(text['data'].keys()), 'factor':list(text['data'].values())})
-    # Thank Jfish(from xi'an) for reported this bug,Solved on 18/04/2015
+    # Thank Jfish(xi'an) for reported this bug,Solved on 18/04/2015
     df['date'] = df['date'].map(_fun_except) # for null case
     if df['date'].dtypes == np.object:
         df['date'] = df['date'].astype(np.datetime64)
@@ -439,7 +442,7 @@ def _fun_except(x):
         return x
 
 
-def _parse_fq_data(url, retry_count, pause):
+def _parse_fq_data(url, index, retry_count, pause):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
@@ -453,7 +456,10 @@ def _parse_fq_data(url, retry_count, pause):
             df = pd.read_html(sarr, skiprows = [0, 1])[0]
             if len(df) == 0:
                 return pd.DataFrame()
-            df.columns = ct.HIST_FQ_COLS
+            if index:
+                df.columns = ct.HIST_FQ_COLS[0:7]
+            else:
+                df.columns = ct.HIST_FQ_COLS
             if df['date'].dtypes == np.object:
                 df['date'] = df['date'].astype(np.datetime64)
             df = df.drop_duplicates('date')
@@ -461,9 +467,55 @@ def _parse_fq_data(url, retry_count, pause):
             pass
         else:
             return df
-    raise IOError("获取失败，请检查网络")
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
+def get_index():
+    """
+    获取大盘指数行情
+    return
+    -------
+      DataFrame
+          code:指数代码
+          name:指数名称
+          change:涨跌幅
+          open:开盘价
+          preclose:昨日收盘价
+          close:收盘价
+          high:最高价
+          low:最低价
+          volume:成交量(手)
+          amount:成交金额（亿元）
+    """
+    request = Request(ct.INDEX_HQ_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['sinahq']))
+    text = urlopen(request, timeout=10).read()
+    text = text.decode('GBK')
+    text = text.replace('var hq_str_sh', '').replace('var hq_str_sz', '')
+    text = text.replace('";', '').replace('"', '').replace('=', ',')
+    text = '%s%s'%(ct.INDEX_HEADER, text)
+    df = pd.read_csv(StringIO(text), sep=',', thousands=',')
+    df['change'] = (df['close'] / df['preclose'] - 1 ) * 100
+    df['amount'] = df['amount'] / 100000000
+    df['change'] = df['change'].map(ct.FORMAT)
+    df['amount'] = df['amount'].map(ct.FORMAT)
+    df = df[ct.INDEX_COLS]
+    df['code'] = df['code'].map(lambda x:str(x).zfill(6))
+    df['change'] = df['change'].astype(float)
+    df['amount'] = df['amount'].astype(float)
+    return df
+ 
+
+def _get_index_url(index, code, qt):
+    if index:
+        url = ct.HIST_INDEX_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                              code, qt[0], qt[1])
+    else:
+        url = ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                              code, qt[0], qt[1])
+    return url
+    
+    
 def _random(n=13):
     from random import randint
     start = 10**(n-1)

@@ -156,7 +156,7 @@ def _get_detail(tag, retry_count=3, pause=0.001):
             df = pd.DataFrame(pd.read_json(js, dtype={'code':object}), columns=ct.THE_FIELDS)
             df = df[ct.FOR_CLASSIFY_B_COLS]
             return df
-        raise IOError("数据获取失败，请检查网络和URL")
+        raise IOError(ct.NETWORK_URL_ERROR_MSG)
     
 
 def _get_type_data(url):

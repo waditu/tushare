@@ -1,4 +1,4 @@
-__version__ = '0.2.7'
+__version__ = '0.2.8'
 __author__ = 'Jimmy Liu'
 
 """
@@ -6,7 +6,8 @@ for trading data
 """
 from tushare.stock.trading import (get_hist_data, get_tick_data,
                                    get_today_all, get_realtime_quotes,
-                                   get_h_data, get_today_ticks)
+                                   get_h_data, get_today_ticks,
+                                   get_index)
 
 """
 for trading data
@@ -33,7 +34,8 @@ for classifying data
 from tushare.stock.classifying import (get_industry_classified, get_concept_classified,
                                        get_area_classified, get_gem_classified,
                                        get_sme_classified, get_st_classified,
-                                       get_hs300s, get_sz50s, get_zz500s)
+                                       get_hs300s, get_sz50s, get_zz500s,
+                                       get_terminated, get_suspended)
 
 """
 for macro data
