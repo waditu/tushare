@@ -26,4 +26,10 @@ QQÈº297882961:@Õã½­-QT£¬Ìá³ö002738¹ÉÆ±µÄÀúÊ·Êı¾İ±¨´í£¨get_hist_data£©£¬¾­¹ı¼ì²é£
 Î¢²©@ariestiger£¬±¨¸æget_h_data()µÄ³É½»Á¿ÁĞÃûÆ´Ğ´´íÎó
 
 
+2015-05-01
+------------------
+QQÈº297882961:@Koff£¬Ìá³öÔÚÊ¹ÓÃget_today_tick½Ó¿ÚµÄÊ±ºò±¨UnboundLocalError: local variable 'data' referenced before assignmentÒì³££¨ÊÕÅÌºóÍíÉÏµ÷ÓÃµÄ£©
+
+2015-05-05
+QQ Mr.OKÌá³öÔö¼Ó¹«Ë¾¹É¶«ÊıµÄ½Ó¿Ú
 
