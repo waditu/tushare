@@ -96,6 +96,7 @@ DATA_INPUT_ERROR_MSG = 'date input error.'
 NETWORK_URL_ERROR_MSG = '获取失败，请检查网络和URL'
 DATE_CHK_MSG = '年度输入错误：请输入1989年以后的年份数字，格式：YYYY'
 DATE_CHK_Q_MSG = '季度输入错误：请输入1、2、3或4数字'
+TOP_PARAS_MSG = 'top有误，请输入整数或all.'
 
 import sys
 PY3 = (sys.version_info[0] >= 3)

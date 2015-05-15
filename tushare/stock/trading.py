@@ -179,7 +179,6 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
         DataFrame 当日所有股票交易数据(DataFrame)
               属性:成交时间、成交价格、价格变动，成交手、成交金额(元)，买卖类型
     """
-    import tushare.util.dateu as du
     if code is None or len(code)!=6 :
         return None
     symbol = _code_to_symbol(code)
@@ -360,19 +359,17 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             df = _parse_fq_data(_get_index_url(index, code, qt), index,
                                 retry_count, pause)
             data = data.append(df, ignore_index=True)
+    if len(data) == 0 or len(data[(data.date>=start)&(data.date<=end)]) == 0:
+        return None
+    data = data.drop_duplicates('date')
     if index:
+        data = data[(data.date>=start) & (data.date<=end)]
         data = data.set_index('date')
         data = data.sort_index(ascending=False)
         return data
-    if len(data) == 0:
-        return None
-    data = data.drop_duplicates('date')
-    if start is not None:
-        data = data[data.date>=start]
-    if end is not None:
-        data = data[data.date<=end]
     if autype == 'hfq':
         data = data.drop('factor', axis=1)
+        data = data[(data.date>=start) & (data.date<=end)]
         for label in ['open', 'high', 'close', 'low']:
             data[label] = data[label].map(ct.FORMAT)
         data = data.set_index('date')
@@ -385,12 +382,12 @@ def get_h_data(code, start=None, end=None, autype='qfq',
         if autype == 'qfq':
             df = _parase_fq_factor(code, start, end)
             df = df.drop_duplicates('date')
-            df = df[df.date>=start]
-            df = df[df.date<=end]
-            df = pd.merge(data, df)
             df = df.sort('date', ascending=False)
             frow = df.head(1)
-            rate = float(frow['close']) / float(frow['factor'])
+            df = pd.merge(data, df)
+            preClose = float(get_realtime_quotes(code)['pre_close'])
+            df = df[(df.date>=start) & (df.date<=end)]
+            rate = preClose / float(frow['factor'])
             df['close_temp'] = df['close']
             df['close'] = rate * df['factor']
             for label in ['open', 'high', 'low']:
@@ -403,6 +400,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             df = df.astype(float)
             return df
         else:
+            data = data[(data.date>=start) & (data.date<=end)]
             for label in ['open', 'high', 'close', 'low']:
                 data[label] = data[label].map(ct.FORMAT)
             data = data.set_index('date')
@@ -533,4 +531,4 @@ def _code_to_symbol(code):
         if len(code) != 6 :
             return ''
         else:
-            return 'sh%s'%code if code[:1] == '6' else 'sz%s'%code
+            return 'sh%s'%code if code[:1] in ['5,', '6'] else 'sz%s'%code
