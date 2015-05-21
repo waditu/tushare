@@ -9,8 +9,9 @@ Created on 2014/07/31
 import pandas as pd
 import numpy as np
 from tushare.stock import cons as ct
+from tushare.util import dateu as du
 
-def shibor_data(year):
+def shibor_data(year=None):
     """
     获取上海银行间同业拆放利率（Shibor）
     Parameters
@@ -29,6 +30,7 @@ def shibor_data(year):
     9M:9个月拆放利率
     1Y:1年拆放利率
     """
+    year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['Shibor']
     lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
@@ -43,7 +45,7 @@ def shibor_data(year):
     except:
         return None
 
-def shibor_quote_data(year):
+def shibor_quote_data(year=None):
     """
     获取Shibor银行报价数据
     Parameters
@@ -72,6 +74,7 @@ def shibor_quote_data(year):
     1Y_B:买入
     1Y_A:卖出
     """
+    year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['Quote']
     lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
@@ -86,7 +89,7 @@ def shibor_quote_data(year):
     except:
         return None
 
-def shibor_ma_data(year):
+def shibor_ma_data(year=None):
     """
     获取Shibor均值数据
     Parameters
@@ -98,6 +101,7 @@ def shibor_ma_data(year):
     date:日期
        其它分别为各周期5、10、20均价
     """
+    year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['Tendency']
     lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
@@ -113,7 +117,7 @@ def shibor_ma_data(year):
         return None
 
 
-def lpr_data(year):
+def lpr_data(year=None):
     """
     获取贷款基础利率（LPR）
     Parameters
@@ -125,6 +129,7 @@ def lpr_data(year):
     date:日期
     1Y:1年贷款基础利率
     """
+    year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['LPR']
     lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
@@ -140,7 +145,7 @@ def lpr_data(year):
         return None
     
 
-def lpr_ma_data(year):
+def lpr_ma_data(year=None):
     """
     获取贷款基础利率均值数据
     Parameters
@@ -154,6 +159,7 @@ def lpr_ma_data(year):
     1Y_10:10日均值
     1Y_20:20日均值
     """
+    year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['LPR_Tendency']
     lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
