@@ -29,10 +29,12 @@ def shibor_data(year):
     9M:9个月拆放利率
     1Y:1年拆放利率
     """
+    lab = ct.SHIBOR_TYPE['Shibor']
+    lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'Shibor',
-                                               year, ct.SHIBOR_TYPE['Shibor'],
+                                               year, lab,
                                                year))
         df.columns = ct.SHIBOR_COLS
         df['date'] = df['date'].map(lambda x: x.date())
@@ -70,10 +72,12 @@ def shibor_quote_data(year):
     1Y_B:买入
     1Y_A:卖出
     """
+    lab = ct.SHIBOR_TYPE['Quote']
+    lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'Quote',
-                                               year, ct.SHIBOR_TYPE['Quote'],
+                                               year, lab,
                                                year), skiprows=[0])
         df.columns = ct.QUOTE_COLS
         df['date'] = df['date'].map(lambda x: x.date())
@@ -94,10 +98,12 @@ def shibor_ma_data(year):
     date:日期
        其它分别为各周期5、10、20均价
     """
+    lab = ct.SHIBOR_TYPE['Tendency']
+    lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'Shibor_Tendency',
-                                               year, ct.SHIBOR_TYPE['Tendency'],
+                                               year, lab,
                                                year), skiprows=[0])
         df.columns = ct.SHIBOR_MA_COLS
         df['date'] = df['date'].map(lambda x: x.date())
@@ -119,10 +125,12 @@ def lpr_data(year):
     date:日期
     1Y:1年贷款基础利率
     """
+    lab = ct.SHIBOR_TYPE['LPR']
+    lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'LPR',
-                                               year, ct.SHIBOR_TYPE['LPR'],
+                                               year, lab,
                                                year))
         df.columns = ct.LPR_COLS
         df['date'] = df['date'].map(lambda x: x.date())
@@ -146,10 +154,12 @@ def lpr_ma_data(year):
     1Y_10:10日均值
     1Y_20:20日均值
     """
+    lab = ct.SHIBOR_TYPE['LPR_Tendency']
+    lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'LPR_Tendency',
-                                               year, ct.SHIBOR_TYPE['LPR_Tendency'],
+                                               year, lab,
                                                year), skiprows=[0])
         df.columns = ct.LPR_MA_COLS
         df['date'] = df['date'].map(lambda x: x.date())
