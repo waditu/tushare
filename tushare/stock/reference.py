@@ -175,6 +175,7 @@ def forecast_data(year, quarter):
         ct._write_head()
         data =  _get_forecast_data(year, quarter, 1, pd.DataFrame())
         df = pd.DataFrame(data, columns=ct.FORECAST_COLS)
+        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
         return df
 
 
@@ -190,6 +191,7 @@ def _get_forecast_data(year, quarter, pageNo, dataArr):
         else:
             sarr = [etree.tostring(node) for node in res]
         sarr = ''.join(sarr)
+        sarr = sarr.replace('--', '0')
         sarr = '<table>%s</table>'%sarr
         df = pd.read_html(sarr)[0]
         df = df.drop([4, 5, 8], axis=1)
@@ -690,4 +692,3 @@ def _random(n=13):
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))  
-
