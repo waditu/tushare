@@ -48,7 +48,7 @@ def diff_day(start=None, end=None):
     delta = d1 - d2
     return delta.days
 
-def get_quarts(start,end):
+def get_quarts(start, end):
     idx = pd.period_range('Q'.join(year_qua(start)), 'Q'.join(year_qua(end)),
                           freq='Q-JAN')
     return [str(d).split('Q') for d in idx]

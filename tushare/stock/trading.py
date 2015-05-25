@@ -352,6 +352,9 @@ def get_h_data(code, start=None, end=None, autype='qfq',
     ct._write_head()
     data = _parse_fq_data(_get_index_url(index, code, qt), index,
                           retry_count, pause)
+#     tmpdf = _parse_fq_data(_get_index_url(index, code, du.get_quarts(start=du.today(), end = du.today())[0]), index,
+#                           retry_count, pause)
+#     ft = tmpdf.head(1)['factor']
     if len(qs)>1:
         for d in range(1, len(qs)):
             qt = qs[d]
@@ -373,33 +376,28 @@ def get_h_data(code, start=None, end=None, autype='qfq',
         for label in ['open', 'high', 'close', 'low']:
             data[label] = data[label].map(ct.FORMAT)
         data = data.set_index('date')
-        data = data.sort_index(ascending=False)
+        data = data.sort_index(ascending = False)
         return data
     else:
-        for label in ['open', 'high', 'close', 'low']:
-            data[label] = data[label] / data['factor']
-        data = data.drop('factor', axis=1)
         if autype == 'qfq':
+            data = data.drop('factor', axis=1)
             df = _parase_fq_factor(code, start, end)
             df = df.drop_duplicates('date')
             df = df.sort('date', ascending=False)
             frow = df.head(1)
-            df = pd.merge(data, df)
             preClose = float(get_realtime_quotes(code)['pre_close'])
-            df = df[(df.date>=start) & (df.date<=end)]
-            rate = preClose / float(frow['factor'])
-            df['close_temp'] = df['close']
-            df['close'] = rate * df['factor']
-            for label in ['open', 'high', 'low']:
-                df[label] = df[label] * (df['close'] / df['close_temp'])
-                df[label] = df[label].map(ct.FORMAT)
-            df = df.drop(['factor', 'close_temp'], axis=1)
-            df['close'] = df['close'].map(ct.FORMAT)
-            df = df.set_index('date')
-            df = df.sort_index(ascending=False)
-            df = df.astype(float)
-            return df
+            rate = float(frow['factor']) / preClose
+            data = data[(data.date >= start) & (data.date <= end)]
+            for label in ['open', 'high', 'low', 'close']:
+                data[label] = data[label] / rate
+                data[label] = data[label].map(ct.FORMAT)
+            data = data.set_index('date')
+            data = data.sort_index(ascending = False)
+            return data
         else:
+            for label in ['open', 'high', 'close', 'low']:
+                data[label] = data[label] / data['factor']
+            data = data.drop('factor', axis=1)
             data = data[(data.date>=start) & (data.date<=end)]
             for label in ['open', 'high', 'close', 'low']:
                 data[label] = data[label].map(ct.FORMAT)
@@ -532,3 +530,4 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] in ['5,', '6'] else 'sz%s'%code
+
