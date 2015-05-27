@@ -71,7 +71,7 @@ def profit_data(year=2014, top=25,
                                             pause), ignore_index=True)
             return df.head(top)
         else:
-            print('top有误，请输入整数或all.')
+            print(ct.TOP_PARAS_MSG)
     
 
 def _fun_divi(x):
@@ -173,8 +173,9 @@ def forecast_data(year, quarter):
     """
     if ct._check_input(year, quarter) is True:
         ct._write_head()
-        data =  _get_forecast_data(year, quarter, 1, [])
+        data =  _get_forecast_data(year, quarter, 1, pd.DataFrame())
         df = pd.DataFrame(data, columns=ct.FORECAST_COLS)
+        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
         return df
 
 
@@ -182,20 +183,21 @@ def _get_forecast_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
         html = lxml.html.parse(ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], 
-                                                ct.PAGES['fd'], year,quarter, pageNo,
+                                                ct.PAGES['fd'], year, quarter, pageNo,
                                                 ct.PAGE_NUM[1]))
-        xtrs = html.xpath("//table[@class=\"list_table\"]/tr")
-        for trs in xtrs:
-            code = trs.xpath('td[1]//span/a/text()')[0]
-            name = trs.xpath('td[2]/span/a/text()')[0]
-            type = trs.xpath('td[3]/a/text()')
-            type = type[0] if len(type)>0 else trs.xpath('td[3]/text()')[0]
-            report_date = trs.xpath('td[4]/text()')[0] 
-            pre_eps = trs.xpath('td[7]/text()')[0] 
-            pre_eps = '0' if pre_eps == '--' else pre_eps
-            range = trs.xpath('td[8]/text()')[0] 
-            dataArr.append([code, name, type, report_date, pre_eps, range])
-        nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick') #获取下一页
+        res = html.xpath("//table[@class=\"list_table\"]/tr")
+        if ct.PY3:
+            sarr = [etree.tostring(node).decode('utf-8') for node in res]
+        else:
+            sarr = [etree.tostring(node) for node in res]
+        sarr = ''.join(sarr)
+        sarr = sarr.replace('--', '0')
+        sarr = '<table>%s</table>'%sarr
+        df = pd.read_html(sarr)[0]
+        df = df.drop([4, 5, 8], axis=1)
+        df.columns = ct.FORECAST_COLS
+        dataArr = dataArr.append(df, ignore_index=True)
+        nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
         if len(nextPage)>0:
             pageNo = re.findall(r'\d+',nextPage[0])[0]
             return _get_forecast_data(year, quarter, pageNo, dataArr)
@@ -388,7 +390,7 @@ def _newstocks(data, pageNo, retry_count, pause):
             df.columns = rv.NEW_STOCKS_COLS
             df['code'] = df['code'].map(lambda x : str(x).zfill(6))
             res = html.xpath('//table[@class=\"table2\"]/tr[1]/td[1]/a/text()')
-            tag = '下一页' if ct.PY3 else unicode('下一页','utf-8')
+            tag = '下一页' if ct.PY3 else unicode('下一页', 'utf-8')
             hasNext = True if tag in res else False 
             data = data.append(df, ignore_index=True)
             pageNo += 1
@@ -648,8 +650,6 @@ def sz_margin_details(date='', retry_count=3, pause=0.001):
     --------
     date:string
                 明细数据日期 format：YYYY-MM-DD 默认为空''
-    symbol：string
-                标的代码，6位数字e.g.600848，默认为空  
     retry_count : int, 默认 3
                  如遇网络等问题重复执行的次数 
     pause : int, 默认 0
@@ -692,4 +692,3 @@ def _random(n=13):
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))  
-
