@@ -11,14 +11,15 @@ from tushare.stock import cons as ct
 import lxml.html
 from lxml import etree
 import re
+from pandas.compat import StringIO
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
 
-def get_stock_basics(file_path=None):
+def get_stock_basics():
     """
         获取沪深上市公司基本情况
-    Parameters
-    --------
-    file_path:a file path string,default as 'data/all.csv' in the package
-        you can use your own file with the same columns 
     Return
     --------
     DataFrame
@@ -39,8 +40,10 @@ def get_stock_basics(file_path=None):
                pb,市净率
                timeToMarket,上市日期
     """
-    file_path = file_path if file_path else ct.ALL_STOCK_BASICS_FILE%_data_path()
-    df = pd.read_csv(file_path, dtype={'code':'object'}, encoding='GBK')
+    request = Request(ct.ALL_STOCK_BASICS_FILE)
+    text = urlopen(request, timeout=10).read()
+    text = text.decode('GBK')
+    df = pd.read_csv(StringIO(text), dtype={'code':'object'})
     df = df.set_index('code')
     return df
 
@@ -378,4 +381,3 @@ def _data_path():
     caller_file = inspect.stack()[1][1]  
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
-

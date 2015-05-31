@@ -1,7 +1,8 @@
 0.3.1
 -------
 
--修复get_h_data的bug
+- 修复get\_h\_data的bug
+- 修改get\_stock\_basics数据获取方式
 
 
 0.2.9

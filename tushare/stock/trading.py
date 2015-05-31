@@ -352,9 +352,6 @@ def get_h_data(code, start=None, end=None, autype='qfq',
     ct._write_head()
     data = _parse_fq_data(_get_index_url(index, code, qt), index,
                           retry_count, pause)
-#     tmpdf = _parse_fq_data(_get_index_url(index, code, du.get_quarts(start=du.today(), end = du.today())[0]), index,
-#                           retry_count, pause)
-#     ft = tmpdf.head(1)['factor']
     if len(qs)>1:
         for d in range(1, len(qs)):
             qt = qs[d]
@@ -385,7 +382,18 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             df = df.drop_duplicates('date')
             df = df.sort('date', ascending=False)
             frow = df.head(1)
-            preClose = float(get_realtime_quotes(code)['pre_close'])
+            rt = get_realtime_quotes(code)
+            if ((float(rt['high']) == 0) & (float(rt['low']) == 0)):
+                preClose = float(rt['pre_close'])
+            else:
+                if du.is_holiday(du.today()):
+                    preClose = float(rt['price'])
+                else:
+                    if (du.get_hour() > 9) & (du.get_hour() < 18):
+                        preClose = float(rt['pre_close'])
+                    else:
+                        preClose = float(rt['price'])
+            
             rate = float(frow['factor']) / preClose
             data = data[(data.date >= start) & (data.date <= end)]
             for label in ['open', 'high', 'low', 'close']:
@@ -422,7 +430,6 @@ def _parase_fq_factor(code, start, end):
     text = text.replace('_', '-')
     text = json.loads(text)
     df = pd.DataFrame({'date':list(text['data'].keys()), 'factor':list(text['data'].values())})
-    # Thank Jfish(xi'an) for reported this bug,Solved on 18/04/2015
     df['date'] = df['date'].map(_fun_except) # for null case
     if df['date'].dtypes == np.object:
         df['date'] = df['date'].astype(np.datetime64)
@@ -442,7 +449,10 @@ def _parse_fq_data(url, index, retry_count, pause):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            html = lxml.html.parse(url)  
+            request = Request(url)
+            text = urlopen(request, timeout=10).read()
+            text = text.decode('GBK')
+            html = lxml.html.parse(StringIO(text))
             res = html.xpath('//table[@id=\"FundHoldSharesTable\"]')
             if ct.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -530,4 +540,3 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] in ['5,', '6'] else 'sz%s'%code
-

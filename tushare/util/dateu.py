@@ -34,6 +34,9 @@ def get_month():
     month = datetime.datetime.today().month
     return month
 
+def get_hour():
+    return datetime.datetime.today().hour
+    
 def today_last_year():
     lasty = datetime.datetime.today().date() + datetime.timedelta(-365)
     return str(lasty)
@@ -51,4 +54,21 @@ def diff_day(start=None, end=None):
 def get_quarts(start, end):
     idx = pd.period_range('Q'.join(year_qua(start)), 'Q'.join(year_qua(end)),
                           freq='Q-JAN')
-    return [str(d).split('Q') for d in idx]
+    return [str(d).split('Q') for d in idx][::-1]
+
+
+holiday = ['2015-01-01', '2015-01-02', '2015-02-18', '2015-02-19', '2015-02-20', '2015-02-23', '2015-02-24', '2015-04-06',
+                            '2015-05-01', '2015-06-22', '2015-09-03', '2015-10-01', '2015-10-02', '2015-10-05', '2015-10-06', '2015-10-07']
+    
+
+def is_holiday(date):
+    if isinstance(date, str):
+        date = datetime.datetime.strptime(date, '%Y-%m-%d')
+    today=int(date.strftime("%w"))
+    if today > 0 and today < 6 and date not in holiday:
+        return False
+    else:
+        return True
+
+    
+    

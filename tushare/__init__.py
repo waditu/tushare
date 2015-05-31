@@ -1,4 +1,4 @@
-__version__ = '0.2.9'
+__version__ = '0.3.1'
 __author__ = 'Jimmy Liu'
 
 """
@@ -58,4 +58,4 @@ for shibor
 """
 from tushare.stock.shibor import (shibor_data, shibor_quote_data,
                                   shibor_ma_data, lpr_data,
-                                  lpr_ma_data,)
+                                  lpr_ma_data)
