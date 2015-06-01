@@ -75,7 +75,8 @@ def get_report_data(year, quarter):
     if ct._check_input(year,quarter) is True:
         ct._write_head()
         df =  _get_report_data(year, quarter, 1, pd.DataFrame())
-        df = df.drop_duplicates('code')
+        if df is not None:
+            df = df.drop_duplicates('code')
         return df
 
 
@@ -130,7 +131,8 @@ def get_profit_data(year, quarter):
     if ct._check_input(year, quarter) is True:
         ct._write_head()
         data =  _get_profit_data(year, quarter, 1, pd.DataFrame())
-        data = data.drop_duplicates('code')
+        if data is not None:
+            data = data.drop_duplicates('code')
         return data
 
 
@@ -184,7 +186,8 @@ def get_operation_data(year, quarter):
     if ct._check_input(year, quarter) is True:
         ct._write_head()
         data =  _get_operation_data(year, quarter, 1, pd.DataFrame())
-        data = data.drop_duplicates('code')
+        if data is not None:
+            data = data.drop_duplicates('code')
         return data
 
 
@@ -238,7 +241,8 @@ def get_growth_data(year, quarter):
     if ct._check_input(year, quarter) is True:
         ct._write_head()
         data =  _get_growth_data(year, quarter, 1, pd.DataFrame())
-        data = data.drop_duplicates('code')
+        if data is not None:
+            data = data.drop_duplicates('code')
         return data
 
 
@@ -292,7 +296,8 @@ def get_debtpaying_data(year, quarter):
     if ct._check_input(year, quarter) is True:
         ct._write_head()
         df =  _get_debtpaying_data(year, quarter, 1, pd.DataFrame())
-        df = df.drop_duplicates('code')
+        if df is not None:
+            df = df.drop_duplicates('code')
         return df
 
 
@@ -345,7 +350,8 @@ def get_cashflow_data(year, quarter):
     if ct._check_input(year, quarter) is True:
         ct._write_head()
         df =  _get_cashflow_data(year, quarter, 1, pd.DataFrame())
-        df = df.drop_duplicates('code')
+        if df is not None:
+            df = df.drop_duplicates('code')
         return df
 
 
