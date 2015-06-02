@@ -3,6 +3,7 @@
 import datetime
 import pandas as pd
 
+
 def year_qua(date):
     mon = date[5:7]
     mon = int(mon)
@@ -26,6 +27,7 @@ def today():
     day = datetime.datetime.today().date()
     return str(day) 
 
+
 def get_year():
     year = datetime.datetime.today().year
     return year
@@ -37,19 +39,23 @@ def get_month():
 def get_hour():
     return datetime.datetime.today().hour
     
+    
 def today_last_year():
     lasty = datetime.datetime.today().date() + datetime.timedelta(-365)
     return str(lasty)
 
+
 def day_last_week(days=-7):
     lasty = datetime.datetime.today().date() + datetime.timedelta(days)
     return str(lasty)
+
 
 def diff_day(start=None, end=None):
     d1 = datetime.datetime.strptime(end, '%Y-%m-%d')
     d2 = datetime.datetime.strptime(start, '%Y-%m-%d')
     delta = d1 - d2
     return delta.days
+
 
 def get_quarts(start, end):
     idx = pd.period_range('Q'.join(year_qua(start)), 'Q'.join(year_qua(end)),
@@ -69,6 +75,17 @@ def is_holiday(date):
         return False
     else:
         return True
+    
+    
+def last_tddate():
+    today = datetime.datetime.today().date()
+    today=int(today.strftime("%w"))
+    if today == 0:
+        return day_last_week(-2)
+    else:
+        return day_last_week(-1)
+        
+    
 
     
     
