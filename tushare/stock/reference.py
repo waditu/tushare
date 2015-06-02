@@ -20,7 +20,6 @@ from pandas.util.testing import _network_error_classes
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
-from _license import date
 import numpy as np
 try:
     from urllib.request import urlopen, Request
