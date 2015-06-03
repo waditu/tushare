@@ -83,8 +83,11 @@ def get_report_data(year, quarter):
 def _get_report_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
+        request = Request(ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
                          year, quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -139,9 +142,12 @@ def get_profit_data(year, quarter):
 def _get_profit_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.PROFIT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+        request = Request(ct.PROFIT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                               ct.PAGES['fd'], year,
                                               quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -194,9 +200,12 @@ def get_operation_data(year, quarter):
 def _get_operation_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.OPERATION_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+        request = Request(ct.OPERATION_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                  ct.PAGES['fd'], year,
                                                  quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -249,9 +258,12 @@ def get_growth_data(year, quarter):
 def _get_growth_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.GROWTH_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+        request = Request(ct.GROWTH_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                               ct.PAGES['fd'], year,
                                               quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -304,9 +316,12 @@ def get_debtpaying_data(year, quarter):
 def _get_debtpaying_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.DEBTPAYING_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+        request = Request(ct.DEBTPAYING_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                   ct.PAGES['fd'], year,
                                                   quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -358,9 +373,12 @@ def get_cashflow_data(year, quarter):
 def _get_cashflow_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.CASHFLOW_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+        request = Request(ct.CASHFLOW_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                 ct.PAGES['fd'], year,
                                                 quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
