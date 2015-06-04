@@ -72,7 +72,7 @@ setup(
     author='Jimmy Liu',
     author_email='jimmysoa@sina.cn',
     license='BSD',
-    url='http://tushare.waditu.com',
+    url='http://tushare.org',
     keywords='china stock data',
     classifiers=['Development Status :: 4 - Beta',
     'Programming Language :: Python :: 2.6',

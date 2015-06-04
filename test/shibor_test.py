@@ -7,6 +7,7 @@ class Test(unittest.TestCase):
 
     def set_data(self):
         self.year = 2014
+#         self.year = None
 
     def test_shibor_data(self):
         self.set_data()

@@ -207,7 +207,7 @@
 -  **open**:开盘价
 -  **high**:最高价
 -  **low**:最低价
--  **settlement**:最日收盘价
+-  **settlement**:昨日收盘价
 -  **volume**:成交量
 -  **turnoverratio**:换手率
 

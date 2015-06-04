@@ -11,14 +11,15 @@ from tushare.stock import cons as ct
 import lxml.html
 from lxml import etree
 import re
+from pandas.compat import StringIO
+try:
+    from urllib.request import urlopen, Request
+except ImportError:
+    from urllib2 import urlopen, Request
 
-def get_stock_basics(file_path=None):
+def get_stock_basics():
     """
         获取沪深上市公司基本情况
-    Parameters
-    --------
-    file_path:a file path string,default as 'data/all.csv' in the package
-        you can use your own file with the same columns 
     Return
     --------
     DataFrame
@@ -39,8 +40,10 @@ def get_stock_basics(file_path=None):
                pb,市净率
                timeToMarket,上市日期
     """
-    file_path = file_path if file_path else ct.ALL_STOCK_BASICS_FILE%_data_path()
-    df = pd.read_csv(file_path, dtype={'code':'object'}, encoding='GBK')
+    request = Request(ct.ALL_STOCK_BASICS_FILE)
+    text = urlopen(request, timeout=10).read()
+    text = text.decode('GBK')
+    df = pd.read_csv(StringIO(text), dtype={'code':'object'})
     df = df.set_index('code')
     return df
 
@@ -72,15 +75,19 @@ def get_report_data(year, quarter):
     if ct._check_input(year,quarter) is True:
         ct._write_head()
         df =  _get_report_data(year, quarter, 1, pd.DataFrame())
-        df = df.drop_duplicates('code')
+        if df is not None:
+            df = df.drop_duplicates('code')
         return df
 
 
 def _get_report_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
+        request = Request(ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
                          year, quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -127,16 +134,20 @@ def get_profit_data(year, quarter):
     if ct._check_input(year, quarter) is True:
         ct._write_head()
         data =  _get_profit_data(year, quarter, 1, pd.DataFrame())
-        data = data.drop_duplicates('code')
+        if data is not None:
+            data = data.drop_duplicates('code')
         return data
 
 
 def _get_profit_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.PROFIT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+        request = Request(ct.PROFIT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                               ct.PAGES['fd'], year,
                                               quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -181,16 +192,20 @@ def get_operation_data(year, quarter):
     if ct._check_input(year, quarter) is True:
         ct._write_head()
         data =  _get_operation_data(year, quarter, 1, pd.DataFrame())
-        data = data.drop_duplicates('code')
+        if data is not None:
+            data = data.drop_duplicates('code')
         return data
 
 
 def _get_operation_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.OPERATION_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+        request = Request(ct.OPERATION_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                  ct.PAGES['fd'], year,
                                                  quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -235,16 +250,20 @@ def get_growth_data(year, quarter):
     if ct._check_input(year, quarter) is True:
         ct._write_head()
         data =  _get_growth_data(year, quarter, 1, pd.DataFrame())
-        data = data.drop_duplicates('code')
+        if data is not None:
+            data = data.drop_duplicates('code')
         return data
 
 
 def _get_growth_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.GROWTH_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+        request = Request(ct.GROWTH_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                               ct.PAGES['fd'], year,
                                               quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -289,16 +308,20 @@ def get_debtpaying_data(year, quarter):
     if ct._check_input(year, quarter) is True:
         ct._write_head()
         df =  _get_debtpaying_data(year, quarter, 1, pd.DataFrame())
-        df = df.drop_duplicates('code')
+        if df is not None:
+            df = df.drop_duplicates('code')
         return df
 
 
 def _get_debtpaying_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.DEBTPAYING_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+        request = Request(ct.DEBTPAYING_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                   ct.PAGES['fd'], year,
                                                   quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -342,16 +365,20 @@ def get_cashflow_data(year, quarter):
     if ct._check_input(year, quarter) is True:
         ct._write_head()
         df =  _get_cashflow_data(year, quarter, 1, pd.DataFrame())
-        df = df.drop_duplicates('code')
+        if df is not None:
+            df = df.drop_duplicates('code')
         return df
 
 
 def _get_cashflow_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.CASHFLOW_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+        request = Request(ct.CASHFLOW_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                 ct.PAGES['fd'], year,
                                                 quarter, pageNo, ct.PAGE_NUM[1]))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -378,4 +405,3 @@ def _data_path():
     caller_file = inspect.stack()[1][1]  
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
-

@@ -169,7 +169,7 @@ Quick Start
 
 更多文档
 ========
-[http://tushare.waditu.com/](http://tushare.waditu.com/ "TuShare Docs")
+[http://tushare.org/](http://tushare.org/ "TuShare Docs")
  
 Change Logs
 ------

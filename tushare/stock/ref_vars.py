@@ -4,6 +4,8 @@ DP_URL = '%sapp.finance.%s/data/stock/%s?day=&page=%s'
 DP_163_URL = '%squotes.%s/data/caibao/%s?reportdate=%s&sort=declaredate&order=desc&page=%s'
 FUND_HOLDS_URL = '%squotes.%s/hs/marketdata/service/%s?host=/hs/marketdata/service/%s&page=%s&query=start:%s;end:%s&order=desc&count=60&type=query&req=%s'
 XSG_URL = '%sdatainterface.%s/EM_DataCenter/%s?type=FD&sty=BST&st=3&sr=true&fd=%s&stat=%s'
+LHB_URL = '%sdata.%s/stock/lhb/%s.html'
+LHB_COLS = ['code', 'name', 'pchange', 'amount', 'buy', 'bratio', 'sell', 'sratio', 'reason']
 NEW_STOCKS_URL = '%s%s/corp/view/%s?page=%s&cngem=0&orderBy=NetDate&orderType=desc'
 MAR_SH_HZ_URL = '%s%s/marketdata/tradedata/%s?jsonCallBack=jsonpCallback%s&isPagination=true&tabType=&pageHelp.pageSize=100&beginDate=%s&endDate=%s%s&_=%s'
 MAR_SH_HZ_REF_URL = '%s%s/market/dealingdata/overview/margin/'
