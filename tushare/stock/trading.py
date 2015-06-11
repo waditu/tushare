@@ -303,12 +303,14 @@ def get_realtime_quotes(symbols=None):
     regSym = re.compile(r'(?:sh|sz)(.*?)\=')
     syms = regSym.findall(text)
     data_list = []
-    for row in data:
+    syms_list = []
+    for index, row in enumerate(data):
         if len(row)>1:
             data_list.append([astr for astr in row.split(',')])
+            syms_list.append(syms[index])
     df = pd.DataFrame(data_list, columns=ct.LIVE_DATA_COLS)
     df = df.drop('s', axis=1)
-    df['code'] = syms
+    df['code'] = syms_list
     ls = [cls for cls in df.columns if '_v' in cls]
     for txt in ls:
         df[txt] = df[txt].map(lambda x : x[:-2])
