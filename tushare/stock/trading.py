@@ -154,6 +154,8 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
                                 date, symbol))
             lines = urlopen(re, timeout=10).read()
             lines = lines.decode('GBK') 
+            if len(lines) < 100:
+                return None
             df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
                                skiprows=[0])      
         except _network_error_classes:
@@ -309,7 +311,7 @@ def get_realtime_quotes(symbols=None):
             data_list.append([astr for astr in row.split(',')])
             syms_list.append(syms[index])
     if len(syms_list) == 0:
-        return
+        return None
     df = pd.DataFrame(data_list, columns=ct.LIVE_DATA_COLS)
     df = df.drop('s', axis=1)
     df['code'] = syms_list
