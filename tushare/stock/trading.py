@@ -154,6 +154,8 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
                                 date, symbol))
             lines = urlopen(re, timeout=10).read()
             lines = lines.decode('GBK') 
+            if len(lines) < 100:
+                return None
             df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
                                skiprows=[0])      
         except _network_error_classes:
@@ -303,12 +305,16 @@ def get_realtime_quotes(symbols=None):
     regSym = re.compile(r'(?:sh|sz)(.*?)\=')
     syms = regSym.findall(text)
     data_list = []
-    for row in data:
+    syms_list = []
+    for index, row in enumerate(data):
         if len(row)>1:
             data_list.append([astr for astr in row.split(',')])
+            syms_list.append(syms[index])
+    if len(syms_list) == 0:
+        return None
     df = pd.DataFrame(data_list, columns=ct.LIVE_DATA_COLS)
     df = df.drop('s', axis=1)
-    df['code'] = syms
+    df['code'] = syms_list
     ls = [cls for cls in df.columns if '_v' in cls]
     for txt in ls:
         df[txt] = df[txt].map(lambda x : x[:-2])
