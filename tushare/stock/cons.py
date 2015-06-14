@@ -6,7 +6,7 @@ Created on 2014/07/31
 @contact: jimmysoa@sina.cn
 """
 
-VERSION = '0.2.8'
+VERSION = '0.3.4'
 K_LABELS = ['D', 'W', 'M']
 K_MIN_LABELS = ['5', '15', '30', '60']
 K_TYPE = {'D': 'akdaily', 'W': 'akweekly', 'M': 'akmonthly'}
@@ -109,6 +109,7 @@ NETWORK_URL_ERROR_MSG = '获取失败，请检查网络和URL'
 DATE_CHK_MSG = '年度输入错误：请输入1989年以后的年份数字，格式：YYYY'
 DATE_CHK_Q_MSG = '季度输入错误：请输入1、2、3或4数字'
 TOP_PARAS_MSG = 'top有误，请输入整数或all.'
+LHB_MSG = '周期输入有误，请输入数字5、10、30或60'
 
 import sys
 PY3 = (sys.version_info[0] >= 3)
@@ -133,5 +134,11 @@ def _check_input(year, quarter):
         raise TypeError(DATE_CHK_MSG)
     elif quarter is None or type(quarter) is str or quarter not in [1, 2, 3, 4]:
         raise TypeError(DATE_CHK_Q_MSG)
+    else:
+        return True
+    
+def _check_lhb_input(last):
+    if last not in [5, 10, 30, 60]:
+        raise TypeError(LHB_MSG)
     else:
         return True

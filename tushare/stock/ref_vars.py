@@ -5,6 +5,7 @@ DP_163_URL = '%squotes.%s/data/caibao/%s?reportdate=%s&sort=declaredate&order=de
 FUND_HOLDS_URL = '%squotes.%s/hs/marketdata/service/%s?host=/hs/marketdata/service/%s&page=%s&query=start:%s;end:%s&order=desc&count=60&type=query&req=%s'
 XSG_URL = '%sdatainterface.%s/EM_DataCenter/%s?type=FD&sty=BST&st=3&sr=true&fd=%s&stat=%s'
 LHB_URL = '%sdata.%s/stock/lhb/%s.html'
+LHB_SINA_URL = '%s%s/q/go.php/vLHBData/kind/%s/%s?last=%s&p=%s'
 LHB_COLS = ['code', 'name', 'pchange', 'amount', 'buy', 'bratio', 'sell', 'sratio', 'reason']
 NEW_STOCKS_URL = '%s%s/corp/view/%s?page=%s&cngem=0&orderBy=NetDate&orderType=desc'
 MAR_SH_HZ_URL = '%s%s/marketdata/tradedata/%s?jsonCallBack=jsonpCallback%s&isPagination=true&tabType=&pageHelp.pageSize=100&beginDate=%s&endDate=%s%s&_=%s'
@@ -16,6 +17,11 @@ MAR_SH_HZ_TAIL_URL = '&pageHelp.pageNo=%s&pageHelp.beginPage=%s&pageHelp.endPage
 TERMINATED_URL = '%s%s/%s?jsonCallBack=jsonpCallback%s&isPagination=true&sqlId=COMMON_SSE_ZQPZ_GPLB_MCJS_ZZSSGGJBXX_L&pageHelp.pageSize=50&_=%s'
 SUSPENDED_URL = '%s%s/%s?jsonCallBack=jsonpCallback%s&isPagination=true&sqlId=COMMON_SSE_ZQPZ_GPLB_MCJS_ZTSSGS_L&pageHelp.pageSize=50&_=%s'
 TERMINATED_T_COLS = ['COMPANY_CODE', 'COMPANY_ABBR', 'LISTING_DATE', 'CHANGE_DATE']
+LHB_KINDS = ['ggtj', 'yytj', 'jgzz', 'jgmx']
+LHB_GGTJ_COLS = ['code', 'name', 'count', 'bamount', 'samount', 'net', 'bcount', 'scount']
+LHB_YYTJ_COLS = ['broker', 'count', 'bamount', 'bcount', 'samount', 'scount', 'top3']
+LHB_JGZZ_COLS = ['code', 'name', 'price', 'pchange', 'bamount', 'bcount', 'samount', 'scount', 'net']
+LHB_JGMX_COLS = ['code', 'name', 'date', 'bamount', 'samount', 'type']
 TERMINATED_COLS = ['code', 'name', 'oDate', 'tDate']
 DP_COLS = ['report_date', 'quarter', 'code', 'name', 'plan']
 DP_163_COLS = ['code', 'name', 'year', 'plan', 'report_date']
