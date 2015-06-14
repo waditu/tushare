@@ -20,7 +20,7 @@ from pandas.util.testing import _network_error_classes
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
-import numpy as np
+
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -138,15 +138,17 @@ def _dist_cotent(year, pageNo, retry_count, pause):
             df = df.drop('plan', axis=1)
             df['code'] = df['code'].astype(object)
             df['code'] = df['code'].map(lambda x : str(x).zfill(6))
+            pages = []
             if pageNo == 0:
                 page = html.xpath('//div[@class=\"mod_pages\"]/a')
-                asr = page[len(page)-2]
-                pages = asr.xpath('text()')
+                if len(page)>1:
+                    asr = page[len(page)-2]
+                    pages = asr.xpath('text()')
         except _network_error_classes:
             pass
         else:
             if pageNo == 0:
-                return df, pages[0]
+                return df, pages[0] if len(pages)>0 else 0
             else:
                 return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)    
@@ -688,81 +690,8 @@ def sz_margin_details(date='', retry_count=3, pause=0.001):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def get_tops(date = None, retry_count=3, pause=0.001):
-    """
-    获取每日龙虎榜列表
-    Parameters
-    --------
-    date:string
-                明细数据日期 format：YYYY-MM-DD 默认为空''
-    retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
-    pause : int, 默认 0
-                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-    
-    Return
-    ------
-    DataFrame
-        code：代码
-        name ：名称
-        pchange：涨跌幅     
-        amount：龙虎榜成交额(万)
-        buy：买入额(万)
-        bratio：占总成交比例
-        sell：卖出额(万)
-        sratio ：占总成交比例
-        reason：上榜原因
-        date  ：日期
-    """
-    if date is None:
-        if du.get_hour() < 18:
-            date = du.last_tddate() 
-    else:
-        if(du.is_holiday(date)):
-            return None
-    for _ in range(retry_count):
-        time.sleep(pause)
-        try:
-            request = Request(rv.LHB_URL%(ct.P_TYPE['http'], ct.DOMAINS['em'], date))
-            text = urlopen(request, timeout=10).read()
-            text = text.decode('GBK')
-            html = lxml.html.parse(StringIO(text))
-            res = html.xpath("//table[@id=\"dt_1\"]")
-            if ct.PY3:
-                sarr = [etree.tostring(node).decode('utf-8') for node in res]
-            else:
-                sarr = [etree.tostring(node) for node in res]
-            sarr = ''.join(sarr)
-            df = pd.read_html(sarr)[0]
-            df.columns = [i for i in range(1,12)]
-            df = df.apply(_f_rows, axis=1)
-            df = df.fillna(method='ffill')
-            df = df.drop([1, 4], axis=1)
-            df.columns = rv.LHB_COLS
-            df = df.drop_duplicates()
-            df['code'] = df['code'].astype(int)
-            df['code'] = df['code'].map(lambda x: str(x).zfill(6))
-            df['date'] = date
-        except:
-            pass
-        else:
-            return df
-    raise IOError(ct.NETWORK_URL_ERROR_MSG)
-
-
-def _f_rows(x):
-    if '%' in x[3]:
-        x[11] = x[6]
-        for i in range(6, 11):
-            x[i] = x[i-5]
-        for i in range(1, 6):
-            x[i] = np.NaN
-    return x
-
-
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))  
-
