@@ -16,7 +16,6 @@ import lxml.html
 from lxml import etree
 import re
 import json
-from pandas.util.testing import _network_error_classes
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
@@ -144,8 +143,8 @@ def _dist_cotent(year, pageNo, retry_count, pause):
                 if len(page)>1:
                     asr = page[len(page)-2]
                     pages = asr.xpath('text()')
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             if pageNo == 0:
                 return df, pages[0] if len(pages)>0 else 0
@@ -206,8 +205,8 @@ def _get_forecast_data(year, quarter, pageNo, dataArr):
             return _get_forecast_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
-    except:
-        pass
+    except Exception as e:
+            print(e)
     
 
 def xsg_data(year=None, month=None, 
@@ -241,8 +240,8 @@ def xsg_data(year=None, month=None,
                                      ct.PAGES['emxsg'], year, month))
             lines = urlopen(request, timeout = 10).read()
             lines = lines.decode('utf-8') if ct.PY3 else lines
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             da = lines[3:len(lines)-3]
             list =  []
@@ -331,8 +330,8 @@ def _holding_cotent(start, end, pageNo, retry_count, pause):
             df.columns = rv.FUND_HOLDS_COLS
             df = df[['code', 'name', 'date', 'nums', 'nlast', 'count', 
                          'clast', 'amount', 'ratio']]
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             if pageNo == 0:
                 return df, int(lines['pagecount'])
@@ -479,8 +478,8 @@ def _sh_hz(data, start=None, end=None,
                 data = _sh_hz(data, start=start, end=end, pageNo=pageNo, 
                        beginPage=beginPage, endPage=endPage, 
                        retry_count=retry_count, pause=pause)
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return data
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
@@ -573,8 +572,8 @@ def _sh_mx(data, date='', start='', end='',
                 data = _sh_mx(data, start=start, end=end, pageNo=pageNo, 
                        beginPage=beginPage, endPage=endPage, 
                        retry_count=retry_count, pause=pause)
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return data
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
@@ -639,8 +638,8 @@ def _sz_hz(date='', retry_count=3, pause=0.001):
             df = pd.read_html(lines, skiprows=[0])[0]
             df.columns = rv.MAR_SZ_HZ_COLS
             df['opDate'] = date
-        except:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
@@ -683,8 +682,8 @@ def sz_margin_details(date='', retry_count=3, pause=0.001):
             df.columns = rv.MAR_SZ_MX_COLS
             df['stockCode'] = df['stockCode'].map(lambda x:str(x).zfill(6))
             df['opDate'] = date
-        except:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)

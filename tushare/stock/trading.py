@@ -15,7 +15,6 @@ from lxml import etree
 import pandas as pd
 import numpy as np
 from tushare.stock import cons as ct
-from pandas.util.testing import _network_error_classes
 import re
 from pandas.compat import StringIO
 from tushare.util import dateu as du
@@ -67,8 +66,8 @@ def get_hist_data(code=None, start=None, end=None,
             lines = urlopen(request, timeout = 10).read()
             if len(lines) < 15: #no data
                 return None
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             js = json.loads(lines.decode('utf-8') if ct.PY3 else lines)
             cols = []
@@ -158,8 +157,8 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
                 return None
             df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
                                skiprows=[0])      
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
@@ -227,8 +226,8 @@ def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
             df = pd.read_html(StringIO(sarr), parse_dates=False)[0]
             df.columns = ct.TODAY_TICK_COLUMNS
             df['pchange'] = df['pchange'].map(lambda x : x.replace('%', ''))
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
@@ -378,6 +377,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
         data = data[(data.date>=start) & (data.date<=end)]
         for label in ['open', 'high', 'close', 'low']:
             data[label] = data[label].map(ct.FORMAT)
+            data[label] = data[label].astype(float)
         data = data.set_index('date')
         data = data.sort_index(ascending = False)
         return data
@@ -405,6 +405,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             for label in ['open', 'high', 'low', 'close']:
                 data[label] = data[label] / rate
                 data[label] = data[label].map(ct.FORMAT)
+                data[label] = data[label].astype(float)
             data = data.set_index('date')
             data = data.sort_index(ascending = False)
             return data
@@ -475,8 +476,8 @@ def _parse_fq_data(url, index, retry_count, pause):
             if df['date'].dtypes == np.object:
                 df['date'] = df['date'].astype(np.datetime64)
             df = df.drop_duplicates('date')
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
