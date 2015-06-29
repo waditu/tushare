@@ -16,6 +16,7 @@ import lxml.html
 from lxml import etree
 import re
 import json
+import string
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
@@ -377,8 +378,10 @@ def _newstocks(data, pageNo, retry_count, pause):
         time.sleep(pause)
         ct._write_console()
         try:
-            html = lxml.html.parse(rv.NEW_STOCKS_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],
+            response = urlopen(rv.NEW_STOCKS_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],
                          ct.PAGES['newstock'], pageNo))
+            content = response.read().decode('gbk')
+            html = lxml.html.fromstring(content)
             res = html.xpath('//table[@id=\"NewStockTable\"]/tr')
             if ct.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
