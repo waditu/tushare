@@ -16,7 +16,6 @@ import lxml.html
 from lxml import etree
 import re
 import json
-import string
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
