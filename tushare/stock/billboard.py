@@ -52,7 +52,9 @@ def top_list(date = None, retry_count=3, pause=0.001):
     """
     if date is None:
         if du.get_hour() < 18:
-            date = du.last_tddate() 
+            date = du.last_tddate()
+        else:
+            date = du.today() 
     else:
         if(du.is_holiday(date)):
             return None
@@ -91,13 +93,25 @@ def cap_tops(days= 5, retry_count= 3, pause= 0.001):
     获取个股上榜统计数据
     Parameters
     --------
-    days:int
-              天数，统计n天以来上榜次数，默认为5天，其余是10、30、60
-    retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
-    pause : int, 默认 0
-                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+        days:int
+                  天数，统计n天以来上榜次数，默认为5天，其余是10、30、60
+        retry_count : int, 默认 3
+                     如遇网络等问题重复执行的次数 
+        pause : int, 默认 0
+                    重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    Return
+    ------
+    DataFrame
+        code：代码
+        name：名称
+        count：上榜次数
+        bamount：累积购买额(万)     
+        samount：累积卖出额(万)
+        net：净额(万)
+        bcount：买入席位数
+        scount：卖出席位数
     """
+    
     if ct._check_lhb_input(days) is True:
         ct._write_head()
         df =  _cap_tops(days, pageNo=1, retry_count=retry_count,
@@ -149,6 +163,15 @@ def broker_tops(days= 5, retry_count= 3, pause= 0.001):
                  如遇网络等问题重复执行的次数 
     pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    Return
+    ---------
+    broker：营业部名称
+    count：上榜次数
+    bamount：累积购买额(万)
+    bcount：买入席位数
+    samount：累积卖出额(万)
+    scount：卖出席位数
+    top3：买入前三股票
     """
     if ct._check_lhb_input(days) is True:
         ct._write_head()
@@ -198,6 +221,16 @@ def inst_tops(days= 5, retry_count= 3, pause= 0.001):
                  如遇网络等问题重复执行的次数 
     pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+                
+    Return
+    --------
+    code:代码
+    name:名称
+    bamount:累积买入额(万)
+    bcount:买入次数
+    samount:累积卖出额(万)
+    scount:卖出次数
+    net:净额(万)
     """
     if ct._check_lhb_input(days) is True:
         ct._write_head()
@@ -247,11 +280,21 @@ def inst_detail(retry_count= 3, pause= 0.001):
                  如遇网络等问题重复执行的次数 
     pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+                
+    Return
+    ----------
+    code:股票代码
+    name:股票名称     
+    date:交易日期     
+    bamount:机构席位买入额(万)     
+    samount:机构席位卖出额(万)     
+    type:类型
     """
     ct._write_head()
     df =  _inst_detail(pageNo=1, retry_count=retry_count,
                         pause=pause)
-    df['code'] = df['code'].map(lambda x: str(x).zfill(6))
+    if len(df)>0:
+        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
     return df  
  
 
@@ -294,3 +337,6 @@ def _f_rows(x):
             x[i] = np.NaN
     return x
 
+if __name__ == "__main__":
+    print(top_list('2015-06-17'))
+#     print(inst_detail())
