@@ -389,6 +389,8 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             df = df.sort('date', ascending=False)
             frow = df.head(1)
             rt = get_realtime_quotes(code)
+            if rt is None:
+                return None
             if ((float(rt['high']) == 0) & (float(rt['low']) == 0)):
                 preClose = float(rt['pre_close'])
             else:
@@ -547,3 +549,4 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] in ['5', '6'] else 'sz%s'%code
+
