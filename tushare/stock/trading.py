@@ -288,7 +288,7 @@ def get_realtime_quotes(symbols=None):
             31：time，时间；
     """
     symbols_list = ''
-    if type(symbols) is list or type(symbols) is set or type(symbols) is tuple or type(symbols) is pd.Series:
+    if isinstance(symbols, list) or isinstance(symbols, set) or isinstance(symbols, tuple) or isinstance(symbols, pd.Series):
         for code in symbols:
             symbols_list += _code_to_symbol(code) + ','
     else:
@@ -397,6 +397,8 @@ def get_h_data(code, start=None, end=None, autype='qfq',
                 if du.is_holiday(du.today()):
                     preClose = float(rt['price'])
                 else:
+                    print(du.get_hour())
+                    print((du.get_hour() > 9) & (du.get_hour() < 18) )
                     if (du.get_hour() > 9) & (du.get_hour() < 18):
                         preClose = float(rt['pre_close'])
                     else:
@@ -529,7 +531,25 @@ def _get_index_url(index, code, qt):
         url = ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                               code, qt[0], qt[1])
     return url
-    
+
+
+def get_hists(symbols, start=None, end=None,
+                  ktype='D', retry_count=3,
+                  pause=0.001):
+    """
+    批量获取历史行情数据，具体参数和返回数据类型请参考get_hist_data接口
+    """
+    df = pd.DataFrame()
+    if isinstance(symbols, list) or isinstance(symbols, set) or isinstance(symbols, tuple) or isinstance(symbols, pd.Series):
+        for symbol in symbols:
+            data = get_hist_data(symbol, start=start, end=end,
+                                 ktype=ktype, retry_count=retry_count,
+                                 pause=pause)
+            data['code'] = symbol
+            df = df.append(data, ignore_index=True)
+        return df
+    else:
+        return None
     
 def _random(n=13):
     from random import randint

@@ -22,7 +22,7 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'idx': 'www.csindex.com.cn', '163': 'money.163.com',
            'em': 'eastmoney.com', 'sseq': 'query.sse.com.cn',
            'sse': 'www.sse.com.cn', 'szse': 'www.szse.cn',
-           'oss': 'tudata.oss-cn-beijing.aliyuncs.com',
+           'oss': 'waditu.com',
            'shibor': 'www.shibor.org'}
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
@@ -130,9 +130,9 @@ def _write_msg(msg):
     sys.stdout.flush()
     
 def _check_input(year, quarter):
-    if type(year) is str or year < 1989 :
+    if isinstance(year, str) or year < 1989 :
         raise TypeError(DATE_CHK_MSG)
-    elif quarter is None or type(quarter) is str or quarter not in [1, 2, 3, 4]:
+    elif quarter is None or isinstance(quarter, str) or quarter not in [1, 2, 3, 4]:
         raise TypeError(DATE_CHK_Q_MSG)
     else:
         return True
