@@ -43,6 +43,7 @@ def get_stock_basics():
     request = Request(ct.ALL_STOCK_BASICS_FILE)
     text = urlopen(request, timeout=10).read()
     text = text.decode('GBK')
+    text = text.replace('--', '')
     df = pd.read_csv(StringIO(text), dtype={'code':'object'})
     df = df.set_index('code')
     return df
@@ -88,6 +89,7 @@ def _get_report_data(year, quarter, pageNo, dataArr):
                          year, quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
+        text = text.replace('--', '')
         html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
@@ -149,6 +151,7 @@ def _get_profit_data(year, quarter, pageNo, dataArr):
                                               quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
+        text = text.replace('--', '')
         html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
@@ -208,6 +211,7 @@ def _get_operation_data(year, quarter, pageNo, dataArr):
                                                  quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
+        text = text.replace('--', '')
         html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
@@ -267,6 +271,7 @@ def _get_growth_data(year, quarter, pageNo, dataArr):
                                               quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
+        text = text.replace('--', '')
         html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
@@ -384,6 +389,7 @@ def _get_cashflow_data(year, quarter, pageNo, dataArr):
                                                 quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
+        text = text.replace('--', '')
         html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
