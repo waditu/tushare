@@ -6,7 +6,7 @@ Created on 2014/07/31
 @contact: jimmysoa@sina.cn
 """
 
-VERSION = '0.3.4'
+VERSION = '0.3.6'
 K_LABELS = ['D', 'W', 'M']
 K_MIN_LABELS = ['5', '15', '30', '60']
 K_TYPE = {'D': 'akdaily', 'W': 'akweekly', 'M': 'akmonthly'}
@@ -22,7 +22,7 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'idx': 'www.csindex.com.cn', '163': 'money.163.com',
            'em': 'eastmoney.com', 'sseq': 'query.sse.com.cn',
            'sse': 'www.sse.com.cn', 'szse': 'www.szse.cn',
-           'oss': 'waditu.com',
+           'oss': 'tudata.oss-cn-beijing.aliyuncs.com',
            'shibor': 'www.shibor.org'}
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
