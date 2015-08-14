@@ -6,7 +6,7 @@ Created on 2014/07/31
 @contact: jimmysoa@sina.cn
 """
 
-VERSION = '0.2.8'
+VERSION = '0.3.6'
 K_LABELS = ['D', 'W', 'M']
 K_MIN_LABELS = ['5', '15', '30', '60']
 K_TYPE = {'D': 'akdaily', 'W': 'akweekly', 'M': 'akmonthly'}
@@ -98,7 +98,7 @@ SHIBOR_MA_COLS = ['date', 'ON_5', 'ON_10', 'ON_20', '1W_5', '1W_10', '1W_20','2W
 LPR_COLS = ['date', '1Y']
 LPR_MA_COLS = ['date', '1Y_5', '1Y_10', '1Y_20']
 INDEX_HEADER = 'code,name,open,preclose,close,high,low,0,0,volume,amount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,d,c,3\n'
-INDEX_COLS = ['code', 'name', 'change', 'preclose', 'close', 'high', 'low', 'volume', 'amount']
+INDEX_COLS = ['code', 'name', 'change', 'open', 'preclose', 'close', 'high', 'low', 'volume', 'amount']
 HIST_FQ_COLS = ['date', 'open', 'high', 'close', 'low', 'volume', 'amount', 'factor']
 HIST_FQ_FACTOR_COLS = ['code','value']
 DATA_GETTING_TIPS = '[Getting data:]'
@@ -109,6 +109,7 @@ NETWORK_URL_ERROR_MSG = '获取失败，请检查网络和URL'
 DATE_CHK_MSG = '年度输入错误：请输入1989年以后的年份数字，格式：YYYY'
 DATE_CHK_Q_MSG = '季度输入错误：请输入1、2、3或4数字'
 TOP_PARAS_MSG = 'top有误，请输入整数或all.'
+LHB_MSG = '周期输入有误，请输入数字5、10、30或60'
 
 import sys
 PY3 = (sys.version_info[0] >= 3)
@@ -129,9 +130,15 @@ def _write_msg(msg):
     sys.stdout.flush()
     
 def _check_input(year, quarter):
-    if type(year) is str or year < 1989 :
+    if isinstance(year, str) or year < 1989 :
         raise TypeError(DATE_CHK_MSG)
-    elif quarter is None or type(quarter) is str or quarter not in [1, 2, 3, 4]:
+    elif quarter is None or isinstance(quarter, str) or quarter not in [1, 2, 3, 4]:
         raise TypeError(DATE_CHK_Q_MSG)
+    else:
+        return True
+    
+def _check_lhb_input(last):
+    if last not in [5, 10, 30, 60]:
+        raise TypeError(LHB_MSG)
     else:
         return True

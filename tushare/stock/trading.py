@@ -15,7 +15,6 @@ from lxml import etree
 import pandas as pd
 import numpy as np
 from tushare.stock import cons as ct
-from pandas.util.testing import _network_error_classes
 import re
 from pandas.compat import StringIO
 from tushare.util import dateu as du
@@ -67,8 +66,8 @@ def get_hist_data(code=None, start=None, end=None,
             lines = urlopen(request, timeout = 10).read()
             if len(lines) < 15: #no data
                 return None
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             js = json.loads(lines.decode('utf-8') if ct.PY3 else lines)
             cols = []
@@ -154,10 +153,12 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
                                 date, symbol))
             lines = urlopen(re, timeout=10).read()
             lines = lines.decode('GBK') 
+            if len(lines) < 100:
+                return None
             df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
                                skiprows=[0])      
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
@@ -225,8 +226,8 @@ def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
             df = pd.read_html(StringIO(sarr), parse_dates=False)[0]
             df.columns = ct.TODAY_TICK_COLUMNS
             df['pchange'] = df['pchange'].map(lambda x : x.replace('%', ''))
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
@@ -287,7 +288,7 @@ def get_realtime_quotes(symbols=None):
             31：time，时间；
     """
     symbols_list = ''
-    if type(symbols) is list or type(symbols) is set or type(symbols) is tuple or type(symbols) is pd.Series:
+    if isinstance(symbols, list) or isinstance(symbols, set) or isinstance(symbols, tuple) or isinstance(symbols, pd.Series):
         for code in symbols:
             symbols_list += _code_to_symbol(code) + ','
     else:
@@ -303,12 +304,16 @@ def get_realtime_quotes(symbols=None):
     regSym = re.compile(r'(?:sh|sz)(.*?)\=')
     syms = regSym.findall(text)
     data_list = []
-    for row in data:
+    syms_list = []
+    for index, row in enumerate(data):
         if len(row)>1:
             data_list.append([astr for astr in row.split(',')])
+            syms_list.append(syms[index])
+    if len(syms_list) == 0:
+        return None
     df = pd.DataFrame(data_list, columns=ct.LIVE_DATA_COLS)
     df = df.drop('s', axis=1)
-    df['code'] = syms
+    df['code'] = syms_list
     ls = [cls for cls in df.columns if '_v' in cls]
     for txt in ls:
         df[txt] = df[txt].map(lambda x : x[:-2])
@@ -372,6 +377,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
         data = data[(data.date>=start) & (data.date<=end)]
         for label in ['open', 'high', 'close', 'low']:
             data[label] = data[label].map(ct.FORMAT)
+            data[label] = data[label].astype(float)
         data = data.set_index('date')
         data = data.sort_index(ascending = False)
         return data
@@ -383,12 +389,16 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             df = df.sort('date', ascending=False)
             frow = df.head(1)
             rt = get_realtime_quotes(code)
+            if rt is None:
+                return None
             if ((float(rt['high']) == 0) & (float(rt['low']) == 0)):
                 preClose = float(rt['pre_close'])
             else:
                 if du.is_holiday(du.today()):
                     preClose = float(rt['price'])
                 else:
+                    print(du.get_hour())
+                    print((du.get_hour() > 9) & (du.get_hour() < 18) )
                     if (du.get_hour() > 9) & (du.get_hour() < 18):
                         preClose = float(rt['pre_close'])
                     else:
@@ -399,6 +409,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             for label in ['open', 'high', 'low', 'close']:
                 data[label] = data[label] / rate
                 data[label] = data[label].map(ct.FORMAT)
+                data[label] = data[label].astype(float)
             data = data.set_index('date')
             data = data.sort_index(ascending = False)
             return data
@@ -469,8 +480,8 @@ def _parse_fq_data(url, index, retry_count, pause):
             if df['date'].dtypes == np.object:
                 df['date'] = df['date'].astype(np.datetime64)
             df = df.drop_duplicates('date')
-        except _network_error_classes:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
@@ -520,7 +531,25 @@ def _get_index_url(index, code, qt):
         url = ct.HIST_FQ_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                               code, qt[0], qt[1])
     return url
-    
+
+
+def get_hists(symbols, start=None, end=None,
+                  ktype='D', retry_count=3,
+                  pause=0.001):
+    """
+    批量获取历史行情数据，具体参数和返回数据类型请参考get_hist_data接口
+    """
+    df = pd.DataFrame()
+    if isinstance(symbols, list) or isinstance(symbols, set) or isinstance(symbols, tuple) or isinstance(symbols, pd.Series):
+        for symbol in symbols:
+            data = get_hist_data(symbol, start=start, end=end,
+                                 ktype=ktype, retry_count=retry_count,
+                                 pause=pause)
+            data['code'] = symbol
+            df = df.append(data, ignore_index=True)
+        return df
+    else:
+        return None
     
 def _random(n=13):
     from random import randint
@@ -539,4 +568,5 @@ def _code_to_symbol(code):
         if len(code) != 6 :
             return ''
         else:
-            return 'sh%s'%code if code[:1] in ['5,', '6'] else 'sz%s'%code
+            return 'sh%s'%code if code[:1] in ['5', '6'] else 'sz%s'%code
+

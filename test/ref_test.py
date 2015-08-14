@@ -52,9 +52,6 @@ class Test(unittest.TestCase):
         self.set_data()
         print(fd.sz_margin_details(self.end))   
         
-    def test_get_tops(self):
-        self.set_data()
-        print(fd.get_tops(self.end))  
     
 if __name__ == "__main__":
     unittest.main()

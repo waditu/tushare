@@ -1,4 +1,4 @@
-__version__ = '0.3.2'
+__version__ = '0.3.6'
 __author__ = 'Jimmy Liu'
 
 """
@@ -7,7 +7,7 @@ for trading data
 from tushare.stock.trading import (get_hist_data, get_tick_data,
                                    get_today_all, get_realtime_quotes,
                                    get_h_data, get_today_ticks,
-                                   get_index)
+                                   get_index, get_hists)
 
 """
 for trading data
@@ -15,8 +15,7 @@ for trading data
 from tushare.stock.fundamental import (get_stock_basics, get_report_data,
                                        get_profit_data,
                                        get_operation_data, get_growth_data,
-                                       get_debtpaying_data, get_cashflow_data
-                                       )
+                                       get_debtpaying_data, get_cashflow_data)
 
 """
 for macro data
@@ -51,8 +50,7 @@ from tushare.stock.reference import (profit_data, forecast_data,
                                      xsg_data, fund_holdings,
                                      new_stocks, sh_margins,
                                      sh_margin_details,
-                                     sz_margins, sz_margin_details,
-                                     get_tops)
+                                     sz_margins, sz_margin_details)
 
 """
 for shibor
@@ -60,3 +58,9 @@ for shibor
 from tushare.stock.shibor import (shibor_data, shibor_quote_data,
                                   shibor_ma_data, lpr_data,
                                   lpr_ma_data)
+
+"""
+for LHB
+"""
+from tushare.stock.billboard import (top_list, cap_tops, broker_tops,
+                                     inst_tops, inst_detail)

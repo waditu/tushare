@@ -43,6 +43,7 @@ def get_stock_basics():
     request = Request(ct.ALL_STOCK_BASICS_FILE)
     text = urlopen(request, timeout=10).read()
     text = text.decode('GBK')
+    text = text.replace('--', '')
     df = pd.read_csv(StringIO(text), dtype={'code':'object'})
     df = df.set_index('code')
     return df
@@ -77,6 +78,7 @@ def get_report_data(year, quarter):
         df =  _get_report_data(year, quarter, 1, pd.DataFrame())
         if df is not None:
             df = df.drop_duplicates('code')
+            df['code'] = df['code'].map(lambda x:str(x).zfill(6))
         return df
 
 
@@ -87,6 +89,7 @@ def _get_report_data(year, quarter, pageNo, dataArr):
                          year, quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
+        text = text.replace('--', '')
         html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
@@ -105,8 +108,8 @@ def _get_report_data(year, quarter, pageNo, dataArr):
             return _get_report_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
-    except:
-        pass
+    except Exception as e:
+        print(e)
 
 
 def get_profit_data(year, quarter):
@@ -136,6 +139,7 @@ def get_profit_data(year, quarter):
         data =  _get_profit_data(year, quarter, 1, pd.DataFrame())
         if data is not None:
             data = data.drop_duplicates('code')
+            data['code'] = data['code'].map(lambda x:str(x).zfill(6))
         return data
 
 
@@ -147,6 +151,7 @@ def _get_profit_data(year, quarter, pageNo, dataArr):
                                               quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
+        text = text.replace('--', '')
         html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
@@ -194,6 +199,7 @@ def get_operation_data(year, quarter):
         data =  _get_operation_data(year, quarter, 1, pd.DataFrame())
         if data is not None:
             data = data.drop_duplicates('code')
+            data['code'] = data['code'].map(lambda x:str(x).zfill(6))
         return data
 
 
@@ -205,6 +211,7 @@ def _get_operation_data(year, quarter, pageNo, dataArr):
                                                  quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
+        text = text.replace('--', '')
         html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
@@ -222,8 +229,8 @@ def _get_operation_data(year, quarter, pageNo, dataArr):
             return _get_operation_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
-    except:
-        pass
+    except Exception as e:
+        print(e)
 
 
 def get_growth_data(year, quarter):
@@ -252,6 +259,7 @@ def get_growth_data(year, quarter):
         data =  _get_growth_data(year, quarter, 1, pd.DataFrame())
         if data is not None:
             data = data.drop_duplicates('code')
+            data['code'] = data['code'].map(lambda x:str(x).zfill(6))
         return data
 
 
@@ -263,6 +271,7 @@ def _get_growth_data(year, quarter, pageNo, dataArr):
                                               quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
+        text = text.replace('--', '')
         html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
@@ -280,8 +289,8 @@ def _get_growth_data(year, quarter, pageNo, dataArr):
             return _get_growth_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
-    except:
-        pass
+    except Exception as e:
+        print(e)
 
 
 def get_debtpaying_data(year, quarter):
@@ -310,6 +319,7 @@ def get_debtpaying_data(year, quarter):
         df =  _get_debtpaying_data(year, quarter, 1, pd.DataFrame())
         if df is not None:
             df = df.drop_duplicates('code')
+            df['code'] = df['code'].map(lambda x:str(x).zfill(6))
         return df
 
 
@@ -338,8 +348,8 @@ def _get_debtpaying_data(year, quarter, pageNo, dataArr):
             return _get_debtpaying_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
-    except:
-        pass
+    except Exception as e:
+        print(e)
  
  
 def get_cashflow_data(year, quarter):
@@ -367,6 +377,7 @@ def get_cashflow_data(year, quarter):
         df =  _get_cashflow_data(year, quarter, 1, pd.DataFrame())
         if df is not None:
             df = df.drop_duplicates('code')
+            df['code'] = df['code'].map(lambda x:str(x).zfill(6))
         return df
 
 
@@ -378,6 +389,7 @@ def _get_cashflow_data(year, quarter, pageNo, dataArr):
                                                 quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
+        text = text.replace('--', '')
         html = lxml.html.parse(StringIO(text))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
@@ -395,8 +407,8 @@ def _get_cashflow_data(year, quarter, pageNo, dataArr):
             return _get_cashflow_data(year, quarter, pageNo, dataArr)
         else:
             return dataArr
-    except:
-        pass
+    except Exception as e:
+        print(e)
        
        
 def _data_path():
@@ -405,3 +417,4 @@ def _data_path():
     caller_file = inspect.stack()[1][1]  
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
+
