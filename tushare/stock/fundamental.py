@@ -417,4 +417,3 @@ def _data_path():
     caller_file = inspect.stack()[1][1]  
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
-
