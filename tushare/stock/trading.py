@@ -321,7 +321,7 @@ def get_realtime_quotes(symbols=None):
 
 
 def get_h_data(code, start=None, end=None, autype='qfq',
-               index=False, retry_count=3, pause=0.001):
+               index=False, retry_count=3, pause=0.001, with_factor=False):
     '''
     获取历史复权数据
     Parameters
@@ -338,6 +338,8 @@ def get_h_data(code, start=None, end=None, autype='qfq',
                  如遇网络等问题重复执行的次数 
       pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+      with_factor: bool, 默认 False
+                当获取后复权、不复权数据时，是否返回复权因子
     return
     -------
       DataFrame
@@ -348,6 +350,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
           low 最低价
           volume 成交量
           amount 成交金额
+          factor 复权因子(可选)
     '''
     
     start = du.today_last_year() if start is None else start
@@ -373,7 +376,10 @@ def get_h_data(code, start=None, end=None, autype='qfq',
         data = data.sort_index(ascending=False)
         return data
     if autype == 'hfq':
-        data = data.drop('factor', axis=1)
+        if not with_factor:
+            data = data.drop('factor', axis=1)
+        else:
+            data['factor'] = data['factor'].astype(float)
         data = data[(data.date>=start) & (data.date<=end)]
         for label in ['open', 'high', 'close', 'low']:
             data[label] = data[label].map(ct.FORMAT)
@@ -416,7 +422,10 @@ def get_h_data(code, start=None, end=None, autype='qfq',
         else:
             for label in ['open', 'high', 'close', 'low']:
                 data[label] = data[label] / data['factor']
-            data = data.drop('factor', axis=1)
+            if not with_factor:
+                data = data.drop('factor', axis=1)
+            else:
+                data['factor'] = data['factor'].astype(float)
             data = data[(data.date>=start) & (data.date<=end)]
             for label in ['open', 'high', 'close', 'low']:
                 data[label] = data[label].map(ct.FORMAT)
