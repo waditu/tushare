@@ -190,7 +190,7 @@ def get_hs300s():
         df.columns = ct.FOR_CLASSIFY_B_COLS
         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
         wt = pd.read_excel(ct.HS300_CLASSIFY_URL%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
-                                                  ct.INDEX_C_COMM, ct.PAGES['hs300w']), parse_cols=[0,3,6])
+                                                  ct.INDEX_C_COMM, ct.PAGES['hs300w']), parse_cols=[0,4,8])
         wt.columns = ct.FOR_CLASSIFY_W_COLS
         wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
         return pd.merge(df,wt)
