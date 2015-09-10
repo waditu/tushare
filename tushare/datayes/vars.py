@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 """
 Created on 2015年7月4日
 @author: JimmyLiu
@@ -27,4 +27,4 @@ OPTION_RT = _MARKET_HEAD + 'getOptionTickRTSnapshot.csv?optionId=%s&field=%s'
 EQU_RT_RANK = _MARKET_HEAD + 'getEquRTRank.csv?exchangeCD=%s&pagesize=%s&pagenum=%s&desc=%s&field=%s'
 SEC_TIPS = _MARKET_HEAD + 'getSecTips.csv?tipsTypeCD=%s&field=%s'
 TICK_RT_INTRADAY = _MARKET_HEAD + 'getTickRTIntraDay.csv?securityID=%s&startTime=%s&endTime=%s&field=%s'
-BAR_RT = _MARKET_HEAD + 'getBarRTIntraDay.csv?securityID=%s&startTime=%s&endTime=%s&unit=%s&field=%s'
+BAR_RT = _MARKET_HEAD + 'getBarRTIntraDay.csv?securityID=%s&startTime=%s&endTime=%s&unit=%s'
