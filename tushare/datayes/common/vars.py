@@ -70,6 +70,7 @@ TICKRTSNAPSHOTINDEX = '/api/market/getTickRTSnapshotIndex.csv?securityID=%s&fiel
 FUTURETICKRTSNAPSHOT = '/api/market/getFutureTickRTSnapshot.csv?instrumentID=%s&field=%s'
 TICKRTINTRADAY = '/api/market/getTickRTIntraDay.csv?securityID=%s&endTime=%s&startTime=%s&field=%s'
 BARRTINTRADAY = '/api/market/getBarRTIntraDay.csv?securityID=%s&endTime=%s&startTime=%s&field=%s'
+BARHISTONEDAY = '/api/market/getBarHistOneDay.csv?securityID=%s&date=%s&endTime=%s&startTime=%s&field=%s'
 FUTURETICKRTINTRADAY = '/api/market/getFutureTickRTIntraDay.csv?instrumentID=%s&endTime=%s&startTime=%s&field=%s'
 STOCKFACTORSONEDAY = '/api/market/getStockFactorsOneDay.csv?tradeDate=%s&secID=%s&ticker=%s&field=%s'
 STOCKFACTORSDATERANGE = '/api/market/getStockFactorsDateRange.csv?secID=%s&ticker=%s&beginDate=%s&endDate=%s&field=%s'
