@@ -12,7 +12,7 @@ try:
 except ImportError:
     from http.client import HTTPSConnection
 import urllib
-from tushare.datayes.common import vars as vs 
+from tushare.util import vars as vs
 
 class Client:
     httpClient = None
