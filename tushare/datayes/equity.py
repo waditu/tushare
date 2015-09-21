@@ -1,20 +1,25 @@
-#!/usr/bin/env python
 # -*- coding:utf-8 -*- 
 """
-Created on 2015年7月31日
+通联数据
+Created on 2015/08/24
 @author: Jimmy Liu
-@group: DataYes Data.dept
-@QQ:52799046
+@group : waditu
+@contact: jimmysoa@sina.cn
 """
-from tushare.datayes.common import vars as vs 
-import pandas as pd
+
 from pandas.compat import StringIO
+import pandas as pd
+from tushare.util import vars as vs
+from tushare.util.common import Client
+from tushare.util import upass as up
 
 class Equity():
     
-    def __init__(self, client):
-        self.client = client
-        
+    def __init__(self, client=None):
+        if client is None:
+            self.client = Client(up.get_token())
+        else:
+            self.client = client
         
     def Equ(self, equTypeCD='', secID='', ticker='', listStatusCD='', field=''):
         """

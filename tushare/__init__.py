@@ -1,4 +1,4 @@
-__version__ = '0.3.6'
+__version__ = '0.3.8'
 __author__ = 'Jimmy Liu'
 
 """
@@ -64,3 +64,11 @@ for LHB
 """
 from tushare.stock.billboard import (top_list, cap_tops, broker_tops,
                                      inst_tops, inst_detail)
+
+
+"""
+for DataYes Token
+"""
+from tushare.util.upass import (set_token, get_token)
+
+from tushare.datayes.api import *

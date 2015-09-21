@@ -110,6 +110,8 @@ DATE_CHK_MSG = '年度输入错误：请输入1989年以后的年份数字，格
 DATE_CHK_Q_MSG = '季度输入错误：请输入1、2、3或4数字'
 TOP_PARAS_MSG = 'top有误，请输入整数或all.'
 LHB_MSG = '周期输入有误，请输入数字5、10、30或60'
+TOKEN_F_P = 'tk.csv'
+TOKEN_ERR_MSG = '请设置通联数据接口的token凭证码'
 
 import sys
 PY3 = (sys.version_info[0] >= 3)
