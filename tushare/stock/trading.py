@@ -397,8 +397,6 @@ def get_h_data(code, start=None, end=None, autype='qfq',
                 if du.is_holiday(du.today()):
                     preClose = float(rt['price'])
                 else:
-                    print(du.get_hour())
-                    print((du.get_hour() > 9) & (du.get_hour() < 18) )
                     if (du.get_hour() > 9) & (du.get_hour() < 18):
                         preClose = float(rt['pre_close'])
                     else:
