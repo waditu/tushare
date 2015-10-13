@@ -22,7 +22,7 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'idx': 'www.csindex.com.cn', '163': 'money.163.com',
            'em': 'eastmoney.com', 'sseq': 'query.sse.com.cn',
            'sse': 'www.sse.com.cn', 'szse': 'www.szse.cn',
-           'oss': '218.244.146.57',
+           'oss': '218.244.146.57', 'idxip':'115.29.204.48',
            'shibor': 'www.shibor.org'}
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
@@ -31,6 +31,7 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'dp':'all_fpya.php', '163dp':'fpyg.html',
          'emxsg':'JS.aspx', '163fh':'jjcgph.php',
          'newstock':'vRPD_NewStockIssue.php', 'zz500b':'000905cons.xls',
+         'zz500wt':'000905closeweight.xls',
          't_ticks':'vMS_tradedetail.php', 'dw': 'downLoad.html',
          'qmd':'queryMargin.do', 'szsefc':'FrontController.szse',
          'ssecq':'commonQuery.do'}
@@ -82,7 +83,8 @@ SINA_CONCEPTS_INDEX_URL = '%smoney.%s/q/view/%s?param=class'
 SINA_INDUSTRY_INDEX_URL = '%s%s/q/view/%s'
 SINA_DATA_DETAIL_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?page=1&num=400&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
 INDEX_C_COMM = 'sseportal/ps/zhs/hqjt/csi'
-HS300_CLASSIFY_URL = '%s%s/%s/%s'
+HS300_CLASSIFY_URL_FTP = '%s%s/%s'
+HS300_CLASSIFY_URL_HTTP = '%s%s/%s/%s'
 HIST_FQ_URL = '%s%s/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml?year=%s&jidu=%s'
 HIST_INDEX_URL = '%s%s/corp/go.php/vMS_MarketHistory/stockid/%s/type/S.phtml?year=%s&jidu=%s'
 HIST_FQ_FACTOR_URL = '%s%s/api/json.php/BasicStockSrv.getStockFuQuanData?symbol=%s&type=hfq'

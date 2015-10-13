@@ -1,7 +1,6 @@
 # -*- coding:utf-8 -*- 
 
 """
-通联数据token设置
 Created on 2015/08/24
 @author: Jimmy Liu
 @group : waditu
@@ -13,7 +12,7 @@ import os
 from tushare.stock import cons as ct
 
 def set_token(token):
-    df = pd.DataFrame([token], columns={'token'})
+    df = pd.DataFrame([token], columns=['token'])
     df.to_csv(ct.TOKEN_F_P, index=False)
     
     

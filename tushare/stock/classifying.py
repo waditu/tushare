@@ -185,11 +185,11 @@ def get_hs300s():
         weight:权重
     """
     try:
-        df = pd.read_excel(ct.HS300_CLASSIFY_URL%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
-                                                  ct.INDEX_C_COMM, ct.PAGES['hs300b']), parse_cols=[0,1])
+        df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
+                                                  ct.PAGES['hs300b']), parse_cols=[0,1])
         df.columns = ct.FOR_CLASSIFY_B_COLS
         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
-        wt = pd.read_excel(ct.HS300_CLASSIFY_URL%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
+        wt = pd.read_excel(ct.HS300_CLASSIFY_URL_HTTP%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
                                                   ct.INDEX_C_COMM, ct.PAGES['hs300w']), parse_cols=[0,4,8])
         wt.columns = ct.FOR_CLASSIFY_W_COLS
         wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
@@ -208,8 +208,8 @@ def get_sz50s():
         name :股票名称
     """
     try:
-        df = pd.read_excel(ct.HS300_CLASSIFY_URL%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
-                                                  ct.INDEX_C_COMM, ct.PAGES['sz50b']), parse_cols=[0,1])
+        df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
+                                                  ct.PAGES['sz50b']), parse_cols=[0,1])
         df.columns = ct.FOR_CLASSIFY_B_COLS
         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
         return df
@@ -227,11 +227,15 @@ def get_zz500s():
         name :股票名称
     """
     try:
-        df = pd.read_excel(ct.HS300_CLASSIFY_URL%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
-                                                  ct.INDEX_C_COMM, ct.PAGES['zz500b']), parse_cols=[0,1])
+        df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
+                                                  ct.PAGES['zz500b']), parse_cols=[0,1])
         df.columns = ct.FOR_CLASSIFY_B_COLS
         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
-        return df
+        wt = pd.read_excel(ct.HS300_CLASSIFY_URL_HTTP%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
+                                                  ct.INDEX_C_COMM, ct.PAGES['zz500wt']), parse_cols=[0,4,8])
+        wt.columns = ct.FOR_CLASSIFY_W_COLS
+        wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
+        return pd.merge(df,wt)
     except Exception as er:
         print(str(er)) 
 
@@ -297,4 +301,3 @@ def _random(n=13):
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))  
-
