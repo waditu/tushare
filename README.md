@@ -172,7 +172,7 @@ Quick Start
 [http://tushare.org/](http://tushare.org/ "TuShare Docs")
  
 Change Logs
-------
+-----------
 
 0.3.9 2015/10/13
 ============
