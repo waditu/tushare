@@ -13,6 +13,7 @@ except ImportError:
     from http.client import HTTPSConnection
 import urllib
 from tushare.util import vars as vs
+from tushare.stock import cons as ct
 
 class Client:
     httpClient = None
@@ -38,7 +39,10 @@ class Client:
             if(i>=0):
                 for j in range(start, i):
                     if(path[j] > '~'):
-                        re += urllib.quote(path[j])
+                        if ct.PY3:
+                            re += urllib.parse.quote(path[j])
+                        else:
+                            re += urllib.quote(path[j])
                     else:
                         re += path[j]  
                 re += '&'
@@ -46,7 +50,10 @@ class Client:
             else:
                 for j in range(start, n):
                     if(path[j] > '~'):
-                        re += urllib.quote(path[j])
+                        if ct.PY3:
+                            re += urllib.parse.quote(path[j])
+                        else:
+                            re += urllib.quote(path[j])
                     else:
                         re += path[j]  
                 start = n
