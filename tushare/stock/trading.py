@@ -89,6 +89,7 @@ def get_hist_data(code=None, start=None, end=None,
             if (code in ct.INDEX_LABELS) & (ktype in ct.K_MIN_LABELS):
                 df = df.drop('turnover', axis=1)
             df = df.set_index('date')
+            df = df.sort_index(ascending = False)
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
