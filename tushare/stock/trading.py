@@ -420,7 +420,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             for label in ['open', 'high', 'close', 'low']:
                 data[label] = data[label].map(ct.FORMAT)
             data = data.set_index('date')
-            data = data.sort_index(ascending=False)
+            data = data.sort_index(ascending = False)
             data = data.astype(float)
             return data
 
@@ -549,6 +549,7 @@ def get_hists(symbols, start=None, end=None,
         return df
     else:
         return None
+    
     
 def _random(n=13):
     from random import randint
