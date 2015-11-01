@@ -5,7 +5,7 @@ import pandas as pd
 
 
 def year_qua(date):
-    mon = date[5:7]
+    mon = date[4:6]
     mon = int(mon)
     return[date[0:4], _quar(mon)]
     
