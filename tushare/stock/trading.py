@@ -196,7 +196,7 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
                                        dict(__getitem__ = lambda s, n:n))())
         data_str = json.dumps(data_str)
         data_str = json.loads(data_str)
-        pages = len(data_str['detailPages'])
+        pages = len(data_str['detailPages']) + 1
         data = pd.DataFrame()
         ct._write_head()
         for pNo in range(1, pages):
