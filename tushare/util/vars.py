@@ -488,7 +488,7 @@ THEMESTICKERSINSERT = '/api/subject/getThemesTickersInsert.csv?themeID=%s&themeN
 THEMESTICKERSDELETE = '/api/subject/getThemesTickersDelete.csv?themeID=%s&themeName=%s&beginDate=%s&endDate=%s&field=%s'
 THEMESBYTICKERS = '/api/subject/getThemesByTickers.csv?secID=%s&secShortName=%s&ticker=%s&beginDate=%s&endDate=%s&exchangeCD=%s&field=%s'
 THEMESPERIOD = '/api/subject/getThemesPeriod.csv?isLatest=%s&themeID=%s&themeName=%s&field=%s'
-ACTIVETHEMES = '/api/subject/getActiveThemes.csv?date=%s&date=%s&field=%s'
+ACTIVETHEMES = '/api/subject/getActiveThemes.csv?date=%s&field=%s'
 THEMESSIMILARITY = '/api/subject/getThemesSimilarity.csv?themeID=%s&themeName=%s&field=%s'
 THEMESHEAT = '/api/subject/getThemesHeat.csv?themeID=%s&themeName=%s&beginDate=%s&endDate=%s&field=%s'
 SECTORTHEMESBYTICKERS = '/api/subject/getSectorThemesByTickers.csv?secID=%s&secShortName=%s&ticker=%s&beginDate=%s&endDate=%s&exchangeCD=%s&field=%s'
