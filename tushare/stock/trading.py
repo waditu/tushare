@@ -165,6 +165,47 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
+def get_sina_dd(code=None, date=None, retry_count=3, pause=0.001):
+    """
+        获取sina大单数据
+    Parameters
+    ------
+        code:string
+                  股票代码 e.g. 600848
+        date:string
+                  日期 format：YYYY-MM-DD
+        retry_count : int, 默认 3
+                  如遇网络等问题重复执行的次数
+        pause : int, 默认 0
+                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+     return
+     -------
+        DataFrame 当日所有股票交易数据(DataFrame)
+              属性:股票代码    股票名称    交易时间    价格    成交量    前一笔价格    类型（买、卖、中性盘）
+    """
+    if code is None or len(code)!=6 or date is None:
+        return None
+    symbol = _code_to_symbol(code)
+    for _ in range(retry_count):
+        time.sleep(pause)
+        try:
+            re = Request(ct.SINA_DD % (ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd'],
+                                symbol, date))
+            lines = urlopen(re, timeout=10).read()
+            lines = lines.decode('GBK') 
+            if len(lines) < 100:
+                return None
+            df = pd.read_csv(StringIO(lines), names=ct.SINA_DD_COLS,
+                               skiprows=[0])    
+            if df is not None:
+                df['code'] = df['code'].map(lambda x: x[2:])
+        except Exception as e:
+            print(e)
+        else:
+            return df
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
+
 def get_today_ticks(code=None, retry_count=3, pause=0.001):
     """
         获取当日分笔明细数据
