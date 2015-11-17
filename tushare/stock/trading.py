@@ -245,7 +245,8 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
                                             retry_count, pause), ignore_index=True)
     except Exception as er:
         print(str(er))
-    return data
+    else:
+        return data
 
 
 def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
