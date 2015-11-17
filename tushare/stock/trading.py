@@ -226,26 +226,30 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
         return None
     symbol = _code_to_symbol(code)
     date = du.today()
-    try:
-        request = Request(ct.TODAY_TICKS_PAGE_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                                   ct.PAGES['jv'], date,
-                                                   symbol))
-        data_str = urlopen(request, timeout=10).read()
-        data_str = data_str.decode('GBK')
-        data_str = data_str[1:-1]
-        data_str = eval(data_str, type('Dummy', (dict,), 
-                                       dict(__getitem__ = lambda s, n:n))())
-        data_str = json.dumps(data_str)
-        data_str = json.loads(data_str)
-        pages = len(data_str['detailPages'])
-        data = pd.DataFrame()
-        ct._write_head()
-        for pNo in range(1, pages):
-            data = data.append(_today_ticks(symbol, date, pNo,
-                                            retry_count, pause), ignore_index=True)
-    except Exception as er:
-        print(str(er))
-    return data
+    for _ in range(retry_count):
+        time.sleep(pause)
+        try:
+            request = Request(ct.TODAY_TICKS_PAGE_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                                       ct.PAGES['jv'], date,
+                                                       symbol))
+            data_str = urlopen(request, timeout=10).read()
+            data_str = data_str.decode('GBK')
+            data_str = data_str[1:-1]
+            data_str = eval(data_str, type('Dummy', (dict,), 
+                                           dict(__getitem__ = lambda s, n:n))())
+            data_str = json.dumps(data_str)
+            data_str = json.loads(data_str)
+            pages = len(data_str['detailPages'])
+            data = pd.DataFrame()
+            ct._write_head()
+            for pNo in range(1, pages):
+                data = data.append(_today_ticks(symbol, date, pNo,
+                                                retry_count, pause), ignore_index=True)
+        except Exception as er:
+            print(str(er))
+        else:
+            return data
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
 def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
