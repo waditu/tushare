@@ -1,6 +1,6 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 """
-投资参考数据接口 
+投资参考数据接口
 Created on 2015/03/21
 @author: Jimmy Liu
 @group : waditu
@@ -26,7 +26,7 @@ except ImportError:
     from urllib2 import urlopen, Request
 
 
-def profit_data(year=2014, top=25, 
+def profit_data(year=2014, top=25,
               retry_count=3, pause=0.001):
     """
     获取分配预案数据
@@ -35,10 +35,10 @@ def profit_data(year=2014, top=25,
     year:年份
     top:取最新n条数据，默认取最近公布的25条
     retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
+                 如遇网络等问题重复执行的次数
       pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-    
+
     returns
     -------
     DataFrame
@@ -72,13 +72,13 @@ def profit_data(year=2014, top=25,
             return df.head(top)
         else:
             print(ct.TOP_PARAS_MSG)
-    
+
 
 def _fun_divi(x):
     if ct.PY3:
         reg = re.compile(r'分红(.*?)元', re.UNICODE)
         res = reg.findall(x)
-        return 0 if len(res)<1 else float(res[0]) 
+        return 0 if len(res)<1 else float(res[0])
     else:
         if isinstance(x, unicode):
             s1 = unicode('分红','utf-8')
@@ -113,8 +113,8 @@ def _fun_into(x):
             return res1 + res2
         else:
             return 0
-    
-    
+
+
 def _dist_cotent(year, pageNo, retry_count, pause):
     for _ in range(retry_count):
         time.sleep(pause)
@@ -122,7 +122,7 @@ def _dist_cotent(year, pageNo, retry_count, pause):
             if pageNo > 0:
                 ct._write_console()
             html = lxml.html.parse(rv.DP_163_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
-                     ct.PAGES['163dp'], year, pageNo))  
+                     ct.PAGES['163dp'], year, pageNo))
             res = html.xpath('//div[@class=\"fn_rp_list\"]/table')
             if ct.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -150,7 +150,7 @@ def _dist_cotent(year, pageNo, retry_count, pause):
                 return df, pages[0] if len(pages)>0 else 0
             else:
                 return df
-    raise IOError(ct.NETWORK_URL_ERROR_MSG)    
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
 def forecast_data(year, quarter):
@@ -161,7 +161,7 @@ def forecast_data(year, quarter):
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
-       
+
     Return
     --------
     DataFrame
@@ -171,7 +171,7 @@ def forecast_data(year, quarter):
         report_date,发布日期
         pre_eps,上年同期每股收益
         range,业绩变动范围
-        
+
     """
     if ct._check_input(year, quarter) is True:
         ct._write_head()
@@ -184,7 +184,7 @@ def forecast_data(year, quarter):
 def _get_forecast_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
-        html = lxml.html.parse(ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], 
+        html = lxml.html.parse(ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                 ct.PAGES['fd'], year, quarter, pageNo,
                                                 ct.PAGE_NUM[1]))
         res = html.xpath("//table[@class=\"list_table\"]/tr")
@@ -207,9 +207,60 @@ def _get_forecast_data(year, quarter, pageNo, dataArr):
             return dataArr
     except Exception as e:
             print(e)
-    
 
-def xsg_data(year=None, month=None, 
+def get_report_disclose_date(year, quarter, market=0):
+    """
+        获取业绩财报披露日期
+    Parameters
+    --------
+    year:int 年度 e.g:2015
+    quarter:int 季度 e.g:1,2,3,4只能输入这4个季度
+    market:int 市场 e.g:0(全部),1(上海),2(深圳)
+    说明:由于是从其他网站爬取的数据，需要分页抓取，速度取决于您当前的网络速度
+
+    Return
+    --------
+    DataFrame
+        code,股票代码
+        name,股票名称
+        expected_date,预披露日期
+        first_change,一次变更日期
+        second_change,二次变更日期
+        third_change,三次变更日期
+        final_date,实际披露日期
+    """
+    if ct._check_input(year, quarter) is True and ct._check_market_input(market) is True:
+        ct._write_head()
+        df = _get_report_disclose_date(year, quarter, market, 1, 500, pd.DataFrame())
+        return df
+
+def _get_report_disclose_date(year, quarter, market, pageNo, stockPerPage, dataArr):
+    ct._write_console()
+    try:
+        date = str(year) + '-' + _get_quarter_date(quarter)
+        request = Request(ct.REPORT_DISCLOSE_URL%(ct.P_TYPE['http'], ct.DOMAINS['emdi'], date, pageNo, stockPerPage, market))
+        text = urlopen(request, timeout=60).read()
+        if text:
+            pageNum = text.split(',')[0].split(':')[-1]
+            arr = text.split('[')
+            res = arr[1][:-2].replace('"','').split(',')
+            c = [res[i:i+8] for i in range(len(res)) if i % 8 == 0]
+            df = pd.DataFrame.from_records(c)
+            df = df.drop(7, axis=1)
+            df.columns = ct.REPORT_DISCLOSE_COLS
+            dataArr = dataArr.append(df, ignore_index=True)
+            if pageNo < int(pageNum):
+                pageNo += 1
+                return _get_report_disclose_date(year, quarter, market, pageNo, stockPerPage, dataArr)
+            else:
+                return dataArr
+    except Exception as e:
+        print(e)
+
+def _get_quarter_date(x):
+    return {1:'03-31',2:'06-30',3:'09-30',4:'12-31'}[x]
+
+def xsg_data(year=None, month=None,
             retry_count=3, pause=0.001):
     """
     获取限售股解禁数据
@@ -218,10 +269,10 @@ def xsg_data(year=None, month=None,
     year:年份,默认为当前年
     month:解禁月份，默认为当前月
     retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
+                 如遇网络等问题重复执行的次数
     pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-    
+
     Return
     ------
     DataFrame
@@ -257,7 +308,7 @@ def xsg_data(year=None, month=None,
             df[6] = df[6].map(ct.FORMAT)
             df.columns = rv.XSG_COLS
             return df
-    raise IOError(ct.NETWORK_URL_ERROR_MSG)   
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
 def fund_holdings(year, quarter,
@@ -269,10 +320,10 @@ def fund_holdings(year, quarter,
     year:年份e.g 2014
     quarter:季度（只能输入1，2，3，4这个四个数字）
     retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
+                 如遇网络等问题重复执行的次数
     pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-    
+
     Return
     ------
     DataFrame
@@ -328,7 +379,7 @@ def _holding_cotent(start, end, pageNo, retry_count, pause):
             df['SHIZHI'] = df['SHIZHI'].map(ct.FORMAT)
             df['SCSTC27'] = df['SCSTC27'].map(ct.FORMAT)
             df.columns = rv.FUND_HOLDS_COLS
-            df = df[['code', 'name', 'date', 'nums', 'nlast', 'count', 
+            df = df[['code', 'name', 'date', 'nums', 'nlast', 'count',
                          'clast', 'amount', 'ratio']]
         except Exception as e:
             print(e)
@@ -337,8 +388,8 @@ def _holding_cotent(start, end, pageNo, retry_count, pause):
                 return df, int(lines['pagecount'])
             else:
                 return df
-    raise IOError(ct.NETWORK_URL_ERROR_MSG)    
-    
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
 
 def new_stocks(retry_count=3, pause=0.001):
     """
@@ -346,10 +397,10 @@ def new_stocks(retry_count=3, pause=0.001):
     Parameters
     --------
     retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
+                 如遇网络等问题重复执行的次数
     pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-    
+
     Return
     ------
     DataFrame
@@ -393,7 +444,7 @@ def _newstocks(data, pageNo, retry_count, pause):
             df['code'] = df['code'].map(lambda x : str(x).zfill(6))
             res = html.xpath('//table[@class=\"table2\"]/tr[1]/td[1]/a/text()')
             tag = '下一页' if ct.PY3 else unicode('下一页', 'utf-8')
-            hasNext = True if tag in res else False 
+            hasNext = True if tag in res else False
             data = data.append(df, ignore_index=True)
             pageNo += 1
             if hasNext:
@@ -401,7 +452,7 @@ def _newstocks(data, pageNo, retry_count, pause):
         except Exception as ex:
             print(ex)
         else:
-            return data 
+            return data
 
 
 def sh_margins(start=None, end=None, retry_count=3, pause=0.001):
@@ -414,10 +465,10 @@ def sh_margins(start=None, end=None, retry_count=3, pause=0.001):
     end:string
                   结束日期 format：YYYY-MM-DD 为空时取当前日期
     retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
+                 如遇网络等问题重复执行的次数
     pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-    
+
     Return
     ------
     DataFrame
@@ -442,7 +493,7 @@ def sh_margins(start=None, end=None, retry_count=3, pause=0.001):
     return df
 
 
-def _sh_hz(data, start=None, end=None, 
+def _sh_hz(data, start=None, end=None,
            pageNo='', beginPage='',
            endPage='',
            retry_count=3, pause=0.001):
@@ -475,8 +526,8 @@ def _sh_hz(data, start=None, end=None,
             df['opDate'] = df['opDate'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
             data = data.append(df, ignore_index=True)
             if beginPage < datapage*5:
-                data = _sh_hz(data, start=start, end=end, pageNo=pageNo, 
-                       beginPage=beginPage, endPage=endPage, 
+                data = _sh_hz(data, start=start, end=end, pageNo=pageNo,
+                       beginPage=beginPage, endPage=endPage,
                        retry_count=retry_count, pause=pause)
         except Exception as e:
             print(e)
@@ -485,7 +536,7 @@ def _sh_hz(data, start=None, end=None,
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def sh_margin_details(date='', symbol='', 
+def sh_margin_details(date='', symbol='',
                       start='', end='',
                       retry_count=3, pause=0.001):
     """
@@ -495,16 +546,16 @@ def sh_margin_details(date='', symbol='',
     date:string
                 明细数据日期 format：YYYY-MM-DD 默认为空''
     symbol：string
-                标的代码，6位数字e.g.600848，默认为空  
+                标的代码，6位数字e.g.600848，默认为空
     start:string
                   开始日期 format：YYYY-MM-DD 默认为空''
     end:string
                   结束日期 format：YYYY-MM-DD 默认为空''
     retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
+                 如遇网络等问题重复执行的次数
     pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-    
+
     Return
     ------
     DataFrame
@@ -532,7 +583,7 @@ def sh_margin_details(date='', symbol='',
     return df
 
 
-def _sh_mx(data, date='', start='', end='', 
+def _sh_mx(data, date='', start='', end='',
            symbol='',
            pageNo='', beginPage='',
            endPage='',
@@ -552,7 +603,7 @@ def _sh_mx(data, date='', start='', end='',
             endPage = pageNo + 4
             ref = rv.MAR_SH_HZ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
             clt = Client(rv.MAR_SH_MX_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
-                                    ct.PAGES['qmd'], _random(5), date, 
+                                    ct.PAGES['qmd'], _random(5), date,
                                     symbol, start, end, tail,
                                     _random()), ref=ref, cookie=rv.MAR_SH_COOKIESTR)
             lines = clt.gvalue()
@@ -569,8 +620,8 @@ def _sh_mx(data, date='', start='', end='',
             df['opDate'] = df['opDate'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
             data = data.append(df, ignore_index=True)
             if beginPage < datapage*5:
-                data = _sh_mx(data, start=start, end=end, pageNo=pageNo, 
-                       beginPage=beginPage, endPage=endPage, 
+                data = _sh_mx(data, start=start, end=end, pageNo=pageNo,
+                       beginPage=beginPage, endPage=endPage,
                        retry_count=retry_count, pause=pause)
         except Exception as e:
             print(e)
@@ -589,10 +640,10 @@ def sz_margins(start=None, end=None, retry_count=3, pause=0.001):
     end:string
                   结束日期 format：YYYY-MM-DD 默认为今日
     retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
+                 如遇网络等问题重复执行的次数
     pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-    
+
     Return
     ------
     DataFrame
@@ -623,7 +674,7 @@ def sz_margins(start=None, end=None, retry_count=3, pause=0.001):
         ct._write_msg(ct.DATA_INPUT_ERROR_MSG)
     else:
         return data
-        
+
 
 def _sz_hz(date='', retry_count=3, pause=0.001):
     for _ in range(retry_count):
@@ -653,10 +704,10 @@ def sz_margin_details(date='', retry_count=3, pause=0.001):
     date:string
                 明细数据日期 format：YYYY-MM-DD 默认为空''
     retry_count : int, 默认 3
-                 如遇网络等问题重复执行的次数 
+                 如遇网络等问题重复执行的次数
     pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-    
+
     Return
     ------
     DataFrame
@@ -693,4 +744,4 @@ def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
-    return str(randint(start, end))  
+    return str(randint(start, end))

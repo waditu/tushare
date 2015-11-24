@@ -51,7 +51,8 @@ from tushare.stock.reference import (profit_data, forecast_data,
                                      xsg_data, fund_holdings,
                                      new_stocks, sh_margins,
                                      sh_margin_details,
-                                     sz_margins, sz_margin_details)
+                                     sz_margins, sz_margin_details,
+                                     get_report_disclose_date)
 
 """
 for shibor

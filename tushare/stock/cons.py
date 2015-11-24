@@ -18,12 +18,12 @@ PAGE_NUM = [38, 60, 80, 100]
 FORMAT = lambda x: '%.2f' % x
 DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'ifeng': 'ifeng.com', 'sf': 'finance.sina.com.cn',
-           'vsf': 'vip.stock.finance.sina.com.cn', 
+           'vsf': 'vip.stock.finance.sina.com.cn',
            'idx': 'www.csindex.com.cn', '163': 'money.163.com',
            'em': 'eastmoney.com', 'sseq': 'query.sse.com.cn',
            'sse': 'www.sse.com.cn', 'szse': 'www.szse.cn',
            'oss': '218.244.146.57', 'idxip':'115.29.204.48',
-           'shibor': 'www.shibor.org'}
+           'shibor': 'www.shibor.org', 'emdi':'datainterface.eastmoney.com'}
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
          'ntinfo':'vCB_BulletinGather.php', 'hs300b':'000300cons.xls',
@@ -42,6 +42,7 @@ DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
 REPORT_COLS = ['code', 'name', 'eps', 'eps_yoy', 'bvps', 'roe',
                'epcf', 'net_profits', 'profits_yoy', 'distrib', 'report_date']
 FORECAST_COLS = ['code', 'name', 'type', 'report_date', 'pre_eps', 'range']
+REPORT_DISCLOSE_COLS = ['code', 'name', 'expected_date', 'first_change', 'second_change', 'third_change', 'final_date']
 PROFIT_COLS = ['code', 'name', 'roe', 'net_profit_ratio',
                'gross_profit_rate', 'net_profits', 'eps', 'business_income', 'bips']
 OPERATION_COLS = ['code', 'name', 'arturnover', 'arturndays', 'inventory_turnover',
@@ -75,6 +76,7 @@ OPERATION_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/operation/%s?s_i=&s_a=&s_c=&
 GROWTH_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/grow/%s?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=%s'
 DEBTPAYING_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/debtpaying/%s?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=%s'
 CASHFLOW_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/cashflow/%s?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=%s'
+REPORT_DISCLOSE_URL = '%s%s/EM_DataCenter/JS.aspx?type=SR&sty=YYSJ&fd=%s&st=1&sr=1&p=%s&ps=%s&js=var%%20res={pages:(pc),data:[(x)]}&stat=%s'
 SHIBOR_TYPE ={'Shibor': 'Shibor数据', 'Quote': '报价数据', 'Tendency': 'Shibor均值数据',
               'LPR': 'LPR数据', 'LPR_Tendency': 'LPR均值数据'}
 SHIBOR_DATA_URL = '%s%s/shibor/web/html/%s?nameNew=Historical_%s_Data_%s.xls&downLoadPath=data&nameOld=%s%s.xls&shiborSrc=http://www.shibor.org/shibor/'
@@ -116,6 +118,7 @@ TOP_PARAS_MSG = 'top有误，请输入整数或all.'
 LHB_MSG = '周期输入有误，请输入数字5、10、30或60'
 TOKEN_F_P = 'tk.csv'
 TOKEN_ERR_MSG = '请设置通联数据接口的token凭证码'
+MARKET_CHK_MSG = '市场输入错误：请输入0(全部市场)、1(上海)、2(深圳)'
 
 import sys
 PY3 = (sys.version_info[0] >= 3)
@@ -126,7 +129,7 @@ def _write_head():
 def _write_console():
     sys.stdout.write(DATA_GETTING_FLAG)
     sys.stdout.flush()
-    
+
 def _write_tips(tip):
     sys.stdout.write(DATA_ROWS_TIPS%tip)
     sys.stdout.flush()
@@ -134,7 +137,7 @@ def _write_tips(tip):
 def _write_msg(msg):
     sys.stdout.write(msg)
     sys.stdout.flush()
-    
+
 def _check_input(year, quarter):
     if isinstance(year, str) or year < 1989 :
         raise TypeError(DATE_CHK_MSG)
@@ -142,9 +145,15 @@ def _check_input(year, quarter):
         raise TypeError(DATE_CHK_Q_MSG)
     else:
         return True
-    
+
 def _check_lhb_input(last):
     if last not in [5, 10, 30, 60]:
         raise TypeError(LHB_MSG)
+    else:
+        return True
+
+def _check_market_input(market):
+    if market is None or isinstance(market, str) or market not in [0,1,2]:
+        raise TypeError(MARKET_CHK_MSG)
     else:
         return True
