@@ -33,7 +33,7 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'newstock':'vRPD_NewStockIssue.php', 'zz500b':'000905cons.xls',
          'zz500wt':'000905closeweight.xls',
          't_ticks':'vMS_tradedetail.php', 'dw': 'downLoad.html',
-         'qmd':'queryMargin.do', 'szsefc':'FrontController.szse',
+         'qmd':'queryMargin.do', 'szsefc':'ShowReport.szse',
          'ssecq':'commonQuery.do', 'sinadd':'cn_bill_download.php'}
 TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
 TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
