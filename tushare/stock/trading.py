@@ -80,6 +80,7 @@ def get_hist_data(code=None, start=None, end=None,
             df = pd.DataFrame(js['record'], columns=cols)
             if ktype.upper() in ['D', 'W', 'M']:
                 df = df.applymap(lambda x: x.replace(u',', u''))
+                df[df==''] = 0
             for col in cols[1:]:
                 df[col] = df[col].astype(float)
             if start is not None:
