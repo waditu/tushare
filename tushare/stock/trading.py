@@ -243,7 +243,7 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
             pages = len(data_str['detailPages'])
             data = pd.DataFrame()
             ct._write_head()
-            for pNo in range(1, pages):
+            for pNo in range(1, pages+1):
                 data = data.append(_today_ticks(symbol, date, pNo,
                                                 retry_count, pause), ignore_index=True)
         except Exception as er:
@@ -620,4 +620,3 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
-
