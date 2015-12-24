@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*- 
 
 import datetime
+import time
 import pandas as pd
 
 
@@ -49,6 +50,8 @@ def day_last_week(days=-7):
     lasty = datetime.datetime.today().date() + datetime.timedelta(days)
     return str(lasty)
 
+def get_now():
+    return time.strftime('%Y-%m-%d %H:%M:%S')
 
 def diff_day(start=None, end=None):
     d1 = datetime.datetime.strptime(end, '%Y-%m-%d')
