@@ -81,6 +81,6 @@ setup(
     'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
     'License :: OSI Approved :: BSD License'],
-    packages=['tushare','tushare.stock', 'tushare.data', 'tushare.util', 'tushare.datayes'],
+    packages=['tushare','tushare.stock', 'tushare.data', 'tushare.util', 'tushare.datayes', 'tushare.internet'],
     package_data={'': ['*.csv']},
 )
