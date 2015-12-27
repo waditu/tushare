@@ -121,6 +121,7 @@ TOP_PARAS_MSG = 'top有误，请输入整数或all.'
 LHB_MSG = '周期输入有误，请输入数字5、10、30或60'
 TOKEN_F_P = 'tk.csv'
 TOKEN_ERR_MSG = '请设置通联数据接口的token凭证码'
+BOX_INPUT_ERR_MSG = '请输入YYYY-MM格式的年月数据'
 
 import sys
 PY3 = (sys.version_info[0] >= 3)

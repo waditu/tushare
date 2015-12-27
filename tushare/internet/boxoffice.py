@@ -29,12 +29,13 @@ def realtime_boxoffice(retry_count=3,pause=0.001):
      return
      -------
         DataFrame 
-              BoxOffice 实时票房（万） 
-              MovieName 影片名 
-              boxPer 票房占比 （%）
-              movieDay 上映天数
-              sumBoxOffice 累计票房（万） 
-              time 数据获取时间
+              BoxOffice     实时票房（万） 
+              Irank         排名
+              MovieName     影片名 
+              boxPer        票房占比 （%）
+              movieDay      上映天数
+              sumBoxOffice  累计票房（万） 
+              time          数据获取时间
     """
     for _ in range(retry_count):
         time.sleep(pause)
@@ -68,14 +69,15 @@ def day_boxoffice(date=None, retry_count=3, pause=0.001):
      return
      -------
         DataFrame 
-              AvgPrice 平均票价
-              AvpPeoPle 场均人次
-              BoxOffice 单日票房（万）
-              BoxOffice_Up 环比变化 （%）
-              MovieDay 上映天数
-              MovieName 影片名 
-              SumBoxOffice 累计票房（万） 
-              WomIndex 口碑指数 
+              AvgPrice      平均票价
+              AvpPeoPle     场均人次
+              BoxOffice     单日票房（万）
+              BoxOffice_Up  环比变化 （%）
+              IRank         排名
+              MovieDay      上映天数
+              MovieName     影片名 
+              SumBoxOffice  累计票房（万） 
+              WomIndex      口碑指数 
     """
     for _ in range(retry_count):
         time.sleep(pause)
@@ -95,7 +97,7 @@ def day_boxoffice(date=None, retry_count=3, pause=0.001):
         else:
             js = json.loads(lines.decode('utf-8') if ct.PY3 else lines)
             df = pd.DataFrame(js['data1'])
-            df = df.drop(['MovieImg', 'BoxOffice1', 'MovieID', 'Director', 'IRank', 'IRank_pro'], axis=1)
+            df = df.drop(['MovieImg', 'BoxOffice1', 'MovieID', 'Director', 'IRank_pro'], axis=1)
             return df
 
 
@@ -123,12 +125,15 @@ def month_boxoffice(date=None, retry_count=3, pause=0.001):
               days          月内天数
               releaseTime   上映日期
     """
+    if date is None:
+        date = du.day_last_week(-30)[0:7] 
+    elif len(date)>8:
+        print(ct.BOX_INPUT_ERR_MSG)
+        return
+    date += '-01'
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            if date is None:
-                date = du.day_last_week(-30)[0:7] 
-            date += '-01'
             request = Request(ct.BOXOFFICE_MONTH%(ct.P_TYPE['http'], ct.DOMAINS['mbox'],
                               ct.BOX, date))
             lines = urlopen(request, timeout = 10).read()
@@ -176,7 +181,7 @@ def day_cinema(date=None, retry_count=3, pause=0.001):
         if df is not None:
             data = pd.concat([data, df])
     data = data.drop_duplicates()
-    return data.reset_index()
+    return data.reset_index(drop=True)
 
 
 def _day_cinema(date=None, pNo=1, retry_count=3, pause=0.001):
@@ -203,5 +208,3 @@ def _random(n=13):
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))
-
-
