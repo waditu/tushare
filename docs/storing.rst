@@ -88,7 +88,6 @@ pandas将数据保存为MicroSoft Excel文件格式。
 -  **columns**: 需要保存的列，默认为None
 -  **header**: 是否保存columns名，默认为True
 -  **index**: 是否保存index，默认为True
--  **mode** : 创建新文件还是追加到现有文件，默认为新建
 -  **encoding**: 文件编码格式
 -  **startrow**: 在数据的头部留出startrow行空行
 -  **startcol** :在数据的左边留出startcol列空列
