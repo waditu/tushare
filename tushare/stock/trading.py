@@ -166,7 +166,7 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def get_sina_dd(code=None, date=None, retry_count=3, pause=0.001):
+def get_sina_dd(code=None, date=None, vol=400, retry_count=3, pause=0.001):
     """
         获取sina大单数据
     Parameters
@@ -187,11 +187,12 @@ def get_sina_dd(code=None, date=None, retry_count=3, pause=0.001):
     if code is None or len(code)!=6 or date is None:
         return None
     symbol = _code_to_symbol(code)
+    vol = vol*100
     for _ in range(retry_count):
         time.sleep(pause)
         try:
             re = Request(ct.SINA_DD % (ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd'],
-                                symbol, date))
+                                symbol, vol, date))
             lines = urlopen(re, timeout=10).read()
             lines = lines.decode('GBK') 
             if len(lines) < 100:
@@ -620,3 +621,4 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
+

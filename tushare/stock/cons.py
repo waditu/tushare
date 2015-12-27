@@ -91,7 +91,7 @@ HIST_FQ_FACTOR_URL = '%s%s/api/json.php/BasicStockSrv.getStockFuQuanData?symbol=
 INDEX_HQ_URL = '''%shq.%s/rn=xppzh&list=sh000001,sh000002,sh000003,sh000008,sh000009,sh000010,sh000011,sh000012,sh000016,sh000017,sh000300,sz399001,sz399002,sz399003,sz399004,sz399005,sz399006,sz399100,sz399101,sz399106,sz399107,sz399108,sz399333,sz399606'''
 SSEQ_CQ_REF_URL = '%s%s/assortment/stock/list/name'
 ALL_STK_URL = '%s%s/all.csv'
-SINA_DD = '%s%s/quotes_service/view/%s?symbol=%s&num=60&page=1&sort=ticktime&asc=0&volume=40000&amount=0&type=0&day=%s'
+SINA_DD = '%s%s/quotes_service/view/%s?symbol=%s&num=60&page=1&sort=ticktime&asc=0&volume=%s&amount=0&type=0&day=%s'
 BOX = 'boxOffice'
 MOVIE_BOX = '%s%s/%s/GetHourBoxOffice?d=%s'
 BOXOFFICE_DAY = '%s%s/%s/GetDayBoxOffice?num=%s&d=%s'
