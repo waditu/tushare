@@ -92,8 +92,11 @@ INDEX_HQ_URL = '''%shq.%s/rn=xppzh&list=sh000001,sh000002,sh000003,sh000008,sh00
 SSEQ_CQ_REF_URL = '%s%s/assortment/stock/list/name'
 ALL_STK_URL = '%s%s/all.csv'
 SINA_DD = '%s%s/quotes_service/view/%s?symbol=%s&num=60&page=1&sort=ticktime&asc=0&volume=40000&amount=0&type=0&day=%s'
-MOVIE_BOX = '%s%s/boxOffice/GetHourBoxOffice?d=%s'
-BOXOFFICE_DAY = '%s%s/boxOffice/GetDayBoxOffice?num=%s&d=%s'
+BOX = 'boxOffice'
+MOVIE_BOX = '%s%s/%s/GetHourBoxOffice?d=%s'
+BOXOFFICE_DAY = '%s%s/%s/GetDayBoxOffice?num=%s&d=%s'
+BOXOFFICE_MONTH = '%s%s/%s/getMonthBox?sdate=%s'
+BOXOFFICE_CBD = '%s%s/%s/getCBD?pIndex=%s&dt=%s'
 SHIBOR_COLS = ['date', 'ON', '1W', '2W', '1M', '3M', '6M', '9M', '1Y']
 QUOTE_COLS = ['date', 'bank', 'ON_B', 'ON_A', '1W_B', '1W_A', '2W_B', '2W_A', '1M_B', '1M_A',
                     '3M_B', '3M_A', '6M_B', '6M_A', '9M_B', '9M_A', '1Y_B', '1Y_A']
