@@ -470,7 +470,7 @@ SOCIALDATAXQBYTICKER = '/api/subject/getSocialDataXQByTicker.csv?ticker=%s&field
 SOCIALDATAXQBYDATE = '/api/subject/getSocialDataXQByDate.csv?statisticsDate=%s&field=%s'
 OPTVAR = '/api/options/getOptVar.csv?exchangeCD=%s&secID=%s&ticker=%s&contractType=%s&exerType=%s&field=%s'
 NEWSINFO = '/api/subject/getNewsInfo.csv?newsID=%s&field=%s'
-NEWSINFOBYTIME = '/api/subject/getNewsInfoByTime.csv?newsPublishDate=%s&newsPublishDate=%s&beginTime=%s&endTime=%s&field=%s'
+NEWSINFOBYTIME = '/api/subject/getNewsInfoByTime.csv?newsPublishDate=%s&beginTime=%s&endTime=%s&field=%s'
 NEWSCONTENT = '/api/subject/getNewsContent.csv?newsID=%s&field=%s'
 NEWSCONTENTBYTIME = '/api/subject/getNewsContentByTime.csv?newsPublishDate=%s&newsPublishDate=%s&beginTime=%s&endTime=%s&field=%s'
 COMPANYBYNEWS = '/api/subject/getCompanyByNews.csv?newsID=%s&field=%s'
