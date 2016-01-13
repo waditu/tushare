@@ -38,7 +38,8 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
 TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
 TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
 DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
-                       'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
+                       'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio',
+                       'amount', 'per', 'pb', 'mktcap', 'nmc']
 REPORT_COLS = ['code', 'name', 'eps', 'eps_yoy', 'bvps', 'roe',
                'epcf', 'net_profits', 'profits_yoy', 'distrib', 'report_date']
 FORECAST_COLS = ['code', 'name', 'type', 'report_date', 'pre_eps', 'range']

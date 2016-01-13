@@ -123,7 +123,7 @@ def _parsing_dayprice_json(pageNum=1):
     df = pd.DataFrame(pd.read_json(js, dtype={'code':object}),
                       columns=ct.DAY_TRADING_COLUMNS)
     df = df.drop('symbol', axis=1)
-    df = df.ix[df.volume > 0]
+#     df = df.ix[df.volume > 0]
     return df
 
 
@@ -155,7 +155,7 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
                                 date, symbol))
             lines = urlopen(re, timeout=10).read()
             lines = lines.decode('GBK') 
-            if len(lines) < 100:
+            if len(lines) < 20:
                 return None
             df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
                                skiprows=[0])      
@@ -287,7 +287,7 @@ def get_today_all():
     return
     -------
       DataFrame
-           属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率
+           属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率，成交额，市盈率，市净率，总市值，流通市值
     """
     ct._write_head()
     df = _parsing_dayprice_json(1)
