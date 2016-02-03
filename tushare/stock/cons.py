@@ -16,6 +16,7 @@ INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
 PAGE_NUM = [38, 60, 80, 100]
 FORMAT = lambda x: '%.2f' % x
+FORMAT4 = lambda x: '%.4f' % x
 DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'ifeng': 'ifeng.com', 'sf': 'finance.sina.com.cn',
            'vsf': 'vip.stock.finance.sina.com.cn', 
@@ -60,7 +61,7 @@ LIVE_DATA_COLS = ['name', 'open', 'pre_close', 'price', 'high', 'low', 'bid', 'a
                   'b1_v', 'b1_p', 'b2_v', 'b2_p', 'b3_v', 'b3_p', 'b4_v', 'b4_p', 'b5_v', 'b5_p',
                   'a1_v', 'a1_p', 'a2_v', 'a2_p', 'a3_v', 'a3_p', 'a4_v', 'a4_p', 'a5_v', 'a5_p', 'date', 'time', 's']
 FOR_CLASSIFY_B_COLS = ['code','name']
-FOR_CLASSIFY_W_COLS = ['date','code','weight']
+FOR_CLASSIFY_W_COLS = ['date','code', 'name', 'weight']
 THE_FIELDS = ['code','symbol','name','changepercent','trade','open','high','low','settlement','volume','turnoverratio']
 TICK_PRICE_URL = '%smarket.%s/%s?date=%s&symbol=%s'
 TODAY_TICKS_PAGE_URL = '%s%s/quotes_service/api/%s/CN_Transactions.getAllPageTime?date=%s&symbol=%s'

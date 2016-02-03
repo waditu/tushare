@@ -567,7 +567,7 @@ def get_index():
     df['change'] = (df['close'] / df['preclose'] - 1 ) * 100
     df['amount'] = df['amount'] / 100000000
     df['change'] = df['change'].map(ct.FORMAT)
-    df['amount'] = df['amount'].map(ct.FORMAT)
+    df['amount'] = df['amount'].map(ct.FORMAT4)
     df = df[ct.INDEX_COLS]
     df['code'] = df['code'].map(lambda x:str(x).zfill(6))
     df['change'] = df['change'].astype(float)
