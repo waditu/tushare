@@ -17,6 +17,7 @@ from pandas.util.testing import _network_error_classes
 import time
 import tushare.stock.fundamental as fd
 from tushare.util.netbase import Client
+
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -184,18 +185,15 @@ def get_hs300s():
         date :日期
         weight:权重
     """
+    from tushare.stock.fundamental import get_stock_basics
     try:
-#         df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
-#                                                   ct.PAGES['hs300b']), parse_cols=[0,1])
-#         print df
-#         df.columns = ct.FOR_CLASSIFY_B_COLS
-#         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
-        wt = pd.read_excel(ct.HS300_CLASSIFY_URL_HTTP%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
-                                                  ct.INDEX_C_COMM, ct.PAGES['hs300w']), parse_cols=[0, 4, 5, 8])
+        wt = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
+                                                  ct.PAGES['hs300w']), parse_cols=[0, 3, 6])
         wt.columns = ct.FOR_CLASSIFY_W_COLS
         wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
-#         return pd.merge(df,wt)
-        return wt
+        df = get_stock_basics()[['name']]
+        df = df.reset_index()
+        return pd.merge(df,wt)
     except Exception as er:
         print(str(er))
 
@@ -228,17 +226,19 @@ def get_zz500s():
         code :股票代码
         name :股票名称
     """
+    from tushare.stock.fundamental import get_stock_basics
     try:
 #         df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
 #                                                   ct.PAGES['zz500b']), parse_cols=[0,1])
 #         df.columns = ct.FOR_CLASSIFY_B_COLS
 #         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
-        wt = pd.read_excel(ct.HS300_CLASSIFY_URL_HTTP%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
-                                                  ct.INDEX_C_COMM, ct.PAGES['zz500wt']), parse_cols=[0, 4, 5, 8])
+        wt = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
+                                                   ct.PAGES['zz500wt']), parse_cols=[0, 3, 6])
         wt.columns = ct.FOR_CLASSIFY_W_COLS
         wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
-#         return pd.merge(df,wt)
-        return wt
+        df = get_stock_basics()[['name']]
+        df = df.reset_index()
+        return pd.merge(df,wt)
     except Exception as er:
         print(str(er)) 
 
