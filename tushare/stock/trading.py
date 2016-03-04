@@ -155,7 +155,7 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
                                 date, symbol))
             lines = urlopen(re, timeout=10).read()
             lines = lines.decode('GBK') 
-            if len(lines) < 20:
+            if len(lines) < 2000:
                 return None
             df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
                                skiprows=[0])      
