@@ -35,7 +35,7 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'zz500wt':'000905closeweight.xls',
          't_ticks':'vMS_tradedetail.php', 'dw': 'downLoad.html',
          'qmd':'queryMargin.do', 'szsefc':'ShowReport.szse',
-         'ssecq':'commonQuery.do', 'sinadd':'cn_bill_download.php'}
+         'ssecq':'commonQuery.do', 'sinadd':'cn_bill_download.php', 'ids_sw':'SwHy.php'}
 TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
 TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
 DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
@@ -84,7 +84,7 @@ SHIBOR_DATA_URL = '%s%s/shibor/web/html/%s?nameNew=Historical_%s_Data_%s.xls&dow
 ALL_STOCK_BASICS_FILE = '%s%s/static/all.csv'%(P_TYPE['http'], DOMAINS['oss'])
 SINA_CONCEPTS_INDEX_URL = '%smoney.%s/q/view/%s?param=class'
 SINA_INDUSTRY_INDEX_URL = '%s%s/q/view/%s'
-SINA_DATA_DETAIL_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?page=1&num=400&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
+SINA_DATA_DETAIL_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?page=1&num=1000&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
 INDEX_C_COMM = 'sseportal/ps/zhs/hqjt/csi'
 HS300_CLASSIFY_URL_FTP = '%s%s/webdata/%s'
 HS300_CLASSIFY_URL_HTTP = '%s%s/%s/%s'
