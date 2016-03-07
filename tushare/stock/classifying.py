@@ -30,7 +30,8 @@ def get_industry_classified(standard='sina'):
     Parameters
     ----------
     standard
-    string in ('sina','sw')
+    sina:新浪行业 sw：申万 行业
+    
     Returns
     -------
     DataFrame
@@ -38,7 +39,7 @@ def get_industry_classified(standard='sina'):
         name :股票名称
         c_name :行业名称
     """
-    if standard=='sw':
+    if standard == 'sw':
         df = _get_type_data(ct.SINA_INDUSTRY_INDEX_URL%(ct.P_TYPE['http'],
                                                     ct.DOMAINS['vsf'], ct.PAGES['ids_sw']))
     else:
@@ -47,7 +48,6 @@ def get_industry_classified(standard='sina'):
     data = []
     ct._write_head()
     for row in df.values:
-        print('\n'+row[0])
         rowDf =  _get_detail(row[0], retry_count=10, pause=0.01)
         rowDf['c_name'] = row[1]
         data.append(rowDf)
