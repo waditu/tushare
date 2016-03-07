@@ -24,22 +24,31 @@ except ImportError:
     from urllib2 import urlopen, Request
 
 
-def get_industry_classified():
+def get_industry_classified(standard='sina'):
     """
         获取行业分类数据
-    Return
-    --------
+    Parameters
+    ----------
+    standard
+    string in ('sina','sw')
+    Returns
+    -------
     DataFrame
         code :股票代码
         name :股票名称
         c_name :行业名称
     """
-    df = _get_type_data(ct.SINA_INDUSTRY_INDEX_URL%(ct.P_TYPE['http'],
+    if standard=='sw':
+        df = _get_type_data(ct.SINA_INDUSTRY_INDEX_URL%(ct.P_TYPE['http'],
+                                                    ct.DOMAINS['vsf'], ct.PAGES['ids_sw']))
+    else:
+        df = _get_type_data(ct.SINA_INDUSTRY_INDEX_URL%(ct.P_TYPE['http'],
                                                     ct.DOMAINS['vsf'], ct.PAGES['ids']))
     data = []
     ct._write_head()
     for row in df.values:
-        rowDf =  _get_detail(row[0])
+        print('\n'+row[0])
+        rowDf =  _get_detail(row[0], retry_count=10, pause=0.01)
         rowDf['c_name'] = row[1]
         data.append(rowDf)
     data = pd.concat(data, ignore_index=True)
@@ -157,7 +166,7 @@ def _get_detail(tag, retry_count=3, pause=0.001):
             df = pd.DataFrame(pd.read_json(js, dtype={'code':object}), columns=ct.THE_FIELDS)
             df = df[ct.FOR_CLASSIFY_B_COLS]
             return df
-        raise IOError(ct.NETWORK_URL_ERROR_MSG)
+        #raise IOError(ct.NETWORK_URL_ERROR_MSG)
     
 
 def _get_type_data(url):
