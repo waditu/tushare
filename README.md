@@ -7,6 +7,11 @@ TuShare是实现对股票/期货等金融数据从**数据采集**、**清洗加
 
 ![](http://tushare.waditu.com/_images/main_pic_min.png)
 
+欢迎关注扫描TuShare的微信公众号“挖地兔”，更多资源和信息与您分享：
+
+![](http://tushare.waditu.com/_images/8.jpg)
+
+
 Dependencies
 =========
 python 2.x/3.x   
