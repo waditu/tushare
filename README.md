@@ -11,7 +11,7 @@ TuShare是实现对股票/期货等金融数据从**数据采集**、**清洗加
 
 ![](http://tushare.waditu.com/_images/8.jpg)
 
-如有需要，可以可以加入TuShare QQ群：14934432
+如有需要，也可以加入TuShare QQ群：14934432
 
 Dependencies
 =========
