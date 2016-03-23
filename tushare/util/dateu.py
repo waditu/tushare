@@ -1,6 +1,7 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 import datetime
+import time
 import pandas as pd
 
 
@@ -49,6 +50,8 @@ def day_last_week(days=-7):
     lasty = datetime.datetime.today().date() + datetime.timedelta(days)
     return str(lasty)
 
+def get_now():
+    return time.strftime('%Y-%m-%d %H:%M:%S')
 
 def diff_day(start=None, end=None):
     d1 = datetime.datetime.strptime(end, '%Y-%m-%d')
@@ -62,21 +65,24 @@ def get_quarts(start, end):
                           freq='Q-JAN')
     return [str(d).split('Q') for d in idx][::-1]
 
+holiday = ['2015-01-01', '2015-01-02', '2015-02-18', '2015-02-19', '2015-02-20', '2015-02-23', '2015-02-24',
+           '2015-04-06', '2015-05-01', '2015-06-22', '2015-09-03', '2015-09-04', '2015-10-01', '2015-10-02',
+           '2015-10-05', '2015-10-06', '2015-10-07',
+           '2016-01-01', '2016-02-08', '2016-02-09', '2016-02-10', '2016-02-11', '2016-02-12', '2016-04-04',
+           '2016-05-02', '2016-06-09', '2016-06-10', '2016-09-15', '2016-09-16', '2016-10-03', '2016-10-04',
+           '2016-10-05', '2016-10-06', '2016-10-07']
 
-holiday = ['2015-01-01', '2015-01-02', '2015-02-18', '2015-02-19', '2015-02-20', '2015-02-23', '2015-02-24', '2015-04-06',
-                            '2015-05-01', '2015-06-22', '2015-09-03',  '2015-09-04', '2015-10-01', '2015-10-02', '2015-10-05', '2015-10-06', '2015-10-07']
-    
 
 def is_holiday(date):
     if isinstance(date, str):
-        date = datetime.datetime.strptime(date, '%Y-%m-%d')
-    today=int(date.strftime("%w"))
-    if today > 0 and today < 6 and date not in holiday:
-        return False
-    else:
+        today = datetime.datetime.strptime(date, '%Y-%m-%d')
+
+    if today.isoweekday() in [6, 7] or date in holiday:
         return True
-    
-    
+    else:
+        return False
+
+
 def last_tddate():
     today = datetime.datetime.today().date()
     today=int(today.strftime("%w"))

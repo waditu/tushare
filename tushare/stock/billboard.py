@@ -336,7 +336,3 @@ def _f_rows(x):
         for i in range(1, 6):
             x[i] = np.NaN
     return x
-
-if __name__ == "__main__":
-    print(top_list('2015-06-17'))
-#     print(inst_detail())
