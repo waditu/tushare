@@ -68,6 +68,12 @@ from tushare.stock.billboard import (top_list, cap_tops, broker_tops,
 
 
 """
+for utils
+"""
+from tushare.util.dateu import (trade_cal, is_holiday)
+
+
+"""
 for DataYes Token
 """
 from tushare.util.upass import (set_token, get_token)

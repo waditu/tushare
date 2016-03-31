@@ -3,7 +3,7 @@
 import datetime
 import time
 import pandas as pd
-
+from tushare.stock import cons as ct
 
 def year_qua(date):
     mon = date[5:7]
@@ -33,6 +33,7 @@ def get_year():
     year = datetime.datetime.today().year
     return year
 
+
 def get_month():
     month = datetime.datetime.today().month
     return month
@@ -50,8 +51,10 @@ def day_last_week(days=-7):
     lasty = datetime.datetime.today().date() + datetime.timedelta(days)
     return str(lasty)
 
+
 def get_now():
     return time.strftime('%Y-%m-%d %H:%M:%S')
+
 
 def diff_day(start=None, end=None):
     d1 = datetime.datetime.strptime(end, '%Y-%m-%d')
@@ -71,9 +74,8 @@ def trade_cal():
             交易日历
     isOpen=1是交易日，isOpen=0为休市
     '''
-    df = pd.read_csv('../data/calAll.csv')
+    df = pd.read_csv(ct.ALL_CAL_FILE)
     return df
-
 
 
 def is_holiday(date):
