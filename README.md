@@ -180,6 +180,12 @@ Quick Start
 Change Logs
 -----------
 
+0.4.9 2016/03/26
+=============
+- 新增申万行业分类get_industry_classified(standard='sw')
+- 新增交易日历trade_cal()
+- 修复bug
+
 0.4.3 2015/12/24
 ============
 - 新增电影票房数据
