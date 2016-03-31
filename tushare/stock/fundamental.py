@@ -87,8 +87,6 @@ def _get_report_data(year, quarter, pageNo, dataArr):
     try:
         request = Request(ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
                          year, quarter, pageNo, ct.PAGE_NUM[1]))
-        print(ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
-                         year, quarter, pageNo, ct.PAGE_NUM[1]))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('--', '')
