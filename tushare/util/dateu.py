@@ -65,15 +65,23 @@ def get_quarts(start, end):
                           freq='Q-JAN')
     return [str(d).split('Q') for d in idx][::-1]
 
-holiday = ['2015-01-01', '2015-01-02', '2015-02-18', '2015-02-19', '2015-02-20', '2015-02-23', '2015-02-24',
-           '2015-04-06', '2015-05-01', '2015-06-22', '2015-09-03', '2015-09-04', '2015-10-01', '2015-10-02',
-           '2015-10-05', '2015-10-06', '2015-10-07',
-           '2016-01-01', '2016-02-08', '2016-02-09', '2016-02-10', '2016-02-11', '2016-02-12', '2016-04-04',
-           '2016-05-02', '2016-06-09', '2016-06-10', '2016-09-15', '2016-09-16', '2016-10-03', '2016-10-04',
-           '2016-10-05', '2016-10-06', '2016-10-07']
+
+def trade_cal():
+    '''
+            交易日历
+    isOpen=1是交易日，isOpen=0为休市
+    '''
+    df = pd.read_csv('../data/calAll.csv')
+    return df
+
 
 
 def is_holiday(date):
+    '''
+            判断是否为交易日，返回True or False
+    '''
+    df = trade_cal()
+    holiday = df[df.isOpen == 0]['calendarDate'].values
     if isinstance(date, str):
         today = datetime.datetime.strptime(date, '%Y-%m-%d')
 
@@ -91,7 +99,6 @@ def last_tddate():
     else:
         return day_last_week(-1)
         
-    
 
     
     
