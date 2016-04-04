@@ -64,3 +64,9 @@ for LHB
 """
 from tushare.stock.billboard import (top_list, cap_tops, broker_tops,
                                      inst_tops, inst_detail)
+
+"""
+for fund data
+"""
+from tushare.fund.nav import (get_nav_open,get_nav_history)
+
