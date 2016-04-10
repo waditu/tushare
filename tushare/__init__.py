@@ -68,5 +68,5 @@ from tushare.stock.billboard import (top_list, cap_tops, broker_tops,
 """
 for fund data
 """
-from tushare.fund.nav import (get_nav_open,get_nav_history)
+from tushare.fund.nav import (get_nav_open,get_nav_history,get_fund_info)
 

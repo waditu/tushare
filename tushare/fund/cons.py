@@ -52,32 +52,9 @@ NAV_OPEN_COLUMNS = ['symbol','sname','per_nav','total_nav','yesterday_nav','nav_
 NAV_HIS_JJJZ = ['fbrq','jjjz','ljjz']
 NAV_HIS_NHSY = ['fbrq','nhsyl','dwsy']
 
-TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
-TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
-DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
-                       'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
-REPORT_COLS = ['code', 'name', 'eps', 'eps_yoy', 'bvps', 'roe',
-               'epcf', 'net_profits', 'profits_yoy', 'distrib', 'report_date']
-FORECAST_COLS = ['code', 'name', 'type', 'report_date', 'pre_eps', 'range']
-PROFIT_COLS = ['code', 'name', 'roe', 'net_profit_ratio',
-               'gross_profit_rate', 'net_profits', 'eps', 'business_income', 'bips']
-OPERATION_COLS = ['code', 'name', 'arturnover', 'arturndays', 'inventory_turnover',
-                  'inventory_days', 'currentasset_turnover', 'currentasset_days']
-GROWTH_COLS = ['code', 'name', 'mbrg', 'nprg', 'nav', 'targ', 'epsg', 'seg']
-DEBTPAYING_COLS = ['code', 'name', 'currentratio',
-                   'quickratio', 'cashratio', 'icratio', 'sheqratio', 'adratio']
-CASHFLOW_COLS = ['code', 'name', 'cf_sales', 'rateofreturn',
-                 'cf_nm', 'cf_liabilities', 'cashflowratio']
-DAY_PRICE_COLUMNS = ['date', 'open', 'high', 'close', 'low', 'volume', 'price_change', 'p_change',
-                     'ma5', 'ma10', 'ma20', 'v_ma5', 'v_ma10', 'v_ma20', 'turnover']
-INX_DAY_PRICE_COLUMNS = ['date', 'open', 'high', 'close', 'low', 'volume', 'price_change', 'p_change',
-                         'ma5', 'ma10', 'ma20', 'v_ma5', 'v_ma10', 'v_ma20']
-LIVE_DATA_COLS = ['name', 'open', 'pre_close', 'price', 'high', 'low', 'bid', 'ask', 'volume', 'amount',
-                  'b1_v', 'b1_p', 'b2_v', 'b2_p', 'b3_v', 'b3_p', 'b4_v', 'b4_p', 'b5_v', 'b5_p',
-                  'a1_v', 'a1_p', 'a2_v', 'a2_p', 'a3_v', 'a3_p', 'a4_v', 'a4_p', 'a5_v', 'a5_p', 'date', 'time', 's']
-FOR_CLASSIFY_B_COLS = ['code','name']
-FOR_CLASSIFY_W_COLS = ['date','code','weight']
-THE_FIELDS = ['code','symbol','name','changepercent','trade','open','high','low','settlement','volume','turnoverratio']
+FUND_INFO_COLS = ['symbol','jjqc','jjjc','clrq','ssrq','xcr','ssdd',\
+                  'Type1Name','Type2Name','Type3Name','jjgm','jjfe',\
+                  'jjltfe','jjferq','quarter','glr','tgr']
 
 #=====================================================================================================================================================================
 #数据源URL
@@ -91,9 +68,9 @@ SINA_NAV_HISTROY_DATA_URL = '%s%s/fundInfo/api/openapi.php/CaihuiFundInfoService
 SINA_NAV_HISTROY_COUNT_CUR_URL = '%s%s/fundInfo/api/openapi.php/CaihuiFundInfoService.getNavcur?symbol=%s&datefrom=%s&dateto=%s'
 SINA_NAV_HISTROY_DATA_CUR_URL = '%s%s/fundInfo/api/openapi.php/CaihuiFundInfoService.getNavcur?symbol=%s&datefrom=%s&dateto=%s&num=%s'
 
-
 SINA_DATA_DETAIL_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?page=1&num=400&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
-INDEX_C_COMM = 'sseportal/ps/zhs/hqjt/csi'
+
+SINA_FUND_INFO_URL = '%s%s/fundInfo/api/openapi.php/FundPageInfoService.tabjjgk?symbol=%s&format=json'
 
 #=====================================================================================================================================================================
 
@@ -107,7 +84,7 @@ LPR_COLS = ['date', '1Y']
 LPR_MA_COLS = ['date', '1Y_5', '1Y_10', '1Y_20']
 INDEX_HEADER = 'code,name,open,preclose,close,high,low,0,0,volume,amount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,d,c,3\n'
 INDEX_COLS = ['code', 'name', 'change', 'open', 'preclose', 'close', 'high', 'low', 'volume', 'amount']
-HIST_FQ_COLS = ['date', 'open', 'high', 'close', 'low', 'volume', 'amount', 'factor']
+
 HIST_FQ_FACTOR_COLS = ['code','value']
 DATA_GETTING_TIPS = '[Getting data:]'
 DATA_GETTING_FLAG = '#'

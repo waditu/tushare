@@ -13,9 +13,10 @@ class TestTrading(unittest.TestCase):
         self.start = '2015-01-01'
         self.end = '2016-04-04'
     
-    def test_tickData(self):
+    def test_get_nav_open(self):
         self.set_data()        
-        lst = []
+        lst = ['all','equity','mix','bond','monetary','qdii']
+        print '\nget nav ope................\n' 
         for item in lst:
             print 'get %s nav' %item
             df = nav.get_nav_open(item)
@@ -24,15 +25,23 @@ class TestTrading(unittest.TestCase):
     def test_nav_history(self):
         self.set_data()
         lst = ['164905','161005','380007','000733','159920']        
-        islst = [False,False,True,True,False]
         for k,item in enumerate(lst):
             print 'get %s nav' %item
-            df = nav.get_nav_history(item,self.start,self.end,islst[k])
+            df = nav.get_nav_history(item,self.start,self.end)
             if df is not None:
                 print '\n','nums=',len(df),'\n',df[:2]
-#     def test_histData(self):
-#         self.set_data()
-#         td.get_hist_data(self.code, start=self.start, end=self.end)
+
+
+    def test_get_fund_info(self):
+        self.set_data()
+        lst = ['164905','161005','380007','000733','159920']
+        for item in lst:
+            print 'get %s nav' %item
+            df = nav.get_fund_info(item)
+            if df is not None:
+                print '%s fund info' %item,
+                print df        
+
         
 if __name__ == "__main__":
     #import sys;sys.argv = ['', 'Test.testName']

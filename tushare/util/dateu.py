@@ -40,7 +40,7 @@ def get_hour():
     return datetime.datetime.today().hour
     
     
-def today_last_year():
+def SINA_DAY_PRICE_URL():
     lasty = datetime.datetime.today().date() + datetime.timedelta(-365)
     return str(lasty)
 

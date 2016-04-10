@@ -67,7 +67,7 @@ def get_nav_open(fund_type='all'):
         return df
 
 
-def get_nav_history(code, start=None, end=None, ismonetary=False, retry_count=3, pause=0.001):
+def get_nav_history(code, start=None, end=None, retry_count=3, pause=0.001):
     '''
     获取历史净值数据
     Parameters
@@ -93,10 +93,62 @@ def get_nav_history(code, start=None, end=None, ismonetary=False, retry_count=3,
     start = du.today_last_year() if start is None else start
     end = du.today() if end is None else end
 
+    #判断基金类型
+    ismonetary = False #是否是债券型和货币型基金
+    df_fund = get_fund_info(code)
+    fund_type = str(df_fund['Type2Name'])    
+    if (-1 != fund_type.find('债券') or -1 != fund_type.find('货币')):
+        ismonetary = True    
+
     ct._write_head() 
     nums = _get_nav_histroy_num(code,start,end,ismonetary)
     data = _parse_nav_history_data(code,start,end,nums,ismonetary,retry_count,pause)
     return data
+
+
+def get_fund_info(code):
+    '''
+    获取基金基本信息
+    Parameters
+    ------
+      code:string
+                  基金代码 e.g. 000001      
+    return
+    -------
+      DataFrame
+          jjqc      基金全称
+          jjjc      基金简称
+          symbol    基金代码
+          clrq      成立日期
+          ssrq      上市日期
+          xcr       存续期限
+          ssdd      上市地点
+          Type1Name 运作方式
+          Type2Name 基金类型
+          Type3Name 二级分类
+          jjgm      基金规模(亿元)
+          jjfe      基金总份额(亿份)
+          jjltfe    上市流通份额(亿份)
+          jjferq    基金份额日期
+          quarter   上市季度
+          glr       基金管理人
+          tgr       基金托管人
+    '''  
+    request = ct.SINA_FUND_INFO_URL%(ct.P_TYPE['http'],ct.DOMAINS['ssf'],code)    
+    text = urlopen(request, timeout=10).read()
+    text = text.decode('gbk')          
+    js = json.loads(text)
+
+    status_code = int(js['result']['status']['code'])
+    if 0 != status_code:
+        status = str(js['result']['status']['msg'])
+        raise ValueError(status)    
+    data = js['result']['data']    
+    df = pd.DataFrame(data, columns=ct.FUND_INFO_COLS,  index=[0])    
+    df = df.set_index('symbol')
+
+    return df
+
 
 
 def _get_detail(tag, retry_count=3, pause=0.001):
