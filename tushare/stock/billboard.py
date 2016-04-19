@@ -13,6 +13,7 @@ from pandas.compat import StringIO
 from tushare.stock import cons as ct
 import numpy as np
 import time
+import json
 import re
 import lxml.html
 from lxml import etree
@@ -61,26 +62,30 @@ def top_list(date = None, retry_count=3, pause=0.001):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_URL%(ct.P_TYPE['http'], ct.DOMAINS['em'], date))
+            request = Request(rv.LHB_URL%(ct.P_TYPE['http'], ct.DOMAINS['em'], date, date))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
-            html = lxml.html.parse(StringIO(text))
-            res = html.xpath("//table[@id=\"dt_1\"]")
-            if ct.PY3:
-                sarr = [etree.tostring(node).decode('utf-8') for node in res]
-            else:
-                sarr = [etree.tostring(node) for node in res]
-            sarr = ''.join(sarr)
-            df = pd.read_html(sarr)[0]
-            df.columns = [i for i in range(1,12)]
-            df = df.apply(_f_rows, axis=1)
-            df = df.fillna(method='ffill')
-            df = df.drop([1, 4], axis=1)
+            text = text.split('_1=')[1]
+            text = eval(text, type('Dummy', (dict,), 
+                                           dict(__getitem__ = lambda s, n:n))())
+            text = json.dumps(text)
+            text = json.loads(text)
+            df = pd.DataFrame(text['data'], columns=rv.LHB_TMP_COLS)
             df.columns = rv.LHB_COLS
-            df = df.drop_duplicates()
-            df['code'] = df['code'].astype(int)
-            df['code'] = df['code'].map(lambda x: str(x).zfill(6))
+            df['buy'] = df['buy'].astype(float)
+            df['sell'] = df['sell'].astype(float)
+            df['amount'] = df['amount'].astype(float)
+            df['Turnover'] = df['Turnover'].astype(float)
+            df['bratio'] = df['buy'] / df['Turnover']
+            df['sratio'] = df['sell'] /df['Turnover']
+            df['bratio'] = df['bratio'].map(ct.FORMAT)
+            df['sratio'] = df['sratio'].map(ct.FORMAT)
             df['date'] = date
+            for col in ['amount', 'buy', 'sell']:
+                df[col] = df[col].astype(float)
+                df[col] = df[col] / 10000
+                df[col] = df[col].map(ct.FORMAT)
+            df = df.drop('Turnover', axis=1)
         except:
             pass
         else:
@@ -336,3 +341,4 @@ def _f_rows(x):
         for i in range(1, 6):
             x[i] = np.NaN
     return x
+
