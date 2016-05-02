@@ -48,7 +48,7 @@ def get_nav_open(fund_type='all'):
                 per_nav     单位净值
                 total_nav   累计净值
                 yesterday_nav  前一日净值
-                nav_rate    涨跌额
+                nav_a       涨跌额
                 nav_rate    增长率(%)
                 nav_date    净值日期
                 fund_manager 基金经理
@@ -59,12 +59,114 @@ def get_nav_open(fund_type='all'):
         ct._write_head()
         nums = _get_fund_num(ct.SINA_NAV_COUNT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                         ct.NAV_OPEN_KEY[fund_type], ct.NAV_OPEN_API[fund_type],
-                                                        ct.NAV_OPEN_TYPE2[fund_type]))
+                                                        ct.NAV_OPEN_T2[fund_type],ct.NAV_OPEN_T3))
 
         df = _parse_fund_data(ct.SINA_NAV_DATA_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'], 
                                                     ct.NAV_OPEN_KEY[fund_type], ct.NAV_OPEN_API[fund_type], nums,
-                                                    ct.NAV_OPEN_TYPE2[fund_type]))
+                                                    ct.NAV_OPEN_T2[fund_type],ct.NAV_OPEN_T3))
         return df
+
+
+def get_nav_close(fund_type='all',sub_type='all'):
+    """
+        获取封闭型基金净值数据
+    Parameters
+    ------
+        type:string
+            封闭基金类型:
+                1. all      所有封闭型基金
+                2. fbqy     封闭-权益
+                3. fbzq     封闭债券                
+
+        sub_type:string
+            基金子类型:
+                
+                1. type=all sub_type无效
+                2. type=fbqy 封闭-权益
+                    *all    全部封闭权益
+                    *ct     传统封基
+                    *cx     创新封基
+
+                3. type=fbzq  封闭债券
+                    *all    全部封闭债券
+                    *wj     稳健债券型                
+                    *jj     激进债券型
+                    *cz     纯债债券型
+     return
+     -------
+        DataFrame
+            开放型基金净值数据(DataFrame):
+                symbol      基金代码
+                sname       基金名称
+                per_nav     单位净值
+                total_nav   累计净值                            
+                nav_rate    增长率(%)
+                discount_rate 折溢价率(%)
+                nav_date    净值日期
+                start_date  成立日期   
+                end_date    到期日期
+                fund_manager 基金经理
+                jjlx        基金类型
+                jjzfe       基金总份额
+    """
+    ct._write_head()
+    nums = _get_fund_num(ct.SINA_NAV_COUNT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                                    ct.NAV_CLOSE_KEY, ct.NAV_CLOSE_API,
+                                                    ct.NAV_CLOSE_T2[fund_type],ct.NAV_CLOSE_T3[sub_type]))
+
+    df = _parse_fund_data(ct.SINA_NAV_DATA_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'], 
+                                                ct.NAV_OPEN_KEY, ct.NAV_CLOSE_API, nums,
+                                                ct.NAV_CLOSE_T2[fund_type],ct.NAV_CLOSE_T3[sub_type]),'close')
+    return df
+
+
+def get_nav_grading(fund_type='all',sub_type='all'):
+    """
+        获取分级子基金净值数据
+    Parameters
+    ------
+        type:string
+            封闭基金类型:
+                1. all      所有分级基金
+                2. fjgs     分级-固收
+                3. fjgg     分级-杠杆               
+
+        sub_type:string
+            基金子类型(type=all sub_type无效):                
+                *all    全部分级债券
+                *wjzq   稳健债券型
+                *czzq   纯债债券型                
+                *jjzq   激进债券型
+                *gp     股票型
+                *zs     指数型                
+     return
+     -------
+        DataFrame
+            开放型基金净值数据(DataFrame):
+                symbol      基金代码
+                sname       基金名称
+                per_nav     单位净值
+                total_nav   累计净值                            
+                nav_rate    增长率(%)
+                discount_rate 折溢价率(%)
+                nav_date    净值日期
+                start_date  成立日期   
+                end_date    到期日期
+                fund_manager 基金经理
+                jjlx        基金类型
+                jjzfe       基金总份额
+    """
+    ct._write_head()
+    nums = _get_fund_num(ct.SINA_NAV_COUNT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                                    ct.NAV_GRADING_KEY, ct.NAV_GRADING_API,
+                                                    ct.NAV_GRADING_T2[fund_type],ct.NAV_GRADING_T3[sub_type]))
+
+    df = _parse_fund_data(ct.SINA_NAV_DATA_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'], 
+                                                ct.NAV_GRADING_KEY, ct.NAV_GRADING_API, nums,
+                                                ct.NAV_GRADING_T2[fund_type],ct.NAV_GRADING_T3[sub_type]),'grading')
+    return df
+
+
 
 
 def get_nav_history(code, start=None, end=None, retry_count=3, pause=0.001):
@@ -176,7 +278,7 @@ def _get_detail(tag, retry_count=3, pause=0.001):
         raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def _parse_fund_data(url):
+def _parse_fund_data(url,fund_type='open'):
     
     ct._write_console()
 
@@ -197,7 +299,7 @@ def _parse_fund_data(url):
             jstr = json.dumps(text, encoding='GBK')
         js = json.loads(jstr)
         df = pd.DataFrame(pd.read_json(js, dtype={'symbol':object}),
-                          columns=ct.NAV_OPEN_COLUMNS)
+                          columns=ct.NAV_COLUMNS[fund_type])
         df.fillna(0,inplace=True)
         return df
     except Exception as er:

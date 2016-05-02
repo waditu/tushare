@@ -36,13 +36,25 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'qmd':'queryMargin.do', 'szsefc':'FrontController.szse',
          'ssecq':'commonQuery.do'}
 
-NAV_OPEN_API = { 'all':'getNetValueOpen','equity':'getNetValueOpen','mix':'getNetValueOpen','bond':'getNetValueOpen','monetary':'getNetValueMoney','qdii':'getNetValueOpen',
-                    'close':'getNetValueClose','cx':'getNetValueCX'}
+NAV_OPEN_API = { 'all':'getNetValueOpen','equity':'getNetValueOpen','mix':'getNetValueOpen','bond':'getNetValueOpen','monetary':'getNetValueMoney','qdii':'getNetValueOpen'}
 
 NAV_OPEN_KEY = {'all':'6XxbX6h4CED0ATvW','equity':'Gb3sH5uawH5WCUZ9','mix':'6XxbX6h4CED0ATvW',
-                'bond':'Gb3sH5uawH5WCUZ9','monetary':'uGo5qniFnmT5eQjp','qdii':'pTYExKwRmqrSaP0P'}
-NAV_OPEN_TYPE2 = { 'all':'0','equity':'2','mix':'1','bond':'3','monetary':'0','qdii':'6'}
-#NAV_OPEN_TYPE3 = {}
+                'bond':'Gb3sH5uawH5WCUZ9','monetary':'uGo5qniFnmT5eQjp','qdii':'pTYExKwRmqrSaP0P'}            
+NAV_OPEN_T2 = { 'all':'0','equity':'2','mix':'1','bond':'3','monetary':'0','qdii':'6'}
+NAV_OPEN_T3 = ''
+
+
+NAV_CLOSE_API = 'getNetValueClose'
+NAV_CLOSE_KEY = ''
+NAV_CLOSE_T2 = {'all':'0','fbqy':'4','fbzq':'9'}
+NAV_CLOSE_T3 = {'all':'0','ct':'10','cx':'11','wj':'3','jj':'5','cz':'12'}
+
+
+NAV_GRADING_API = 'getNetValueCX'
+NAV_GRADING_KEY = ''
+NAV_GRADING_T2 = {'all':'0','fjgs':'7','fjgg':'8'}
+NAV_GRADING_T3 = {'all':'0','wjzq':'13','gp':'14','zs':'15','czzq':'16','jjzq':'17'}
+
 
 #=====================================================================================================================================================================
 #基金数据列名
@@ -56,14 +68,23 @@ FUND_INFO_COLS = ['symbol','jjqc','jjjc','clrq','ssrq','xcr','ssdd',\
                   'Type1Name','Type2Name','Type3Name','jjgm','jjfe',\
                   'jjltfe','jjferq','quarter','glr','tgr']
 
+
+
+NAV_CLOSE_COLUMNS = ['symbol','sname','per_nav','total_nav','nav_rate','discount_rate','nav_date','start_date','end_date','fund_manager','jjlx','jjzfe']
+
+
+NAV_GRADING_COLUMNS = ['symbol','sname','per_nav','total_nav','nav_rate','discount_rate','nav_date','start_date','end_date','fund_manager','jjlx','jjzfe']
+
+
+NAV_COLUMNS = {'open':NAV_OPEN_COLUMNS,'close':NAV_CLOSE_COLUMNS,'grading':NAV_GRADING_COLUMNS}
+
 #=====================================================================================================================================================================
 #数据源URL
-SINA_NAV_COUNT_URL = '%s%s/fund_center/data/jsonp.php/IO.XSRV2.CallbackList[\'%s\']/NetValue_Service.%s?ccode=&type2=%s&type3='
-SINA_NAV_DATA_URL = '%s%s/fund_center/data/jsonp.php/IO.XSRV2.CallbackList[\'%s\']/NetValue_Service.%s?page=1&num=%s&ccode=&type2=%s&type3=' 
+SINA_NAV_COUNT_URL = '%s%s/fund_center/data/jsonp.php/IO.XSRV2.CallbackList[\'%s\']/NetValue_Service.%s?ccode=&type2=%s&type3=%s'
+SINA_NAV_DATA_URL =  '%s%s/fund_center/data/jsonp.php/IO.XSRV2.CallbackList[\'%s\']/NetValue_Service.%s?page=1&num=%s&ccode=&type2=%s&type3=%s'
 
 SINA_NAV_HISTROY_COUNT_URL = '%s%s/fundInfo/api/openapi.php/CaihuiFundInfoService.getNav?symbol=%s&datefrom=%s&dateto=%s'
-SINA_NAV_HISTROY_DATA_URL = '%s%s/fundInfo/api/openapi.php/CaihuiFundInfoService.getNav?symbol=%s&datefrom=%s&dateto=%s&num=%s'
-
+SINA_NAV_HISTROY_DATA_URL =  '%s%s/fundInfo/api/openapi.php/CaihuiFundInfoService.getNav?symbol=%s&datefrom=%s&dateto=%s&num=%s'
 
 SINA_NAV_HISTROY_COUNT_CUR_URL = '%s%s/fundInfo/api/openapi.php/CaihuiFundInfoService.getNavcur?symbol=%s&datefrom=%s&dateto=%s'
 SINA_NAV_HISTROY_DATA_CUR_URL = '%s%s/fundInfo/api/openapi.php/CaihuiFundInfoService.getNavcur?symbol=%s&datefrom=%s&dateto=%s&num=%s'
@@ -141,7 +162,7 @@ def _check_nav_oft_input(found_type):
     if found_type not in NAV_OPEN_KEY.keys():
         raise TypeError(OFT_MSG)
     else:
-        return True
+        return True               
 
 def _check_input(year, quarter):
     if isinstance(year, str) or year < 1989 :
@@ -150,3 +171,14 @@ def _check_input(year, quarter):
         raise TypeError(DATE_CHK_Q_MSG)
     else:
         return True        
+
+"""
+class global_vars():
+  '''
+  全局变量，包含如下属性
+    
+  * nav_list：开放基金代码
+  '''
+  nav_list = None
+  def __init__(self):    
+"""
