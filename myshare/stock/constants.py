@@ -7,18 +7,15 @@ Created on 2014/07/31
 """
 import sys
 
-VERSION = '0.3.6'
+VERSION = '0.0.1'
 K_LABELS = ['D', 'W', 'M']
-K_MIN_LABELS = ['5', '15', '30', '60']
+K_MINUTE_LABELS = ['5', '15', '30', '60']
 K_TYPE = {'D': 'akdaily', 'W': 'akweekly', 'M': 'akmonthly'}
 INDEX_LABELS = ['sh', 'sz', 'hs300', 'sz50', 'cyb', 'zxb', 'zx300', 'zh500']
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006', 'zx300': 'sz399008', 'zh500':'sh000905'}
-P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
+PROTOCOL_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
 PAGE_NUM = [38, 60, 80, 100]
-FORMAT = lambda x: '%.2f' % x
-FORMAT4 = lambda x: '%.4f' % x
-
 DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'ifeng': 'ifeng.com', 'sf': 'finance.sina.com.cn',
            'vsf': 'vip.stock.finance.sina.com.cn',
@@ -130,8 +127,10 @@ TOKEN_F_P = 'tk.csv'
 TOKEN_ERR_MSG = '请设置通联数据接口的token凭证码'
 BOX_INPUT_ERR_MSG = '请输入YYYY-MM格式的年月数据'
 
+# IS_PY3 = (sys.version_info[0] >= 3)
 
-PY3 = (sys.version_info[0] >= 3)
+FORMAT = lambda x: '%.2f' % x
+FORMAT4 = lambda x: '%.4f' % x
 
 
 def _write_head():
