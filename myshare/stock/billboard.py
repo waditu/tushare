@@ -52,12 +52,12 @@ def top_list(date = None, retry_count=3, pause=0.001):
         date  ：日期
     """
     if date is None:
-        if du.get_hour() < 18:
-            date = du.last_tddate()
+        if date.get_hour() < 18:
+            date = date.last_tddate()
         else:
-            date = du.today()
+            date = date.today()
     else:
-        if(du.is_holiday(date)):
+        if(date.is_holiday(date)):
             return None
     for _ in range(retry_count):
         time.sleep(pause)
