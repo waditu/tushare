@@ -413,7 +413,11 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             ct._write_console()
             df = _parse_fq_data(_get_index_url(index, code, qt), index,
                                 retry_count, pause)
-            data = data.append(df, ignore_index=True)
+            df = _parse_fq_data(get_url, index, retry_count, pause)
+            if df is None:  # 可能df为空，退出循环
+                break
+            else:
+                data = data.append(df, ignore_index=True)
     if len(data) == 0 or len(data[(data.date>=start)&(data.date<=end)]) == 0:
         return None
     data = data.drop_duplicates('date')
@@ -532,6 +536,9 @@ def _parse_fq_data(url, index, retry_count, pause):
             if df['date'].dtypes == np.object:
                 df['date'] = df['date'].astype(np.datetime64)
             df = df.drop_duplicates('date')
+        except ValueError as e:
+            # 时间较早，已经读不到数据
+            return None
         except Exception as e:
             print(e)
         else:
