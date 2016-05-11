@@ -17,8 +17,8 @@ import json
 import re
 import lxml.html
 from lxml import etree
-from tushare.util import dateu as du
-from tushare.stock import ref_vars as rv
+from myshare.util import date
+from myshare.stock import ref_vars as rv
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -62,7 +62,7 @@ def top_list(date = None, retry_count=3, pause=0.001):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_URL%(contants.P_TYPE['http'], contants.DOMAINS['em'], date, date))
+            request = Request(rv.LHB_URL%(contants.PROTOCOLS['http'], contants.DOMAINS['em'], date, date))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             text = text.split('_1=')[1]
@@ -132,7 +132,7 @@ def _cap_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pd.DataFrame
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_SINA_URL%(contants.P_TYPE['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[0],
+            request = Request(rv.LHB_SINA_URL%(contants.PROTOCOLS['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[0],
                                                contants.PAGES['fd'], last, pageNo))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
@@ -190,7 +190,7 @@ def _broker_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pd.DataFr
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_SINA_URL%(contants.P_TYPE['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[1],
+            request = Request(rv.LHB_SINA_URL%(contants.PROTOCOLS['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[1],
                                                contants.PAGES['fd'], last, pageNo))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
@@ -250,7 +250,7 @@ def _inst_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pd.DataFram
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_SINA_URL%(contants.P_TYPE['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[2],
+            request = Request(rv.LHB_SINA_URL%(contants.PROTOCOLS['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[2],
                                                contants.PAGES['fd'], last, pageNo))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
@@ -308,7 +308,7 @@ def _inst_detail(pageNo=1, retry_count=3, pause=0.001, dataArr=pd.DataFrame()):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_SINA_URL%(contants.P_TYPE['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[3],
+            request = Request(rv.LHB_SINA_URL%(contants.PROTOCOLS['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[3],
                                                contants.PAGES['fd'], '', pageNo))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
