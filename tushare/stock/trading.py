@@ -413,7 +413,6 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             ct._write_console()
             df = _parse_fq_data(_get_index_url(index, code, qt), index,
                                 retry_count, pause)
-            df = _parse_fq_data(get_url, index, retry_count, pause)
             if df is None:  # 可能df为空，退出循环
                 break
             else:
