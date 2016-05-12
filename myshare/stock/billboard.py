@@ -8,24 +8,27 @@ Created on 2015年6月10日
 @contact: jimmysoa@sina.cn
 """
 
-import pandas as pd
+import pandas
 from pandas.compat import StringIO
 import constants
-import numpy as np
+import numpy
 import time
 import json
 import re
 import lxml.html
+import pycurl
 from lxml import etree
-from myshare.util import date
-from myshare.stock import ref_vars as rv
+from ..util import date_helper
+import ref_vars
+
+
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
 
 
-def top_list(date = None, retry_count=3, pause=0.001):
+def top_list(date=None, retry_count=3, pause=0.001):
     """
     获取每日龙虎榜列表
     Parameters
@@ -52,45 +55,56 @@ def top_list(date = None, retry_count=3, pause=0.001):
         date  ：日期
     """
     if date is None:
-        if date.get_hour() < 18:
-            date = date.last_tddate()
+        if date_helper.get_hour() < 18:
+            date = date_helper.last_trade_date()
         else:
-            date = date.today()
-    else:
-        if(date.is_holiday(date)):
-            return None
+            date = date_helper.today()
+    elif date_helper.is_holiday(date):
+        return None
+
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_URL%(contants.PROTOCOLS['http'], contants.DOMAINS['em'], date, date))
-            text = urlopen(request, timeout=10).read()
-            text = text.decode('GBK')
-            text = text.split('_1=')[1]
-            text = eval(text, type('Dummy', (dict,),
-                                           dict(__getitem__ = lambda s, n:n))())
-            text = json.dumps(text)
-            text = json.loads(text)
-            df = pd.DataFrame(text['data'], columns=rv.LHB_TMP_COLS)
-            df.columns = rv.LHB_COLS
+            url = constants.LHB_URL % (constants.PROTOCOLS['http'], constants.DOMAINS['east'], date, date)
+            # request = Request(url)
+            # text = urlopen(request, timeout=10).read()
+            # text = text.decode('GBK')
+            # text = text.split('_1=')[1]
+            # text = eval(text, type('Dummy', (dict,), dict(__getitem__=lambda s, n: n))())
+            # text = json.dumps(text)
+            # text = json.loads(text)
+            html = request(url)
+            df = pandas.DataFrame(text['data'], columns=rv.LHB_TMP_COLS)
+            df.columns = constants.LHB_COLS
             df['buy'] = df['buy'].astype(float)
             df['sell'] = df['sell'].astype(float)
             df['amount'] = df['amount'].astype(float)
             df['Turnover'] = df['Turnover'].astype(float)
             df['bratio'] = df['buy'] / df['Turnover']
             df['sratio'] = df['sell'] /df['Turnover']
-            df['bratio'] = df['bratio'].map(contants.FORMAT)
-            df['sratio'] = df['sratio'].map(contants.FORMAT)
+            df['bratio'] = df['bratio'].map(constants.FORMAT)
+            df['sratio'] = df['sratio'].map(constants.FORMAT)
             df['date'] = date
             for col in ['amount', 'buy', 'sell']:
                 df[col] = df[col].astype(float)
                 df[col] = df[col] / 10000
-                df[col] = df[col].map(contants.FORMAT)
+                df[col] = df[col].map(constants.FORMAT)
             df = df.drop('Turnover', axis=1)
         except:
             pass
         else:
             return df
-    raise IOError(contants.NETWORK_URL_ERROR_MSG)
+    raise IOError(constants.NETWORK_URL_ERROR_MSG)
+
+def request(url):
+    curl = pycurl.Curl()
+    curl.setopt(pycurl.URL, url)
+
+    buffer = StringIO()
+    curl.setopt(pycurl.WRITEFUNCTION, buffer.write)
+    curl.perform()
+    curl.close()
+    return buffer.getvalue()
 
 
 def cap_tops(days= 5, retry_count= 3, pause= 0.001):
@@ -117,8 +131,8 @@ def cap_tops(days= 5, retry_count= 3, pause= 0.001):
         scount：卖出席位数
     """
 
-    if contants._check_lhb_input(days) is True:
-        contants._write_head()
+    if constants._check_lhb_input(days) is True:
+        constants._write_head()
         df =  _cap_tops(days, pageNo=1, retry_count=retry_count,
                         pause=pause)
         df['code'] = df['code'].map(lambda x: str(x).zfill(6))
@@ -127,24 +141,24 @@ def cap_tops(days= 5, retry_count= 3, pause= 0.001):
         return df
 
 
-def _cap_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pd.DataFrame()):
-    contants._write_console()
+def _cap_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
+    constants._write_console()
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_SINA_URL%(contants.PROTOCOLS['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[0],
-                                               contants.PAGES['fd'], last, pageNo))
+            request = Request(rv.LHB_SINA_URL%(constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[0],
+                                               constants.PAGES['fd'], last, pageNo))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             html = lxml.html.parse(StringIO(text))
             res = html.xpath("//table[@id=\"dataTable\"]/tr")
-            if contants.PY3:
+            if constants.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
             else:
                 sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             sarr = '<table>%s</table>'%sarr
-            df = pd.read_html(sarr)[0]
+            df = pandas.read_html(sarr)[0]
             df.columns = rv.LHB_GGTJ_COLS
             dataArr = dataArr.append(df, ignore_index=True)
             nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
@@ -178,31 +192,31 @@ def broker_tops(days= 5, retry_count= 3, pause= 0.001):
     scount：卖出席位数
     top3：买入前三股票
     """
-    if contants._check_lhb_input(days) is True:
-        contants._write_head()
+    if constants._check_lhb_input(days) is True:
+        constants._write_head()
         df =  _broker_tops(days, pageNo=1, retry_count=retry_count,
                         pause=pause)
         return df
 
 
-def _broker_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pd.DataFrame()):
-    contants._write_console()
+def _broker_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
+    constants._write_console()
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_SINA_URL%(contants.PROTOCOLS['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[1],
-                                               contants.PAGES['fd'], last, pageNo))
+            request = Request(rv.LHB_SINA_URL%(constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[1],
+                                               constants.PAGES['fd'], last, pageNo))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             html = lxml.html.parse(StringIO(text))
             res = html.xpath("//table[@id=\"dataTable\"]/tr")
-            if contants.PY3:
+            if constants.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
             else:
                 sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             sarr = '<table>%s</table>'%sarr
-            df = pd.read_html(sarr)[0]
+            df = pandas.read_html(sarr)[0]
             df.columns = rv.LHB_YYTJ_COLS
             dataArr = dataArr.append(df, ignore_index=True)
             nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
@@ -237,32 +251,32 @@ def inst_tops(days= 5, retry_count= 3, pause= 0.001):
     scount:卖出次数
     net:净额(万)
     """
-    if contants._check_lhb_input(days) is True:
-        contants._write_head()
+    if constants._check_lhb_input(days) is True:
+        constants._write_head()
         df =  _inst_tops(days, pageNo=1, retry_count=retry_count,
                         pause=pause)
         df['code'] = df['code'].map(lambda x: str(x).zfill(6))
         return df
 
 
-def _inst_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pd.DataFrame()):
-    contants._write_console()
+def _inst_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
+    constants._write_console()
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_SINA_URL%(contants.PROTOCOLS['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[2],
-                                               contants.PAGES['fd'], last, pageNo))
+            request = Request(rv.LHB_SINA_URL%(constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[2],
+                                               constants.PAGES['fd'], last, pageNo))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             html = lxml.html.parse(StringIO(text))
             res = html.xpath("//table[@id=\"dataTable\"]/tr")
-            if contants.PY3:
+            if constants.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
             else:
                 sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             sarr = '<table>%s</table>'%sarr
-            df = pd.read_html(sarr)[0]
+            df = pandas.read_html(sarr)[0]
             df = df.drop([2,3], axis=1)
             df.columns = rv.LHB_JGZZ_COLS
             dataArr = dataArr.append(df, ignore_index=True)
@@ -295,7 +309,7 @@ def inst_detail(retry_count= 3, pause= 0.001):
     samount:机构席位卖出额(万)
     type:类型
     """
-    contants._write_head()
+    constants._write_head()
     df =  _inst_detail(pageNo=1, retry_count=retry_count,
                         pause=pause)
     if len(df)>0:
@@ -303,24 +317,24 @@ def inst_detail(retry_count= 3, pause= 0.001):
     return df
 
 
-def _inst_detail(pageNo=1, retry_count=3, pause=0.001, dataArr=pd.DataFrame()):
-    contants._write_console()
+def _inst_detail(pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
+    constants._write_console()
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_SINA_URL%(contants.PROTOCOLS['http'], contants.DOMAINS['vsf'], rv.LHB_KINDS[3],
-                                               contants.PAGES['fd'], '', pageNo))
+            request = Request(rv.LHB_SINA_URL%(constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[3],
+                                               constants.PAGES['fd'], '', pageNo))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             html = lxml.html.parse(StringIO(text))
             res = html.xpath("//table[@id=\"dataTable\"]/tr")
-            if contants.PY3:
+            if constants.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
             else:
                 sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             sarr = '<table>%s</table>'%sarr
-            df = pd.read_html(sarr)[0]
+            df = pandas.read_html(sarr)[0]
             df.columns = rv.LHB_JGMX_COLS
             dataArr = dataArr.append(df, ignore_index=True)
             nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
@@ -339,6 +353,6 @@ def _f_rows(x):
         for i in range(6, 11):
             x[i] = x[i-5]
         for i in range(1, 6):
-            x[i] = np.NaN
+            x[i] = numpy.NaN
     return x
 

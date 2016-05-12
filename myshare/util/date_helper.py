@@ -10,7 +10,7 @@ from myshare.stock import constants
 def year_quarter(date):
     mon = date[5:7]
     mon = int(mon)
-    return[date[0:4], _quar(mon)]
+    return [date[0:4], quarter(mon)]
     
 
 def quarter(mon):
@@ -63,17 +63,16 @@ def get_quarts(start, end):
     return [str(d).split('Q') for d in idx][::-1]
 
 
-def trade_calendar():
-    # 交易日历
-    # isOpen=1是交易日，isOpen=0为休市
-    df = pandas.read_csv(constants.ALL_CAL_FILE)
-    return df
-
+# def trade_calendar():
+#     # 交易日历
+#     # isOpen=1是交易日，isOpen=0为休市
+#     return
 
 def is_holiday(date):
     # 判断是否为交易日，返回True or False
-    df = trade_calendar()
-    holiday = df[df.isOpen == 0]['calendarDate'].values
+    dataframe = pandas.read_csv(constants.ALL_CAL_FILE)
+    holiday = dataframe[dataframe.isOpen == 0]['calendarDate'].values
+
     if isinstance(date, str):
         _today = datetime.strptime(date, '%Y-%m-%d')
 
@@ -83,7 +82,7 @@ def is_holiday(date):
         return False
 
 
-def last_tddate():
+def last_trade_date():
     _today = int(datetime.today().date().strftime("%w"))
     if _today == 0:
         return day_last_week(-2)
