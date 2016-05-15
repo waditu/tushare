@@ -7,15 +7,9 @@ Created on 2016/04/03
 """
 
 VERSION = '0.0.1'
-K_LABELS = ['D', 'W', 'M']
-K_MIN_LABELS = ['5', '15', '30', '60']
-K_TYPE = {'D': 'akdaily', 'W': 'akweekly', 'M': 'akmonthly'}
-INDEX_LABELS = ['sh', 'sz', 'hs300', 'sz50', 'cyb', 'zxb']
-INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
-              'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
-PAGE_NUM = [38, 60, 80, 100]
 FORMAT = lambda x: '%.2f' % x
+FORMAT4 = lambda x: '%.4f' % x
 DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'ifeng': 'ifeng.com', 'sf': 'finance.sina.com.cn',
            'ssf': 'stock.finance.sina.com.cn',
@@ -25,16 +19,6 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'sse': 'www.sse.com.cn', 'szse': 'www.szse.cn',
            'oss': '218.244.146.57',
            'shibor': 'www.shibor.org'}
-PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
-         'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
-         'ntinfo':'vCB_BulletinGather.php', 'hs300b':'000300cons.xls',
-         'hs300w':'000300closeweight.xls','sz50b':'000016cons.xls',
-         'dp':'all_fpya.php', '163dp':'fpyg.html',
-         'emxsg':'JS.aspx', '163fh':'jjcgph.php',
-         'newstock':'vRPD_NewStockIssue.php', 'zz500b':'000905cons.xls',
-         't_ticks':'vMS_tradedetail.php', 'dw': 'downLoad.html',
-         'qmd':'queryMargin.do', 'szsefc':'FrontController.szse',
-         'ssecq':'commonQuery.do'}
 
 NAV_OPEN_API = { 'all':'getNetValueOpen','equity':'getNetValueOpen','mix':'getNetValueOpen','bond':'getNetValueOpen','monetary':'getNetValueMoney','qdii':'getNetValueOpen'}
 
@@ -94,19 +78,6 @@ SINA_DATA_DETAIL_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?p
 SINA_FUND_INFO_URL = '%s%s/fundInfo/api/openapi.php/FundPageInfoService.tabjjgk?symbol=%s&format=json'
 
 #=====================================================================================================================================================================
-
-SHIBOR_COLS = ['date', 'ON', '1W', '2W', '1M', '3M', '6M', '9M', '1Y']
-QUOTE_COLS = ['date', 'bank', 'ON_B', 'ON_A', '1W_B', '1W_A', '2W_B', '2W_A', '1M_B', '1M_A',
-                    '3M_B', '3M_A', '6M_B', '6M_A', '9M_B', '9M_A', '1Y_B', '1Y_A']
-SHIBOR_MA_COLS = ['date', 'ON_5', 'ON_10', 'ON_20', '1W_5', '1W_10', '1W_20','2W_5', '2W_10', '2W_20',
-                  '1M_5', '1M_10', '1M_20', '3M_5', '3M_10', '3M_20', '6M_5', '6M_10', '6M_20',
-                  '9M_5', '9M_10', '9M_20','1Y_5', '1Y_10', '1Y_20']
-LPR_COLS = ['date', '1Y']
-LPR_MA_COLS = ['date', '1Y_5', '1Y_10', '1Y_20']
-INDEX_HEADER = 'code,name,open,preclose,close,high,low,0,0,volume,amount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,d,c,3\n'
-INDEX_COLS = ['code', 'name', 'change', 'open', 'preclose', 'close', 'high', 'low', 'volume', 'amount']
-
-HIST_FQ_FACTOR_COLS = ['code','value']
 DATA_GETTING_TIPS = '[Getting data:]'
 DATA_GETTING_FLAG = '#'
 DATA_ROWS_TIPS = '%s rows data found.Please wait for a moment.'
@@ -124,12 +95,6 @@ DICT_NAV_EQUITY = {
     'jjjz':'value',
     'ljjz':'total',
     'change':'change'
-} 
-
-DICT_NAV_MONETARY = {
-    'fbrq':'date',
-    'nhsyl':'value',
-    'dwsy':'total' 
 } 
 
 import sys
@@ -171,14 +136,3 @@ def _check_input(year, quarter):
         raise TypeError(DATE_CHK_Q_MSG)
     else:
         return True        
-
-"""
-class global_vars():
-  '''
-  全局变量，包含如下属性
-    
-  * nav_list：开放基金代码
-  '''
-  nav_list = None
-  def __init__(self):    
-"""

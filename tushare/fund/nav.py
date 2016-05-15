@@ -16,7 +16,6 @@ import pandas as pd
 import numpy as np
 import datetime
 from tushare.fund import cons as ct
-from tushare.fund import ref_vars as rv
 from pandas.util.testing import _network_error_classes
 import time
 from tushare.util.netbase import Client

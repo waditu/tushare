@@ -26,7 +26,7 @@ except ImportError:
     from urllib2 import urlopen, Request
 
 
-def profit_data(year=2014, top=25, 
+def profit_data(year=2015, top=25, 
               retry_count=3, pause=0.001):
     """
     获取分配预案数据
@@ -49,16 +49,17 @@ def profit_data(year=2014, top=25,
     divi:分红金额（每10股）
     shares:转增和送股数（每10股）
     """
-    if top <= 25:
-        df, pages = _dist_cotent(year, 0, retry_count, pause)
-        return df.head(top)
-    elif top == 'all':
+    
+    if top == 'all':
         ct._write_head()
         df, pages = _dist_cotent(year, 0, retry_count, pause)
         for idx in range(1,int(pages)):
             df = df.append(_dist_cotent(year, idx, retry_count,
                                         pause), ignore_index=True)
         return df
+    elif top <= 25:
+        df, pages = _dist_cotent(year, 0, retry_count, pause)
+        return df.head(top)
     else:
         if isinstance(top, int):
             ct._write_head()
@@ -693,4 +694,5 @@ def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
-    return str(randint(start, end))  
+    return str(randint(start, end))
+
