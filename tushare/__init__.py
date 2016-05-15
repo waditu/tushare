@@ -82,9 +82,3 @@ from tushare.datayes.api import *
 
 from tushare.internet.boxoffice import (realtime_boxoffice, day_boxoffice,
                                         day_cinema, month_boxoffice)
-
-"""
-for fund data
-"""
-from tushare.fund.nav import (get_nav_open, get_nav_close, get_nav_grading,
-                              get_nav_history, get_fund_info)
