@@ -10,6 +10,7 @@ Created on 2015年6月10日
 
 import pandas
 from pandas.compat import StringIO
+from io import BytesIO
 import constants
 import numpy
 import time
@@ -18,7 +19,7 @@ import re
 import lxml.html
 import pycurl
 from lxml import etree
-from ..util import date_helper
+from myshare.util import date_helper
 import ref_vars
 
 
@@ -74,7 +75,13 @@ def top_list(date=None, retry_count=3, pause=0.001):
             # text = json.dumps(text)
             # text = json.loads(text)
             html = request(url)
-            df = pandas.DataFrame(text['data'], columns=rv.LHB_TMP_COLS)
+            regex = re.compile(b'\{.*\}')
+            json_content = regex.search(result).group(0)
+            json_content = json.dumps(json_content)
+            json_content = json.loads(json_content)
+            json.dumps(json_value)
+
+            df = pandas.DataFrame(html['data'], columns=constants.LHB_TMP_COLS)
             df.columns = constants.LHB_COLS
             df['buy'] = df['buy'].astype(float)
             df['sell'] = df['sell'].astype(float)
@@ -96,16 +103,21 @@ def top_list(date=None, retry_count=3, pause=0.001):
             return df
     raise IOError(constants.NETWORK_URL_ERROR_MSG)
 
+
 def request(url):
     curl = pycurl.Curl()
-    curl.setopt(pycurl.URL, url)
+    curl.setopt(curl.URL, url)
 
-    buffer = StringIO()
-    curl.setopt(pycurl.WRITEFUNCTION, buffer.write)
+    buffer = BytesIO()
+    curl.setopt(curl.WRITEDATA, buffer)
     curl.perform()
     curl.close()
     return buffer.getvalue()
 
+lhb_url = 'http://data.eastmoney.com/DataCenter_V3/stock2016/TradeDetail/' \
+      'pagesize=200,page=1,sortRule=-1,sortType=,' \
+      'startDate=2016-05-12,endDate=2016-05-12,gpfw=0,js=vardata_tab_1.html'
+result = request(lhb_url)
 
 def cap_tops(days= 5, retry_count= 3, pause= 0.001):
     """
@@ -152,14 +164,11 @@ def _cap_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataF
             text = text.decode('GBK')
             html = lxml.html.parse(StringIO(text))
             res = html.xpath("//table[@id=\"dataTable\"]/tr")
-            if constants.PY3:
-                sarr = [etree.tostring(node).decode('utf-8') for node in res]
-            else:
-                sarr = [etree.tostring(node) for node in res]
+            sarr = [etree.tostring(node).decode('utf-8') for node in res]
             sarr = ''.join(sarr)
             sarr = '<table>%s</table>'%sarr
             df = pandas.read_html(sarr)[0]
-            df.columns = rv.LHB_GGTJ_COLS
+            df.columns = constants.LHB_GGTJ_COLS
             dataArr = dataArr.append(df, ignore_index=True)
             nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
             if len(nextPage)>0:
