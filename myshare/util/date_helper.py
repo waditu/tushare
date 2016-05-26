@@ -11,15 +11,15 @@ def year_quarter(date):
     mon = date[5:7]
     mon = int(mon)
     return [date[0:4], quarter(mon)]
-    
+
 
 def quarter(mon):
     return mon // 4 + 1
- 
- 
+
+
 def today():
     day = datetime.today().date()
-    return str(day) 
+    return str(day)
 
 
 def get_year():
@@ -34,14 +34,14 @@ def get_month():
 
 def get_hour():
     return datetime.today().hour
-    
-    
+
+
 def same_day_last_year():
     return str(datetime.today().date() + timedelta(-365))
 
 
-def same_day_last_week():
-    return str(datetime.today().date() + timedelta(-7))
+def same_day_last_week(days=-7):
+    return str(datetime.today().date() + timedelta(days))
 
 
 def get_now():
@@ -85,6 +85,6 @@ def is_holiday(date):
 def last_trade_date():
     _today = int(datetime.today().date().strftime("%w"))
     if _today == 0:
-        return day_last_week(-2)
+        return same_day_last_week(-2)
     else:
-        return day_last_week(-1)
+        return same_day_last_week(-1)

@@ -20,7 +20,7 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'ifeng': 'ifeng.com', 'sf': 'finance.sina.com.cn',
            'vsf': 'vip.stock.finance.sina.com.cn',
            'idx': 'www.csindex.com.cn', '163': 'money.163.com',
-           'em': 'eastmoney.com', 'sseq': 'query.sse.com.cn',
+           'east': 'eastmoney.com', 'sseq': 'query.sse.com.cn',
            'sse': 'www.sse.com.cn', 'szse': 'www.szse.cn',
            'oss': '218.244.146.57', 'idxip':'115.29.204.48',
            'shibor': 'www.shibor.org', 'mbox':'www.cbooo.cn'}

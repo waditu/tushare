@@ -67,40 +67,29 @@ def top_list(date=None, retry_count=3, pause=0.001):
         time.sleep(pause)
         try:
             url = constants.LHB_URL % (constants.PROTOCOLS['http'], constants.DOMAINS['east'], date, date)
-            # request = Request(url)
-            # text = urlopen(request, timeout=10).read()
-            # text = text.decode('GBK')
-            # text = text.split('_1=')[1]
-            # text = eval(text, type('Dummy', (dict,), dict(__getitem__=lambda s, n: n))())
-            # text = json.dumps(text)
-            # text = json.loads(text)
-            html = request(url)
-            regex = re.compile(b'\{.*\}')
-            json_content = regex.search(result).group(0)
-            json_content = json.dumps(json_content)
-            json_content = json.loads(json_content)
-            json.dumps(json_value)
+            lhb_data = lhb_info(url)
 
-            df = pandas.DataFrame(html['data'], columns=constants.LHB_TMP_COLS)
-            df.columns = constants.LHB_COLS
-            df['buy'] = df['buy'].astype(float)
-            df['sell'] = df['sell'].astype(float)
-            df['amount'] = df['amount'].astype(float)
-            df['Turnover'] = df['Turnover'].astype(float)
-            df['bratio'] = df['buy'] / df['Turnover']
-            df['sratio'] = df['sell'] /df['Turnover']
-            df['bratio'] = df['bratio'].map(constants.FORMAT)
-            df['sratio'] = df['sratio'].map(constants.FORMAT)
-            df['date'] = date
+            data_frame = pandas.DataFrame(lhb_data['data'], columns=constants.LHB_TMP_COLS)
+            print(data_frame)
+            data_frame.columns = constants.LHB_COLS
+            data_frame['buy'] = data_frame['buy'].astype(float)
+            data_frame['sell'] = data_frame['sell'].astype(float)
+            data_frame['amount'] = data_frame['amount'].astype(float)
+            data_frame['Turnover'] = data_frame['Turnover'].astype(float)
+            data_frame['bratio'] = data_frame['buy'] / data_frame['Turnover']
+            data_frame['sratio'] = data_frame['sell'] /data_frame['Turnover']
+            data_frame['bratio'] = data_frame['bratio'].map(constants.FORMAT)
+            data_frame['sratio'] = data_frame['sratio'].map(constants.FORMAT)
+            data_frame['date'] = date
             for col in ['amount', 'buy', 'sell']:
-                df[col] = df[col].astype(float)
-                df[col] = df[col] / 10000
-                df[col] = df[col].map(constants.FORMAT)
-            df = df.drop('Turnover', axis=1)
+                data_frame[col] = data_frame[col].astype(float)
+                data_frame[col] = data_frame[col] / 10000
+                data_frame[col] = data_frame[col].map(constants.FORMAT)
+            data_frame = data_frame.drop('Turnover', axis=1)
         except:
             pass
         else:
-            return df
+            return data_frame
     raise IOError(constants.NETWORK_URL_ERROR_MSG)
 
 
@@ -113,6 +102,16 @@ def request(url):
     curl.perform()
     curl.close()
     return buffer.getvalue()
+
+
+def lhb_info(url):
+    # print(url)
+    html = request(url).decode('GBK')
+    regex = re.compile('\[.*\]')
+    json_content = regex.search(html).group(0)
+    stock_info = json.loads(json_content)
+    print(stock_info)
+    return stock_info
 
 lhb_url = 'http://data.eastmoney.com/DataCenter_V3/stock2016/TradeDetail/' \
       'pagesize=200,page=1,sortRule=-1,sortType=,' \
@@ -145,12 +144,12 @@ def cap_tops(days= 5, retry_count= 3, pause= 0.001):
 
     if constants._check_lhb_input(days) is True:
         constants._write_head()
-        df =  _cap_tops(days, pageNo=1, retry_count=retry_count,
+        data_frame =  _cap_tops(days, pageNo=1, retry_count=retry_count,
                         pause=pause)
-        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
-        if df is not None:
-            df = df.drop_duplicates('code')
-        return df
+        data_frame['code'] = data_frame['code'].map(lambda x: str(x).zfill(6))
+        if data_frame is not None:
+            data_frame = data_frame.drop_duplicates('code')
+        return data_frame
 
 
 def _cap_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
@@ -167,9 +166,9 @@ def _cap_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataF
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
             sarr = ''.join(sarr)
             sarr = '<table>%s</table>'%sarr
-            df = pandas.read_html(sarr)[0]
-            df.columns = constants.LHB_GGTJ_COLS
-            dataArr = dataArr.append(df, ignore_index=True)
+            data_frame = pandas.read_html(sarr)[0]
+            data_frame.columns = constants.LHB_GGTJ_COLS
+            dataArr = dataArr.append(data_frame, ignore_index=True)
             nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
             if len(nextPage)>0:
                 pageNo = re.findall(r'\d+', nextPage[0])[0]
@@ -203,9 +202,9 @@ def broker_tops(days= 5, retry_count= 3, pause= 0.001):
     """
     if constants._check_lhb_input(days) is True:
         constants._write_head()
-        df =  _broker_tops(days, pageNo=1, retry_count=retry_count,
+        data_frame =  _broker_tops(days, pageNo=1, retry_count=retry_count,
                         pause=pause)
-        return df
+        return data_frame
 
 
 def _broker_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
@@ -225,9 +224,9 @@ def _broker_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.Da
                 sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             sarr = '<table>%s</table>'%sarr
-            df = pandas.read_html(sarr)[0]
-            df.columns = rv.LHB_YYTJ_COLS
-            dataArr = dataArr.append(df, ignore_index=True)
+            data_frame = pandas.read_html(sarr)[0]
+            data_frame.columns = rv.LHB_YYTJ_COLS
+            dataArr = dataArr.append(data_frame, ignore_index=True)
             nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
             if len(nextPage)>0:
                 pageNo = re.findall(r'\d+', nextPage[0])[0]
@@ -262,10 +261,10 @@ def inst_tops(days= 5, retry_count= 3, pause= 0.001):
     """
     if constants._check_lhb_input(days) is True:
         constants._write_head()
-        df =  _inst_tops(days, pageNo=1, retry_count=retry_count,
+        data_frame =  _inst_tops(days, pageNo=1, retry_count=retry_count,
                         pause=pause)
-        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
-        return df
+        data_frame['code'] = data_frame['code'].map(lambda x: str(x).zfill(6))
+        return data_frame
 
 
 def _inst_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
@@ -285,10 +284,10 @@ def _inst_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.Data
                 sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             sarr = '<table>%s</table>'%sarr
-            df = pandas.read_html(sarr)[0]
-            df = df.drop([2,3], axis=1)
-            df.columns = rv.LHB_JGZZ_COLS
-            dataArr = dataArr.append(df, ignore_index=True)
+            data_frame = pandas.read_html(sarr)[0]
+            data_frame = data_frame.drop([2,3], axis=1)
+            data_frame.columns = rv.LHB_JGZZ_COLS
+            dataArr = dataArr.append(data_frame, ignore_index=True)
             nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
             if len(nextPage)>0:
                 pageNo = re.findall(r'\d+', nextPage[0])[0]
@@ -319,11 +318,11 @@ def inst_detail(retry_count= 3, pause= 0.001):
     type:类型
     """
     constants._write_head()
-    df =  _inst_detail(pageNo=1, retry_count=retry_count,
+    data_frame =  _inst_detail(pageNo=1, retry_count=retry_count,
                         pause=pause)
-    if len(df)>0:
-        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
-    return df
+    if len(data_frame)>0:
+        data_frame['code'] = data_frame['code'].map(lambda x: str(x).zfill(6))
+    return data_frame
 
 
 def _inst_detail(pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
@@ -343,9 +342,9 @@ def _inst_detail(pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame(
                 sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
             sarr = '<table>%s</table>'%sarr
-            df = pandas.read_html(sarr)[0]
-            df.columns = rv.LHB_JGMX_COLS
-            dataArr = dataArr.append(df, ignore_index=True)
+            data_frame = pandas.read_html(sarr)[0]
+            data_frame.columns = rv.LHB_JGMX_COLS
+            dataArr = dataArr.append(data_frame, ignore_index=True)
             nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
             if len(nextPage)>0:
                 pageNo = re.findall(r'\d+', nextPage[0])[0]
