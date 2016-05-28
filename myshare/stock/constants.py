@@ -140,8 +140,8 @@ XSG_URL = '%sdatainterface.%s/EM_DataCenter/%s?type=FD&sty=BST&st=3&sr=true&fd=%
 # LHB_URL = '%sdata.%s/stock/lhb/%s.html'
 LHB_URL = '%sdata.%s/DataCenter_V3/stock2016/TradeDetail/pagesize=200,page=1,sortRule=-1,sortType=,startDate=%s,endDate=%s,gpfw=0,js=vardata_tab_1.html'
 LHB_SINA_URL = '%s%s/q/go.php/vLHBData/kind/%s/%s?last=%s&p=%s'
-LHB_TMP_COLS = ['SCode', 'SName', 'Chgradio', 'ZeMoney', 'Bmoney', 'Smoney', 'Ctypedes', 'Turnover']
-LHB_COLS = ['code', 'name', 'pchange', 'amount', 'buy', 'sell', 'reason', 'Turnover']
+LHB_EAST_COLS = ['SCode', 'SName', 'Chgradio', 'ZeMoney', 'Bmoney', 'Smoney', 'Ctypedes', 'Turnover']
+LHB_COLS = ['code', 'name', 'pchange', 'amount', 'buy', 'sell', 'reason', 'turnover']
 LHB_KINDS = ['ggtj', 'yytj', 'jgzz', 'jgmx']
 LHB_GGTJ_COLS = ['code', 'name', 'count', 'bamount', 'samount', 'net', 'bcount', 'scount']
 LHB_YYTJ_COLS = ['broker', 'count', 'bamount', 'bcount', 'samount', 'scount', 'top3']
@@ -177,7 +177,7 @@ MAR_SZ_HZ_MSG = 'please do not input more than a year,you can obtaining the data
 MAR_SZ_HZ_MSG2 = 'start and end date all need input.'
 
 
-FORMAT = lambda x: '%.2f' % x
+def two_decimal(x): return '%.2f' % x
 FORMAT4 = lambda x: '%.4f' % x
 
 

@@ -68,29 +68,27 @@ def top_list(date=None, retry_count=3, pause=0.001):
         try:
             url = constants.LHB_URL % (constants.PROTOCOLS['http'], constants.DOMAINS['east'], date, date)
             lhb_data = lhb_info(url)
-
-            data_frame = pandas.DataFrame(lhb_data['data'], columns=constants.LHB_TMP_COLS)
-            print(data_frame)
+            data_frame = pandas.DataFrame(lhb_data, columns=constants.LHB_EAST_COLS)
             data_frame.columns = constants.LHB_COLS
             data_frame['buy'] = data_frame['buy'].astype(float)
             data_frame['sell'] = data_frame['sell'].astype(float)
             data_frame['amount'] = data_frame['amount'].astype(float)
-            data_frame['Turnover'] = data_frame['Turnover'].astype(float)
-            data_frame['bratio'] = data_frame['buy'] / data_frame['Turnover']
-            data_frame['sratio'] = data_frame['sell'] /data_frame['Turnover']
-            data_frame['bratio'] = data_frame['bratio'].map(constants.FORMAT)
-            data_frame['sratio'] = data_frame['sratio'].map(constants.FORMAT)
-            data_frame['date'] = date
-            for col in ['amount', 'buy', 'sell']:
-                data_frame[col] = data_frame[col].astype(float)
-                data_frame[col] = data_frame[col] / 10000
-                data_frame[col] = data_frame[col].map(constants.FORMAT)
-            data_frame = data_frame.drop('Turnover', axis=1)
+            data_frame['turnover'] = data_frame['turnover'].astype(float)
+            data_frame['buy_ratio'] = data_frame['buy'] / data_frame['turnover']
+            data_frame['sell_ratio'] = data_frame['sell'] / data_frame['turnover']
+            # data_frame['buy_ratio'] = data_frame['buy_ratio'].map(constants.two_decimal)
+            # data_frame['sell_ratio'] = data_frame['sell_ratio'].map(constants.two_decimal)
+            print(data_frame['turnover'])
+            # data_frame['date'] = date
+            # for col in ['amount', 'buy', 'sell']:
+            #     data_frame[col] = data_frame[col].astype(float)
+            #     data_frame[col] = data_frame[col] / 10000
+            #     data_frame[col] = data_frame[col].map(constants.FORMAT)
+            # data_frame = data_frame.drop('Turnover', axis=1)
+            return data_frame
         except:
             pass
-        else:
-            return data_frame
-    raise IOError(constants.NETWORK_URL_ERROR_MSG)
+        raise IOError(constants.NETWORK_URL_ERROR_MSG)
 
 
 def request(url):
@@ -108,6 +106,7 @@ def lhb_info(url):
     # print(url)
     html = request(url).decode('GBK')
     regex = re.compile('\[.*\]')
+    # regex = re.compile('\{.*\}')
     json_content = regex.search(html).group(0)
     stock_info = json.loads(json_content)
     print(stock_info)
