@@ -278,15 +278,16 @@ def _parse_fund_data(url, fund_type='open'):
         text = urlopen(request, timeout=10).read()
         if text == 'null':
             return None
+        text = text.decode('gbk') if ct.PY3 else text
         text = text.split('data:')[1].split(',exec_time')[0]
         reg = re.compile(r'\,(.*?)\:')
-        text = reg.sub(r',"\1":', text.decode('gbk') if ct.PY3 else text)
+        text = reg.sub(r',"\1":', text)
         text = text.replace('"{symbol', '{"symbol')
         text = text.replace('{symbol', '{"symbol"')
         if ct.PY3:
             jstr = json.dumps(text)
         else:
-            jstr = json.dumps(text, encoding='GBK')
+            jstr = json.dumps(text, encoding='gbk')
         org_js = json.loads(jstr)
         fund_df = pd.DataFrame(pd.read_json(org_js, dtype={'symbol': object}),
                                columns=ct.NAV_COLUMNS[fund_type])
