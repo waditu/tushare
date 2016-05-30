@@ -62,7 +62,8 @@ LIVE_DATA_COLS = ['name', 'open', 'pre_close', 'price', 'high', 'low', 'bid', 'a
 FOR_CLASSIFY_B_COLS = ['code','name']
 FOR_CLASSIFY_W_COLS = ['date','code', 'weight']
 FOR_CLASSIFY_W5_COLS = ['date','code', 'name', 'weight']
-THE_FIELDS = ['code','symbol','name','changepercent','trade','open','high','low','settlement','volume','turnoverratio']
+THE_FIELDS = [
+    'code', 'symbol', 'name', 'changepercent', 'trade', 'open', 'high', 'low', 'settlement', 'volume', 'turnoverratio']
 TICK_PRICE_URL = '%smarket.%s/%s?date=%s&symbol=%s'
 TODAY_TICKS_PAGE_URL = '%s%s/quotes_service/api/%s/CN_Transactions.getAllPageTime?date=%s&symbol=%s'
 TODAY_TICKS_URL = '%s%s/quotes_service/view/%s?symbol=%s&date=%s&page=%s'
@@ -140,6 +141,7 @@ XSG_URL = '%sdatainterface.%s/EM_DataCenter/%s?type=FD&sty=BST&st=3&sr=true&fd=%
 # LHB_URL = '%sdata.%s/stock/lhb/%s.html'
 LHB_URL = '%sdata.%s/DataCenter_V3/stock2016/TradeDetail/pagesize=200,page=1,sortRule=-1,sortType=,startDate=%s,endDate=%s,gpfw=0,js=vardata_tab_1.html'
 LHB_SINA_URL = '%s%s/q/go.php/vLHBData/kind/%s/%s?last=%s&p=%s'
+LHB_SINA_URL_GG = 'http://vip.stock.finance.sina.com.cn/q/go.php/vLHBData/kind/ggtj/index.phtml?last=%s&p=%s'
 LHB_EAST_COLS = ['SCode', 'SName', 'Chgradio', 'ZeMoney', 'Bmoney', 'Smoney', 'Ctypedes', 'Turnover']
 LHB_COLS = ['code', 'name', 'pchange', 'amount', 'buy', 'sell', 'reason', 'turnover']
 LHB_KINDS = ['ggtj', 'yytj', 'jgzz', 'jgmx']
@@ -196,7 +198,7 @@ def _write_tips(tip):
     sys.stdout.flush()
 
 
-def _write_msg(msg):
+def console_write(msg):
     sys.stdout.write(msg)
     sys.stdout.flush()
 
@@ -210,8 +212,8 @@ def _check_input(year, quarter):
         return True
 
 
-def _check_lhb_input(last):
-    if last not in [5, 10, 30, 60]:
-        raise TypeError(LHB_MSG)
-    else:
-        return True
+# def _check_lhb_input(last):
+#     if last not in [5, 10, 30, 60]:
+#         raise TypeError(LHB_MSG)
+#     else:
+#         return True

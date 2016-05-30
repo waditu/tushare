@@ -20,6 +20,7 @@ import lxml.html
 import pycurl
 from lxml import etree
 from myshare.util import date_helper
+from enum import Enum
 import ref_vars
 
 
@@ -27,6 +28,9 @@ try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
+
+
+LhbPeriod = Enum('LhbPeriod', (('five', 5), ('ten', 10), ('thirty', 30), ('sixty', 60)))
 
 
 def top_list(date=None, retry_count=3, pause=0.001):
@@ -76,26 +80,62 @@ def top_list(date=None, retry_count=3, pause=0.001):
             data_frame['turnover'] = data_frame['turnover'].astype(float)
             data_frame['buy_ratio'] = data_frame['buy'] / data_frame['turnover']
             data_frame['sell_ratio'] = data_frame['sell'] / data_frame['turnover']
-            # data_frame['buy_ratio'] = data_frame['buy_ratio'].map(constants.two_decimal)
-            # data_frame['sell_ratio'] = data_frame['sell_ratio'].map(constants.two_decimal)
-            print(data_frame['turnover'])
-            # data_frame['date'] = date
-            # for col in ['amount', 'buy', 'sell']:
-            #     data_frame[col] = data_frame[col].astype(float)
-            #     data_frame[col] = data_frame[col] / 10000
-            #     data_frame[col] = data_frame[col].map(constants.FORMAT)
-            # data_frame = data_frame.drop('Turnover', axis=1)
+            data_frame['buy_ratio'] = data_frame['buy_ratio'].map(constants.two_decimal)
+            data_frame['sell_ratio'] = data_frame['sell_ratio'].map(constants.two_decimal)
+            data_frame['date'] = date
+            for col in ['amount', 'buy', 'sell']:
+                data_frame[col] = data_frame[col].astype(float) / 10000
+                data_frame[col] = data_frame[col].map(constants.two_decimal)
+            data_frame = data_frame.drop('turnover', 1)
             return data_frame
         except:
             pass
         raise IOError(constants.NETWORK_URL_ERROR_MSG)
 
 
+def cap_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
+    """
+    获取个股上榜统计数据
+    Parameters
+    --------
+        period:int
+                  周期，统计n天以来上榜次数，默认为5天，其余是10、30、60
+        retry_count : int, 默认 3
+                     如遇网络等问题重复执行的次数
+        pause : int, 默认 0
+                    重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    Return
+    ------
+    DataFrame
+        code：代码
+        name：名称
+        count：上榜次数
+        bamount：累积购买额(万)
+        samount：累积卖出额(万)
+        net：净额(万)
+        bcount：买入席位数
+        scount：卖出席位数
+    """
+
+    if isinstance(period, LhbPeriod):
+        ct._write_head()
+        df = _cap_tops(days, page_no=1, retry_count=retry_count,
+                       pause=pause)
+        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
+        if df is not None:
+            df = df.drop_duplicates('code')
+        return df
+    else:
+        TypeError(constants.LHB_MSG)
+
+# def is_lhb_period(period):
+#     return is
+
+
 def request(url):
+    buffer = BytesIO()
     curl = pycurl.Curl()
     curl.setopt(curl.URL, url)
-
-    buffer = BytesIO()
     curl.setopt(curl.WRITEDATA, buffer)
     curl.perform()
     curl.close()
@@ -117,12 +157,13 @@ lhb_url = 'http://data.eastmoney.com/DataCenter_V3/stock2016/TradeDetail/' \
       'startDate=2016-05-12,endDate=2016-05-12,gpfw=0,js=vardata_tab_1.html'
 result = request(lhb_url)
 
-def cap_tops(days= 5, retry_count= 3, pause= 0.001):
+
+def cap_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
     """
     获取个股上榜统计数据
     Parameters
     --------
-        days:int
+        period:int
                   天数，统计n天以来上榜次数，默认为5天，其余是10、30、60
         retry_count : int, 默认 3
                      如遇网络等问题重复执行的次数
@@ -141,23 +182,28 @@ def cap_tops(days= 5, retry_count= 3, pause= 0.001):
         scount：卖出席位数
     """
 
-    if constants._check_lhb_input(days) is True:
-        constants._write_head()
-        data_frame =  _cap_tops(days, pageNo=1, retry_count=retry_count,
-                        pause=pause)
+    # if constants._check_lhb_input(days) is True:
+    if period is True:
+        constants.console_write(constants.DATA_GETTING_TIPS)
+        data_frame = _cap_tops(period, page_no=1, retry_count=retry_count,
+                               pause=pause)
         data_frame['code'] = data_frame['code'].map(lambda x: str(x).zfill(6))
         if data_frame is not None:
             data_frame = data_frame.drop_duplicates('code')
         return data_frame
 
 
-def _cap_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
-    constants._write_console()
+def _cap_tops(period=5, page_no=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
+    constants.console_write(constants.DATA_GETTING_FLAG)
+
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_SINA_URL%(constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[0],
-                                               constants.PAGES['fd'], last, pageNo))
+            url = constants.LHB_SINA_URL_GG % (period, page_no)
+
+            # request = Request(constants.LHB_SINA_URL % (constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[0],
+            #                                             constants.PAGES['fd'], period, page_no))
+
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             html = lxml.html.parse(StringIO(text))
@@ -169,9 +215,10 @@ def _cap_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.DataF
             data_frame.columns = constants.LHB_GGTJ_COLS
             dataArr = dataArr.append(data_frame, ignore_index=True)
             nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
+
             if len(nextPage)>0:
-                pageNo = re.findall(r'\d+', nextPage[0])[0]
-                return _cap_tops(last, pageNo, retry_count, pause, dataArr)
+                page_no = re.findall(r'\d+', nextPage[0])[0]
+                return _cap_tops(period, page_no, retry_count, pause, dataArr)
             else:
                 return dataArr
         except Exception as e:
