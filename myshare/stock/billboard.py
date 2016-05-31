@@ -88,8 +88,8 @@ def top_list(date=None, retry_count=3, pause=0.001):
                 data_frame[col] = data_frame[col].map(constants.two_decimal)
             data_frame = data_frame.drop('turnover', 1)
             return data_frame
-        except:
-            pass
+        except Exception as e:
+            print(e)
         raise IOError(constants.NETWORK_URL_ERROR_MSG)
 
 
@@ -118,7 +118,7 @@ def cap_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
     """
 
     if isinstance(period, LhbPeriod):
-        ct._write_head()
+        constants.console_write(constants.DATA_GETTING_TIPS)
         df = _cap_tops(days, page_no=1, retry_count=retry_count,
                        pause=pause)
         df['code'] = df['code'].map(lambda x: str(x).zfill(6))
@@ -132,19 +132,23 @@ def cap_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
 #     return is
 
 
-def request(url):
+def request(url, encoding='GBK'):
     buffer = BytesIO()
     curl = pycurl.Curl()
     curl.setopt(curl.URL, url)
     curl.setopt(curl.WRITEDATA, buffer)
     curl.perform()
     curl.close()
-    return buffer.getvalue()
+    return buffer.getvalue().decode(encoding)
+
+
+# def request_html(url, encoding='GBK'):
+#     return request(url).decode(encoding)
 
 
 def lhb_info(url):
     # print(url)
-    html = request(url).decode('GBK')
+    html = request(url)
     regex = re.compile('\[.*\]')
     # regex = re.compile('\{.*\}')
     json_content = regex.search(html).group(0)
@@ -193,34 +197,35 @@ def cap_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
         return data_frame
 
 
-def _cap_tops(period=5, page_no=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
+def _cap_tops(period=5, page_no=1, retry_count=3, pause=0.001, data_arr=pandas.DataFrame()):
     constants.console_write(constants.DATA_GETTING_FLAG)
 
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            url = constants.LHB_SINA_URL_GG % (period, page_no)
-
             # request = Request(constants.LHB_SINA_URL % (constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[0],
             #                                             constants.PAGES['fd'], period, page_no))
+            # text = urlopen(request, timeout=10).read()
+            # text = text.decode('GBK')
 
-            text = urlopen(request, timeout=10).read()
-            text = text.decode('GBK')
-            html = lxml.html.parse(StringIO(text))
-            res = html.xpath("//table[@id=\"dataTable\"]/tr")
-            sarr = [etree.tostring(node).decode('utf-8') for node in res]
+            url = constants.LHB_SINA_URL_GG % (period, page_no)
+            response = request(url)
+            tree = lxml.html.document_fromstring(response)
+            nodes = tree.xpath(r'//table[@id="dataTable"]/tr')
+            print(nodes)
+            sarr = [etree.tostring(node).decode('utf-8') for node in nodes]
             sarr = ''.join(sarr)
-            sarr = '<table>%s</table>'%sarr
+            sarr = '<table>%s</table>' % sarr
             data_frame = pandas.read_html(sarr)[0]
             data_frame.columns = constants.LHB_GGTJ_COLS
-            dataArr = dataArr.append(data_frame, ignore_index=True)
-            nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
+            data_arr = data_arr.append(data_frame, ignore_index=True)
+            nextPage = nodes.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
 
             if len(nextPage)>0:
                 page_no = re.findall(r'\d+', nextPage[0])[0]
-                return _cap_tops(period, page_no, retry_count, pause, dataArr)
+                return _cap_tops(period, page_no, retry_count, pause, data_arr)
             else:
-                return dataArr
+                return data_arr
         except Exception as e:
             print(e)
 
