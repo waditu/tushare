@@ -88,8 +88,8 @@ def top_list(date=None, retry_count=3, pause=0.001):
                 data_frame[col] = data_frame[col].map(constants.two_decimal)
             data_frame = data_frame.drop('turnover', 1)
             return data_frame
-        except:
-            pass
+        except Exception as e:
+            print(e)
         raise IOError(constants.NETWORK_URL_ERROR_MSG)
 
 
@@ -118,7 +118,7 @@ def cap_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
     """
 
     if isinstance(period, LhbPeriod):
-        ct._write_head()
+        constants.console_write(constants.DATA_GETTING_TIPS)
         df = _cap_tops(days, page_no=1, retry_count=retry_count,
                        pause=pause)
         df['code'] = df['code'].map(lambda x: str(x).zfill(6))
@@ -128,28 +128,33 @@ def cap_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
     else:
         TypeError(constants.LHB_MSG)
 
+
 # def is_lhb_period(period):
 #     return is
 
 
-def request(url):
+def request(url, encoding='GBK'):
     buffer = BytesIO()
     curl = pycurl.Curl()
     curl.setopt(curl.URL, url)
     curl.setopt(curl.WRITEDATA, buffer)
     curl.perform()
     curl.close()
-    return buffer.getvalue()
+    return buffer.getvalue().decode(encoding)
+
+
+# def request_html(url, encoding='GBK'):
+#     return request(url).decode(encoding)
 
 
 def lhb_info(url):
     # print(url)
-    html = request(url).decode('GBK')
+    html = request(url)
     regex = re.compile('\[.*\]')
     # regex = re.compile('\{.*\}')
     json_content = regex.search(html).group(0)
     stock_info = json.loads(json_content)
-    print(stock_info)
+    # print(stock_info)
     return stock_info
 
 lhb_url = 'http://data.eastmoney.com/DataCenter_V3/stock2016/TradeDetail/' \
@@ -158,7 +163,7 @@ lhb_url = 'http://data.eastmoney.com/DataCenter_V3/stock2016/TradeDetail/' \
 result = request(lhb_url)
 
 
-def cap_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
+def stock_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
     """
     获取个股上榜统计数据
     Parameters
@@ -193,36 +198,71 @@ def cap_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
         return data_frame
 
 
-def _cap_tops(period=5, page_no=1, retry_count=3, pause=0.001, dataArr=pandas.DataFrame()):
+# def _cap_tops(period=5, page_no=1, retry_count=3, pause=0.001, data_arr=pandas.DataFrame()):
+#     constants.console_write(constants.DATA_GETTING_FLAG)
+#
+#     for _ in range(retry_count):
+#         time.sleep(pause)
+#         try:
+#             # request = Request(constants.LHB_SINA_URL % (constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[0],
+#             #                                             constants.PAGES['fd'], period, page_no))
+#             # text = urlopen(request, timeout=10).read()
+#             # text = text.decode('GBK')
+#
+#             url = constants.LHB_SINA_URL_GG % (period, page_no)
+#             response = request(url)
+#             doc = lxml.html.document_fromstring(response)
+#             nodes = doc.xpath(r'//table[@id="dataTable"]/tr')
+#             print(nodes)
+#             lhb_data = [etree.tostring(node).decode('utf-8') for node in nodes]
+#
+#             # for node in nodes:
+#             #     print(node)
+#
+#             lhb_data = ''.join(lhb_data)
+#             lhb_data = '<table>%s</table>' % lhb_data
+#             data_frame = pandas.read_html(lhb_data)[0]
+#             data_frame.columns = constants.LHB_GGTJ_COLS
+#             data_arr = data_arr.append(data_frame, ignore_index=True)
+#             pages = doc.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
+#
+#             print(pages)
+#
+#             if len(pages)>0:
+#                 page_no = re.findall(r'\d+', pages[0])[0]
+#                 return _cap_tops(period, page_no, retry_count, pause, data_arr)
+#             else:
+#                 return data_arr
+#         except Exception as e:
+#             print(e)
+
+
+def stock_tops_page(period=5, page_no=1):
     constants.console_write(constants.DATA_GETTING_FLAG)
+    try:
+        url = constants.LHB_SINA_URL_GG % (period, page_no)
+        html = request(url)
+        # regex = re.search('<table>(<tr>.*</tr>)</table>', html)
+        match_object = re.search('table', html)
+        print(match_object)
+        # doc = lxml.html.document_fromstring(response)
+        # nodes = doc.xpath(r'//table[@id="dataTable"]/tr')
+        # print(nodes)
+        # lhb_data = [etree.tostring(node).decode('utf-8') for node in nodes]
 
-    for _ in range(retry_count):
-        time.sleep(pause)
-        try:
-            url = constants.LHB_SINA_URL_GG % (period, page_no)
+        # for node in nodes:
+        #     print(node)
 
-            # request = Request(constants.LHB_SINA_URL % (constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[0],
-            #                                             constants.PAGES['fd'], period, page_no))
-
-            text = urlopen(request, timeout=10).read()
-            text = text.decode('GBK')
-            html = lxml.html.parse(StringIO(text))
-            res = html.xpath("//table[@id=\"dataTable\"]/tr")
-            sarr = [etree.tostring(node).decode('utf-8') for node in res]
-            sarr = ''.join(sarr)
-            sarr = '<table>%s</table>'%sarr
-            data_frame = pandas.read_html(sarr)[0]
-            data_frame.columns = constants.LHB_GGTJ_COLS
-            dataArr = dataArr.append(data_frame, ignore_index=True)
-            nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
-
-            if len(nextPage)>0:
-                page_no = re.findall(r'\d+', nextPage[0])[0]
-                return _cap_tops(period, page_no, retry_count, pause, dataArr)
-            else:
-                return dataArr
-        except Exception as e:
-            print(e)
+        # lhb_data = ''.join(lhb_data)
+        lhb_data = '<table>%s</table>' % lhb_data
+        print(lhb_data)
+        # data_frame = pandas.read_html(lhb_data)[0]
+        # data_frame.columns = constants.LHB_GGTJ_COLS
+        # print(data_frame)
+        # data_arr = data_arr.append(data_frame, ignore_index=True)
+        # pages = doc.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
+    except Exception as e:
+        print(e)
 
 
 def broker_tops(days= 5, retry_count= 3, pause= 0.001):
