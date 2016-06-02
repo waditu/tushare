@@ -296,10 +296,9 @@ def _cap_tops(period=5, page_no=1, retry_count=3, pause=0.001, data_arr=pandas.D
                 return data_arr
         except Exception as e:
             print(e)
->>>>>>> 8425bc80839451a8ccc0c1b40958f8df19c88af2
 
 
-def broker_tops(days= 5, retry_count= 3, pause= 0.001):
+def broker_tops(days=5, retry_count=3, pause=0.001):
     """
     获取营业部上榜统计数据
     Parameters
@@ -332,7 +331,7 @@ def _broker_tops(last=5, pageNo=1, retry_count=3, pause=0.001, dataArr=pandas.Da
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(rv.LHB_SINA_URL%(constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[1],
+            request = Request(rv.LHB_SINA_URL % (constants.PROTOCOLS['http'], constants.DOMAINS['vsf'], rv.LHB_KINDS[1],
                                                constants.PAGES['fd'], last, pageNo))
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
