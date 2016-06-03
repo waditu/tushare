@@ -15,15 +15,15 @@ import json
 import lxml.html
 from lxml import etree
 import pandas
-import pycurl
+from myshare.util import net
 import time
 import re
 
 
-MinutesKLineType = Enum('KLineType', 'day, week, month, five_minutes, fifteen_minutes, thirty_minutes, sixty_minutes')
+# MinutesKLineType = Enum('KLineType', 'day, week, month, five_minutes, fifteen_minutes, thirty_minutes, sixty_minutes')
 
 
-def get_history_data(code=None, start=None, end=None, k_line=KLineType.day, retry_count=3, pause=0.001):
+def get_history_data(code=None, start=None, end=None, k_line='day', retry_count=3, pause=0.001):
     """
         获取个股历史交易记录
     Parameters
@@ -46,50 +46,58 @@ def get_history_data(code=None, start=None, end=None, k_line=KLineType.day, retr
           属性:日期 ，开盘价， 最高价， 收盘价， 最低价， 成交量， 价格变动 ，涨跌幅，5日均价，10日均价，20日均价，5日均量，10日均量，20日均量，换手率
     """
     symbol = _code_to_symbol(code)
-    url = ''
-    if k_line.upper() in constants.K_LABELS:
-        url = constants.DAY_PRICE_URL % (constants.P_TYPE['http'], constants.DOMAINS['ifeng'],
-                                constants.K_TYPE[k_line.upper()], symbol)
-    elif k_line in constants.K_MIN_LABELS:
-        url = constants.DAY_PRICE_MIN_URL%(constants.P_TYPE['http'], constants.DOMAINS['ifeng'],
-                                    symbol, k_line)
+    k_line = k_line.lower()
+    _is_minutes_k_line = is_minutes_k_line(k_line)
+
+    if _is_minutes_k_line:
+        url = constants.DAY_PRICE_URL % (constants.K_TYPE[k_line], symbol)
     else:
-        raise TypeError('k_line input error.')
+        url = constants.DAY_PRICE_MIN_URL % (symbol, k_line)
     
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            request = Request(url)
-            lines = urlopen(request, timeout = 10).read()
-            if len(lines) < 15: #no data
+            html = net.request(url, 'utf-8')
+            if len(html) < 15: #no data
                 return None
         except Exception as e:
             print(e)
         else:
-            js = json.loads(lines.decode('utf-8') if constants.PY3 else lines)
-            cols = []
-            if (code in constants.INDEX_LABELS) & (k_line.upper() in constants.K_LABELS):
-                cols = constants.INX_DAY_PRICE_COLUMNS
-            else:
-                cols = constants.DAY_PRICE_COLUMNS
-            if len(js['record'][0]) == 14:
-                cols = constants.INX_DAY_PRICE_COLUMNS
-            df = pd.DataFrame(js['record'], columns=cols)
-            if k_line.upper() in ['D', 'W', 'M']:
-                df = df.applymap(lambda x: x.replace(u',', u''))
-                df[df==''] = 0
+            _json = json.loads(html)
+
+            cols = constants.DAY_PRICE_COLUMNS
+
+            if len(_json['record'][0]) == 14 | (code in constants.INDEX_LABELS & (not _is_minutes_k_line)):
+                # remove column turnover
+                cols = cols[:-1]
+
+            data_frame = pandas.DataFrame(_json['record'], columns=cols)
+
+            if not _is_minutes_k_line:
+                data_frame = data_frame.applymap(lambda x: x.replace(u',', u''))
+                data_frame[data_frame == ''] = 0
+
             for col in cols[1:]:
-                df[col] = df[col].astype(float)
+                data_frame[col] = data_frame[col].astype(float)
             if start is not None:
-                df = df[df.date >= start]
+                data_frame = data_frame[data_frame.date >= start]
             if end is not None:
-                df = df[df.date <= end]
+                data_frame = data_frame[data_frame.date <= end]
             if (code in constants.INDEX_LABELS) & (k_line in constants.K_MIN_LABELS):
-                df = df.drop('turnover', axis=1)
-            df = df.set_index('date')
-            df = df.sort_index(ascending = False)
-            return df
+                data_frame = data_frame.drop('turnover', axis=1)
+            data_frame = data_frame.set_index('date')
+            data_frame = data_frame.sort_index(ascending=False)
+            return data_frame
     raise IOError(constants.NETWORK_URL_ERROR_MSG)
+
+
+def is_minutes_k_line(k_line):
+    k_line = k_line.lower()
+    if k_line in constants.MINUTE_K_TYPE():
+        return True
+    if k_line in constants.K_TYPE.keys():
+        return False
+    raise TypeError('k_line type error.')
 
 
 def _parsing_dayprice_json(pageNum=1):

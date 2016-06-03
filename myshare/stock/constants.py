@@ -9,8 +9,8 @@ import sys
 
 VERSION = '0.3.6'
 K_LABELS = ['D', 'W', 'M']
-K_MINUTE_LABELS = ['5', '15', '30', '60']
-K_TYPE = {'D': 'akdaily', 'W': 'akweekly', 'M': 'akmonthly'}
+MINUTE_K_TYPE = ['5', '15', '30', '60']
+K_TYPE = {'day': 'akdaily', 'week': 'akweekly', 'month': 'akmonthly'}
 INDEX_LABELS = ['sh', 'sz', 'hs300', 'sz50', 'cyb', 'zxb', 'zx300', 'zh500']
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006', 'zx300': 'sz399008', 'zh500':'sh000905'}
@@ -68,9 +68,9 @@ TICK_PRICE_URL = '%smarket.%s/%s?date=%s&symbol=%s'
 TODAY_TICKS_PAGE_URL = '%s%s/quotes_service/api/%s/CN_Transactions.getAllPageTime?date=%s&symbol=%s'
 TODAY_TICKS_URL = '%s%s/quotes_service/view/%s?symbol=%s&date=%s&page=%s'
 # DAY_PRICE_URL = '%sapi.finance.%s/%s/?code=%s&type=last'
-DAY_PRICE_URL = 'http://api.finance.%s/%s/?code=%s&type=last'
+DAY_PRICE_URL = 'http://api.finance.ifeng.com/%s/?code=%s&type=last'
+DAY_PRICE_MIN_URL = 'http://api.finance.ifeng.com/akmin?scode=%s&type=%s'
 LIVE_DATA_URL = '%shq.%s/rn=%s&list=%s'
-DAY_PRICE_MIN_URL = '%sapi.finance.%s/akmin?scode=%s&type=%s'
 SINA_DAY_PRICE_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?num=80&sort=changepercent&asc=0&node=hs_a&symbol=&_s_r_a=page&page=%s'
 REPORT_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/mainindex/%s?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=%s'
 FORECAST_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/performance/%s?s_i=&s_a=&s_c=&s_type=&reportdate=%s&quarter=%s&p=%s&num=%s'

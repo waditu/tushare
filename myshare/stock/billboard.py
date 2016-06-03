@@ -17,7 +17,6 @@ import time
 import json
 import re
 import lxml.html
-import pycurl
 from lxml import etree
 from myshare.util import date_helper
 from enum import Enum
@@ -133,14 +132,6 @@ def cap_tops(period=LhbPeriod.five, retry_count=3, pause=0.001):
 #     return is
 
 
-def request(url, encoding='GBK'):
-    buffer = BytesIO()
-    curl = pycurl.Curl()
-    curl.setopt(curl.URL, url)
-    curl.setopt(curl.WRITEDATA, buffer)
-    curl.perform()
-    curl.close()
-    return buffer.getvalue().decode(encoding)
 
 
 # def request_html(url, encoding='GBK'):
