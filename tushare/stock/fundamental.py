@@ -157,7 +157,7 @@ def _get_profit_data(year, quarter, pageNo, dataArr, orderby):
     try:
         request = Request(ct.PROFIT_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                            ct.PAGES['fd'], year,
-                                           quarter, pageNo, ct.PAGE_NUM[1]),orderby)
+                                           quarter, pageNo, ct.PAGE_NUM[1], orderby))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('--', '')
@@ -220,7 +220,7 @@ def _get_operation_data(year, quarter, pageNo, dataArr, orderby):
     try:
         request = Request(ct.OPERATION_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                               ct.PAGES['fd'], year,
-                                              quarter, pageNo, ct.PAGE_NUM[1]), orderby)
+                                              quarter, pageNo, ct.PAGE_NUM[1], orderby))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('--', '')
@@ -282,7 +282,7 @@ def _get_growth_data(year, quarter, pageNo, dataArr, orderby):
     try:
         request = Request(ct.GROWTH_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                            ct.PAGES['fd'], year,
-                                           quarter, pageNo, ct.PAGE_NUM[1]), orderby)
+                                           quarter, pageNo, ct.PAGE_NUM[1], orderby))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('--', '')
@@ -344,7 +344,7 @@ def _get_debtpaying_data(year, quarter, pageNo, dataArr, orderby):
     try:
         request = Request(ct.DEBTPAYING_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                ct.PAGES['fd'], year,
-                                               quarter, pageNo, ct.PAGE_NUM[1]), orderby)
+                                               quarter, pageNo, ct.PAGE_NUM[1], orderby))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         html = lxml.html.parse(StringIO(text))
@@ -404,7 +404,7 @@ def _get_cashflow_data(year, quarter, pageNo, dataArr, orderby):
     try:
         request = Request(ct.CASHFLOW_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                              ct.PAGES['fd'], year,
-                                             quarter, pageNo, ct.PAGE_NUM[1]), orderby)
+                                             quarter, pageNo, ct.PAGE_NUM[1], orderby))
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('--', '')
