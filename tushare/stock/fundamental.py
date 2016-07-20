@@ -12,10 +12,12 @@ import lxml.html
 from lxml import etree
 import re
 from pandas.compat import StringIO
+
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
+
 
 def get_stock_basics():
     """
@@ -44,20 +46,20 @@ def get_stock_basics():
     text = urlopen(request, timeout=10).read()
     text = text.decode('GBK')
     text = text.replace('--', '')
-    df = pd.read_csv(StringIO(text), dtype={'code':'object'})
+    df = pd.read_csv(StringIO(text), dtype={'code': 'object'})
     df = df.set_index('code')
     return df
 
 
-def get_report_data(year, quarter):
+def get_report_data(year, quarter, orderby='default'):
     """
         获取业绩报表数据
     Parameters
     --------
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
-       说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
-       
+    orderby:str 默认以股票代码排序 排序方式: 'code', 'eps','bvps','roe','epcf','net_profits'
+           说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
     Return
     --------
     DataFrame
@@ -73,20 +75,23 @@ def get_report_data(year, quarter):
         distrib,分配方案
         report_date,发布日期
     """
-    if ct._check_input(year,quarter) is True:
+    # print ("This new code @2016/07/20")
+    orderby = ct._check_orderby(orderby, ct.REPORT_ORDERBY)
+    if ct._check_input(year, quarter) is True:
         ct._write_head()
-        df =  _get_report_data(year, quarter, 1, pd.DataFrame())
+        df = _get_report_data(year, quarter, 1, pd.DataFrame(), orderby)
         if df is not None:
-#             df = df.drop_duplicates('code')
-            df['code'] = df['code'].map(lambda x:str(x).zfill(6))
+            #             df = df.drop_duplicates('code')
+            df['code'] = df['code'].map(lambda x: str(x).zfill(6))
         return df
 
 
-def _get_report_data(year, quarter, pageNo, dataArr):
+def _get_report_data(year, quarter, pageNo, dataArr, orderby):
     ct._write_console()
     try:
-        request = Request(ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
-                         year, quarter, pageNo, ct.PAGE_NUM[1]))
+        request = Request(ct.REPORT_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
+                                           year, quarter, pageNo, ct.PAGE_NUM[1], orderby))
+        # 默认排序抓取的信息有重复和遗漏,增加排序功能参数orderby
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('--', '')
@@ -97,28 +102,30 @@ def _get_report_data(year, quarter, pageNo, dataArr):
         else:
             sarr = [etree.tostring(node) for node in res]
         sarr = ''.join(sarr)
-        sarr = '<table>%s</table>'%sarr
+        sarr = '<table>%s</table>' % sarr
         df = pd.read_html(sarr)[0]
         df = df.drop(11, axis=1)
         df.columns = ct.REPORT_COLS
         dataArr = dataArr.append(df, ignore_index=True)
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
-        if len(nextPage)>0:
+        if len(nextPage) > 0:
             pageNo = re.findall(r'\d+', nextPage[0])[0]
-            return _get_report_data(year, quarter, pageNo, dataArr)
+            return _get_report_data(year, quarter, pageNo, dataArr,orderby)
         else:
             return dataArr
     except Exception as e:
         print(e)
 
 
-def get_profit_data(year, quarter):
+def get_profit_data(year, quarter, orderby='default'):
     """
         获取盈利能力数据
     Parameters
     --------
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
+    orderby:str 默认以净资产收益率排序 排序方式: 'roe', 'net_profit_ratio','gross_profit_rate','net_profits',
+                                            'eps','business_income', 'bips'
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
        
     Return
@@ -134,21 +141,23 @@ def get_profit_data(year, quarter):
         business_income,营业收入(百万元)
         bips,每股主营业务收入(元)
     """
+    orderby = ct._check_orderby(orderby, ct.PROFIT_ORDERBY)
+
     if ct._check_input(year, quarter) is True:
         ct._write_head()
-        data =  _get_profit_data(year, quarter, 1, pd.DataFrame())
+        data = _get_profit_data(year, quarter, 1, pd.DataFrame(), orderby)
         if data is not None:
-#             data = data.drop_duplicates('code')
-            data['code'] = data['code'].map(lambda x:str(x).zfill(6))
+            #             data = data.drop_duplicates('code')
+            data['code'] = data['code'].map(lambda x: str(x).zfill(6))
         return data
 
 
-def _get_profit_data(year, quarter, pageNo, dataArr):
+def _get_profit_data(year, quarter, pageNo, dataArr, orderby):
     ct._write_console()
     try:
-        request = Request(ct.PROFIT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                              ct.PAGES['fd'], year,
-                                              quarter, pageNo, ct.PAGE_NUM[1]))
+        request = Request(ct.PROFIT_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                           ct.PAGES['fd'], year,
+                                           quarter, pageNo, ct.PAGE_NUM[1]),orderby)
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('--', '')
@@ -159,27 +168,29 @@ def _get_profit_data(year, quarter, pageNo, dataArr):
         else:
             sarr = [etree.tostring(node) for node in res]
         sarr = ''.join(sarr)
-        sarr = '<table>%s</table>'%sarr
+        sarr = '<table>%s</table>' % sarr
         df = pd.read_html(sarr)[0]
-        df.columns=ct.PROFIT_COLS
+        df.columns = ct.PROFIT_COLS
         dataArr = dataArr.append(df, ignore_index=True)
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
-        if len(nextPage)>0:
+        if len(nextPage) > 0:
             pageNo = re.findall(r'\d+', nextPage[0])[0]
-            return _get_profit_data(year, quarter, pageNo, dataArr)
+            return _get_profit_data(year, quarter, pageNo, dataArr, orderby)
         else:
             return dataArr
     except:
         pass
 
 
-def get_operation_data(year, quarter):
+def get_operation_data(year, quarter, orderby='default'):
     """
         获取营运能力数据
     Parameters
     --------
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
+    orderby:str 默认以应收账款周转率 排序方式:'arturnover','arturndays','inventory_turnover','inventory_days',
+                                            'currentasset_turnover','currentasset_days'
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
        
     Return
@@ -194,21 +205,22 @@ def get_operation_data(year, quarter):
         currentasset_turnover,流动资产周转率(次)
         currentasset_days,流动资产周转天数(天)
     """
+    orderby = ct._check_orderby(orderby, ct.REPORT_ORDERBY)
     if ct._check_input(year, quarter) is True:
         ct._write_head()
-        data =  _get_operation_data(year, quarter, 1, pd.DataFrame())
+        data = _get_operation_data(year, quarter, 1, pd.DataFrame(), orderby)
         if data is not None:
-#             data = data.drop_duplicates('code')
-            data['code'] = data['code'].map(lambda x:str(x).zfill(6))
+            #             data = data.drop_duplicates('code')
+            data['code'] = data['code'].map(lambda x: str(x).zfill(6))
         return data
 
 
-def _get_operation_data(year, quarter, pageNo, dataArr):
+def _get_operation_data(year, quarter, pageNo, dataArr, orderby):
     ct._write_console()
     try:
-        request = Request(ct.OPERATION_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                                 ct.PAGES['fd'], year,
-                                                 quarter, pageNo, ct.PAGE_NUM[1]))
+        request = Request(ct.OPERATION_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                              ct.PAGES['fd'], year,
+                                              quarter, pageNo, ct.PAGE_NUM[1]), orderby)
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('--', '')
@@ -219,27 +231,28 @@ def _get_operation_data(year, quarter, pageNo, dataArr):
         else:
             sarr = [etree.tostring(node) for node in res]
         sarr = ''.join(sarr)
-        sarr = '<table>%s</table>'%sarr
+        sarr = '<table>%s</table>' % sarr
         df = pd.read_html(sarr)[0]
-        df.columns=ct.OPERATION_COLS
+        df.columns = ct.OPERATION_COLS
         dataArr = dataArr.append(df, ignore_index=True)
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
-        if len(nextPage)>0:
+        if len(nextPage) > 0:
             pageNo = re.findall(r'\d+', nextPage[0])[0]
-            return _get_operation_data(year, quarter, pageNo, dataArr)
+            return _get_operation_data(year, quarter, pageNo, dataArr, orderby)
         else:
             return dataArr
     except Exception as e:
         print(e)
 
 
-def get_growth_data(year, quarter):
+def get_growth_data(year, quarter, orderby='default'):
     """
         获取成长能力数据
     Parameters
     --------
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
+    orderby:str 默认以主营业务收入增长率 排序方式:'mbrg','nprg','nav','targ'
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
        
     Return
@@ -254,21 +267,22 @@ def get_growth_data(year, quarter):
         epsg,每股收益增长率
         seg,股东权益增长率
     """
+    orderby = ct._check_orderby(orderby,ct.GROWTH_ORDERBY)
     if ct._check_input(year, quarter) is True:
         ct._write_head()
-        data =  _get_growth_data(year, quarter, 1, pd.DataFrame())
+        data = _get_growth_data(year, quarter, 1, pd.DataFrame(),orderby)
         if data is not None:
-#             data = data.drop_duplicates('code')
-            data['code'] = data['code'].map(lambda x:str(x).zfill(6))
+            #             data = data.drop_duplicates('code')
+            data['code'] = data['code'].map(lambda x: str(x).zfill(6))
         return data
 
 
-def _get_growth_data(year, quarter, pageNo, dataArr):
+def _get_growth_data(year, quarter, pageNo, dataArr, orderby):
     ct._write_console()
     try:
-        request = Request(ct.GROWTH_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                              ct.PAGES['fd'], year,
-                                              quarter, pageNo, ct.PAGE_NUM[1]))
+        request = Request(ct.GROWTH_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                           ct.PAGES['fd'], year,
+                                           quarter, pageNo, ct.PAGE_NUM[1]), orderby)
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('--', '')
@@ -279,27 +293,28 @@ def _get_growth_data(year, quarter, pageNo, dataArr):
         else:
             sarr = [etree.tostring(node) for node in res]
         sarr = ''.join(sarr)
-        sarr = '<table>%s</table>'%sarr
+        sarr = '<table>%s</table>' % sarr
         df = pd.read_html(sarr)[0]
-        df.columns=ct.GROWTH_COLS
+        df.columns = ct.GROWTH_COLS
         dataArr = dataArr.append(df, ignore_index=True)
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
-        if len(nextPage)>0:
+        if len(nextPage) > 0:
             pageNo = re.findall(r'\d+', nextPage[0])[0]
-            return _get_growth_data(year, quarter, pageNo, dataArr)
+            return _get_growth_data(year, quarter, pageNo, dataArr,orderby)
         else:
             return dataArr
     except Exception as e:
         print(e)
 
 
-def get_debtpaying_data(year, quarter):
+def get_debtpaying_data(year, quarter, orderby='default'):
     """
         获取偿债能力数据
     Parameters
     --------
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
+    orderby:str 默认以流动比率 排序方式:'currentratio','quickratio','cashratio','icratio','sheqratio'
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
        
     Return
@@ -314,21 +329,22 @@ def get_debtpaying_data(year, quarter):
         sheqratio,股东权益比率
         adratio,股东权益增长率
     """
+    orderby = ct._check_orderby(orderby, ct.DEBTPAYING_ORDERBY)
     if ct._check_input(year, quarter) is True:
         ct._write_head()
-        df =  _get_debtpaying_data(year, quarter, 1, pd.DataFrame())
+        df = _get_debtpaying_data(year, quarter, 1, pd.DataFrame(), orderby)
         if df is not None:
-#             df = df.drop_duplicates('code')
-            df['code'] = df['code'].map(lambda x:str(x).zfill(6))
+            #             df = df.drop_duplicates('code')
+            df['code'] = df['code'].map(lambda x: str(x).zfill(6))
         return df
 
 
-def _get_debtpaying_data(year, quarter, pageNo, dataArr):
+def _get_debtpaying_data(year, quarter, pageNo, dataArr, orderby):
     ct._write_console()
     try:
-        request = Request(ct.DEBTPAYING_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                                  ct.PAGES['fd'], year,
-                                                  quarter, pageNo, ct.PAGE_NUM[1]))
+        request = Request(ct.DEBTPAYING_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                               ct.PAGES['fd'], year,
+                                               quarter, pageNo, ct.PAGE_NUM[1]), orderby)
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         html = lxml.html.parse(StringIO(text))
@@ -338,27 +354,28 @@ def _get_debtpaying_data(year, quarter, pageNo, dataArr):
         else:
             sarr = [etree.tostring(node) for node in res]
         sarr = ''.join(sarr)
-        sarr = '<table>%s</table>'%sarr
+        sarr = '<table>%s</table>' % sarr
         df = pd.read_html(sarr)[0]
         df.columns = ct.DEBTPAYING_COLS
         dataArr = dataArr.append(df, ignore_index=True)
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
-        if len(nextPage)>0:
+        if len(nextPage) > 0:
             pageNo = re.findall(r'\d+', nextPage[0])[0]
-            return _get_debtpaying_data(year, quarter, pageNo, dataArr)
+            return _get_debtpaying_data(year, quarter, pageNo, dataArr, orderby)
         else:
             return dataArr
     except Exception as e:
         print(e)
- 
- 
-def get_cashflow_data(year, quarter):
+
+
+def get_cashflow_data(year, quarter, orderby='default'):
     """
         获取现金流量数据
     Parameters
     --------
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
+    orderby:str 默认以流动比率 排序方式:'cf_sales','rateofreturn','cf_nm','cf_liabilities','cashflowratio'
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
        
     Return
@@ -372,21 +389,22 @@ def get_cashflow_data(year, quarter):
         cf_liabilities,经营现金净流量对负债比率
         cashflowratio,现金流量比率
     """
+    orderby = ct._check_orderby(orderby, ct.CASHFLOW_ORDERBY)
     if ct._check_input(year, quarter) is True:
         ct._write_head()
-        df =  _get_cashflow_data(year, quarter, 1, pd.DataFrame())
+        df = _get_cashflow_data(year, quarter, 1, pd.DataFrame(), orderby)
         if df is not None:
-#             df = df.drop_duplicates('code')
-            df['code'] = df['code'].map(lambda x:str(x).zfill(6))
+            #             df = df.drop_duplicates('code')
+            df['code'] = df['code'].map(lambda x: str(x).zfill(6))
         return df
 
 
-def _get_cashflow_data(year, quarter, pageNo, dataArr):
+def _get_cashflow_data(year, quarter, pageNo, dataArr, orderby):
     ct._write_console()
     try:
-        request = Request(ct.CASHFLOW_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                                ct.PAGES['fd'], year,
-                                                quarter, pageNo, ct.PAGE_NUM[1]))
+        request = Request(ct.CASHFLOW_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                             ct.PAGES['fd'], year,
+                                             quarter, pageNo, ct.PAGE_NUM[1]), orderby)
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('--', '')
@@ -397,24 +415,23 @@ def _get_cashflow_data(year, quarter, pageNo, dataArr):
         else:
             sarr = [etree.tostring(node) for node in res]
         sarr = ''.join(sarr)
-        sarr = '<table>%s</table>'%sarr
+        sarr = '<table>%s</table>' % sarr
         df = pd.read_html(sarr)[0]
         df.columns = ct.CASHFLOW_COLS
         dataArr = dataArr.append(df, ignore_index=True)
         nextPage = html.xpath('//div[@class=\"pages\"]/a[last()]/@onclick')
-        if len(nextPage)>0:
+        if len(nextPage) > 0:
             pageNo = re.findall(r'\d+', nextPage[0])[0]
-            return _get_cashflow_data(year, quarter, pageNo, dataArr)
+            return _get_cashflow_data(year, quarter, pageNo, dataArr, orderby)
         else:
             return dataArr
     except Exception as e:
         print(e)
-       
-       
+
+
 def _data_path():
     import os
     import inspect
-    caller_file = inspect.stack()[1][1]  
+    caller_file = inspect.stack()[1][1]
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
-
