@@ -24,7 +24,7 @@ install:
   - conda info -a
     
 before_script:
-  - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy pandas matplotlib lxml
+  #- conda install --yes python=$TRAVIS_PYTHON_VERSION numpy scipy pandas matplotlib lxml
   - python setup.py install
   
 script:
