@@ -44,29 +44,8 @@ def get_stock_basics():
     text = urlopen(request, timeout=10).read()
     text = text.decode('GBK')
     text = text.replace('--', '')
-    # Temp Code START
-    mapping = {
-        '代码': 'code',
-        '名称': 'name',
-        '细分行业': 'industry',
-        '地区': 'area',
-        '市盈(动)': 'pe',
-        '流通股本(万)': 'outstanding',
-        '总股本(万)': 'totals',
-        '总资产(万)': 'totalAssets',
-        '流动资产': 'liquidAssets',
-        '固定资产': 'fixedAssets',
-        '公积金': 'reserved',
-        '每股公积': 'reservedPerShare',
-        '每股收益': 'esp',
-        '每股净资': 'bvps',
-        '市净率': 'pb',
-        '上市日期': 'timeToMarket',
-    }
     df = pd.read_csv(StringIO(text), dtype={'代码':'object'})
-    df.rename(columns=mapping, inplace = True)
-    #df = pd.read_csv(StringIO(text), dtype={'code':'object'})
-    # Temp Code  END
+    df.rename(columns=ct.STOCK_BASICS_REP_COLS, inplace = True)
     df = df.set_index('code')
     return df
 
