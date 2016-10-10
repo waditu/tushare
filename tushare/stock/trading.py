@@ -407,6 +407,8 @@ def get_h_data(code, start=None, end=None, autype='qfq',
     ct._write_head()
     data = _parse_fq_data(_get_index_url(index, code, qt), index,
                           retry_count, pause)
+    if data is None:
+        data = pd.DataFrame()
     if len(qs)>1:
         for d in range(1, len(qs)):
             qt = qs[d]
@@ -525,6 +527,8 @@ def _parse_fq_data(url, index, retry_count, pause):
             else:
                 sarr = [etree.tostring(node) for node in res]
             sarr = ''.join(sarr)
+            if sarr == '':
+                return None
             df = pd.read_html(sarr, skiprows = [0, 1])[0]
             if len(df) == 0:
                 return pd.DataFrame()
@@ -628,3 +632,4 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
+        
