@@ -20,6 +20,9 @@ from tushare.util import upass as up
 class TraderAPI(object):
     """
     股票实盘交易接口
+    提醒：本文涉及的思路和内容仅限于量化投资及程序化交易的研究与尝试，不作为个人或机构常规程序化交易的依据，
+    不对实盘的交易风险和政策风险产生的影响负责，如有问题请与我联系。
+    投资有风险，下单须谨慎。
     """
     def __init__(self, broker = ''):
         if broker == '':
