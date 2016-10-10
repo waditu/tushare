@@ -29,11 +29,11 @@ CSC_LOGIN_ACTION = '%s%s/j_spring_security_check'
 BASE_URL = '%s%s/mainHomePage/%s'
 TRADE_CHECK_URL = '%s%s/trading/%s?bsflag=%s&stkcode=%s&buyflag=%s&price=0&_=%d'
 ENTRUST_LIST_URL = '%s%s/securityfind/%s?_=%s'
-ENTRUST_LIST_COLS = ['ordersno', 'stkcode', 'stkname', 'bsflagState', 'orderqty', 'orderprice', 'operdate', 'opertime', 'orderdate']
+ENTRUST_LIST_COLS = ['ordersno', 'stkcode', 'stkname', 'bsflagState', 'orderqty', 'matchqty', 'orderprice', 'operdate', 'opertime', 'orderdate', 'state']
 TRADE_URL = '%s%s/trading/%s'
 CANCEL_URL = '%s%s/securityfind/%s'
 DEAL_LIST_URL = '%s%s/securityfind/%s?selectType=%s%s&_=%d'
 DEAL_DATE_RANGE = '&beginDate=%s&endDate=%s'
-DEAL_LIST_COLS = ['trddate', 'matchtime',  'stkcode', 'stkname', 'bsflagState', 'orderprice', 'matchprice', 'orderqty', 'matchqty', 'matchamt']
+DEAL_LIST_COLS = ['ordersno', 'matchcode', 'trddate', 'matchtime',  'stkcode', 'stkname', 'bsflagState', 'orderprice', 'matchprice', 'orderqty', 'matchqty', 'matchamt']
 BUY = '买入'
 SELL = '卖出'
