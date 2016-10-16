@@ -16,7 +16,6 @@ BK = 'bk'
 def set_token(token):
     df = pd.DataFrame([token], columns=['token'])
     df.to_csv(ct.TOKEN_F_P, index=False)
-    df.to_h
     
     
 def get_token():
