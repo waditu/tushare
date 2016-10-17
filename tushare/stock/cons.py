@@ -6,7 +6,7 @@ Created on 2014/07/31
 @contact: jimmysoa@sina.cn
 """
 
-VERSION = '0.3.6'
+VERSION = '0.5.1'
 K_LABELS = ['D', 'W', 'M']
 K_MIN_LABELS = ['5', '15', '30', '60']
 K_TYPE = {'D': 'akdaily', 'W': 'akweekly', 'M': 'akmonthly'}

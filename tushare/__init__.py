@@ -1,4 +1,4 @@
-__version__ = '0.5.1'
+__version__ = '0.5.2'
 __author__ = 'Jimmy Liu'
 
 """
@@ -94,3 +94,9 @@ from tushare.fund.nav import (get_nav_open, get_nav_close, get_nav_grading,
 for trader API
 """
 from tushare.trader.trader import TraderAPI
+
+
+"""
+for futures API
+"""
+from tushare.futures.intlfutures import (get_intlfuture)
