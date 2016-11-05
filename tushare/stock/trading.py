@@ -595,6 +595,89 @@ def _get_index_url(index, code, qt):
     return url
 
 
+def get_k_data(code=None, start='', end='',
+                  ktype='D', autype='qfq', 
+                  index=False,
+                  retry_count=3,
+                  pause=0.001):
+    """
+    获取k线数据
+    ---------
+    Parameters:
+      code:string
+                  股票代码 e.g. 600848
+      start:string
+                  开始日期 format：YYYY-MM-DD 为空时取当前日期
+      end:string
+                  结束日期 format：YYYY-MM-DD 为空时取去年今日
+      autype:string
+                  复权类型，qfq-前复权 hfq-后复权 None-不复权，默认为qfq
+      ktype：string
+                  数据类型，D=日k线 W=周 M=月 5=5分钟 15=15分钟 30=30分钟 60=60分钟，默认为D
+      retry_count : int, 默认 3
+                 如遇网络等问题重复执行的次数 
+      pause : int, 默认 0
+                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+      drop_factor : bool, 默认 True
+                是否移除复权因子，在分析过程中可能复权因子意义不大，但是如需要先储存到数据库之后再分析的话，有该项目会更加灵活
+    return
+    -------
+      DataFrame
+          date 交易日期 (index)
+          open 开盘价
+          high  最高价
+          close 收盘价
+          low 最低价
+          volume 成交量
+          code 股票代码
+    """
+    symbol = ct.INDEX_SYMBOL[code] if index else _code_to_symbol(code)
+    url = ''
+    dataflag = ''
+    if ktype.upper() in ct.K_LABELS:
+        fq = autype if autype is not None else ''
+        if code[:1] in ('1', '5') or index:
+            fq = ''
+        kline = '' if autype is None else 'fq'
+        url = ct.KLINE_TT_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
+                                kline, fq, symbol, 
+                                ct.TT_K_TYPE[ktype.upper()], start, end,
+                                fq, _random(17))
+        dataflag = '%s%s'%(fq, ct.TT_K_TYPE[ktype.upper()])
+    elif ktype in ct.K_MIN_LABELS:
+        url = ct.KLINE_TT_MIN_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
+                                    symbol, ktype, ktype,
+                                    _random(16))
+        dataflag = 'm%s'%ktype
+    else:
+        raise TypeError('ktype input error.')
+    
+    for _ in range(retry_count):
+        time.sleep(pause)
+        try:
+            request = Request(url)
+            lines = urlopen(request, timeout = 10).read()
+            if len(lines) < 100: #no data
+                return None
+        except Exception as e:
+            print(e)
+        else:
+            lines = lines.decode('utf-8') if ct.PY3 else lines
+            lines = lines.split('=')[1]
+            reg = re.compile(r',{"nd.*?}') 
+            lines = re.subn(reg, '', lines) 
+            js = json.loads(lines[0])
+            df = pd.DataFrame(js['data'][symbol][dataflag], columns=ct.KLINE_TT_COLS)
+            df['code'] = symbol if index else code
+            if ktype in ct.K_MIN_LABELS:
+                df['date'] = df['date'].map(lambda x: '%s-%s-%s %s:%s'%(x[0:4], x[4:6], 
+                                                                        x[6:8], x[8:10], 
+                                                                        x[10:12]))
+            return df
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+    
+
+
 def get_hists(symbols, start=None, end=None,
                   ktype='D', retry_count=3,
                   pause=0.001):
