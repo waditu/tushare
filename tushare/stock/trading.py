@@ -665,7 +665,7 @@ def get_k_data(code=None, start='', end='',
             reg = re.compile(r',{"nd.*?}') 
             lines = re.subn(reg, '', lines) 
             js = json.loads(lines[0])
-            keystr = js['data'][symbol].keys()[2]
+            keystr = list(js['data'][symbol].keys())[2]
             dataflag = keystr if keystr in ct.FQ_KEY else dataflag
             df = pd.DataFrame(js['data'][symbol][dataflag], columns=ct.KLINE_TT_COLS)
             df['code'] = symbol if index else code
