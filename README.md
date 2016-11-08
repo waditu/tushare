@@ -42,6 +42,7 @@ Quick Start
     import tushare as ts
 
 	ts.get_hist_data('600848') #一次性获取全部数据
+	另外，参考get_k_data函数
 
 结果显示：
 
@@ -184,7 +185,7 @@ Change Logs
 
 0.5.6 2016/11/06
 =============
-- 新增全新行情数据接口 [http://mp.weixin.qq.com/s?__biz=MzAwOTgzMDk5Ng==&mid=2650833972&idx=1&sn=4de9f9ee81bc8bf85d1e0a4a8f79b0de&chksm=80adb30fb7da3a19817c72ff6f715ee91d6e342eb0402e860e171993bb0293bc4097e2dc4fe9&mpshare=1&scene=1&srcid=1106BPAdPiPCnj6m2Xyt5p2M#wechat_redirect/](get_k_data "get_k_data")
+- 新增全新行情数据接口get_k_data(请关注tushare公众号“挖地兔”后查看历史文章《全新的免费行情数据接口》)
 - 修复程序和文档bug
 
 
