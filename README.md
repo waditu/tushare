@@ -182,6 +182,18 @@ Quick Start
 Change Logs
 -----------
 
+0.5.6 2016/11/06
+=============
+- 新增全新行情数据接口[http://mp.weixin.qq.com/s?__biz=MzAwOTgzMDk5Ng==&mid=2650833972&idx=1&sn=4de9f9ee81bc8bf85d1e0a4a8f79b0de&chksm=80adb30fb7da3a19817c72ff6f715ee91d6e342eb0402e860e171993bb0293bc4097e2dc4fe9&mpshare=1&scene=1&srcid=1106BPAdPiPCnj6m2Xyt5p2M#wechat_redirect](get_k_data "get_k_data")
+- 修复程序和文档bug
+
+
+0.5.1 2016/10/16
+=============
+- 新增实盘交易接口
+- 修复bug
+
+
 0.4.9 2016/03/26
 =============
 - 新增申万行业分类get_industry_classified(standard='sw')
