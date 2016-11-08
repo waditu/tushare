@@ -667,7 +667,10 @@ def get_k_data(code=None, start='', end='',
             reg = re.compile(r',{"nd.*?}') 
             lines = re.subn(reg, '', lines) 
             js = json.loads(lines[0])
-            df = pd.DataFrame(js['data'][symbol][dataflag], columns=ct.KLINE_TT_COLS)
+            if dataflag in js['data'][symbol]:
+                df = pd.DataFrame(js['data'][symbol][dataflag], columns=ct.KLINE_TT_COLS)
+            else:
+                return None
             df['code'] = symbol if index else code
             if ktype in ct.K_MIN_LABELS:
                 df['date'] = df['date'].map(lambda x: '%s-%s-%s %s:%s'%(x[0:4], x[4:6], 
