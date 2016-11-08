@@ -618,8 +618,6 @@ def get_k_data(code=None, start='', end='',
                  如遇网络等问题重复执行的次数 
       pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
-      drop_factor : bool, 默认 True
-                是否移除复权因子，在分析过程中可能复权因子意义不大，但是如需要先储存到数据库之后再分析的话，有该项目会更加灵活
     return
     -------
       DataFrame
@@ -667,6 +665,8 @@ def get_k_data(code=None, start='', end='',
             reg = re.compile(r',{"nd.*?}') 
             lines = re.subn(reg, '', lines) 
             js = json.loads(lines[0])
+            keystr = js['data'][symbol].keys()[2]
+            dataflag = keystr if keystr in ct.FQ_KEY else dataflag
             df = pd.DataFrame(js['data'][symbol][dataflag], columns=ct.KLINE_TT_COLS)
             df['code'] = symbol if index else code
             if ktype in ct.K_MIN_LABELS:
