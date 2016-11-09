@@ -665,8 +665,7 @@ def get_k_data(code=None, start='', end='',
             reg = re.compile(r',{"nd.*?}') 
             lines = re.subn(reg, '', lines) 
             js = json.loads(lines[0])
-            keystr = list(js['data'][symbol].keys())[2]
-            dataflag = keystr if keystr in ct.FQ_KEY else dataflag
+            dataflag = dataflag if dataflag in list(js['data'][symbol].keys()) else ct.TT_K_TYPE[ktype.upper()]
             df = pd.DataFrame(js['data'][symbol][dataflag], columns=ct.KLINE_TT_COLS)
             df['code'] = symbol if index else code
             if ktype in ct.K_MIN_LABELS:
