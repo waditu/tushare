@@ -9,7 +9,7 @@ def year_qua(date):
     mon = date[5:7]
     mon = int(mon)
     return[date[0:4], _quar(mon)]
-    
+
 
 def _quar(mon):
     if mon in [1, 2, 3]:
@@ -22,11 +22,11 @@ def _quar(mon):
         return '4'
     else:
         return None
- 
- 
+
+
 def today():
     day = datetime.datetime.today().date()
-    return str(day) 
+    return str(day)
 
 
 def get_year():
@@ -40,8 +40,8 @@ def get_month():
 
 def get_hour():
     return datetime.datetime.today().hour
-    
-    
+
+
 def today_last_year():
     lasty = datetime.datetime.today().date() + datetime.timedelta(-365)
     return str(lasty)
@@ -75,12 +75,14 @@ def trade_cal():
     isOpen=1是交易日，isOpen=0为休市
     '''
     df = pd.read_csv(ct.ALL_CAL_FILE)
+    df["calendarDate"] = df.calendarDate.map(
+        lambda d: datetime.datetime.strptime(d, "%Y/%m/%d").strftime("%Y-%m-%d"))
     return df
 
 
 def is_holiday(date):
     '''
-            判断是否为交易日，返回True or False
+            判断是否为非交易日，返回True or False
     '''
     df = trade_cal()
     holiday = df[df.isOpen == 0]['calendarDate'].values
@@ -100,7 +102,3 @@ def last_tddate():
         return day_last_week(-2)
     else:
         return day_last_week(-1)
-        
-
-    
-    
