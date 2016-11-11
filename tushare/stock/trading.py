@@ -632,6 +632,7 @@ def get_k_data(code=None, start='', end='',
     symbol = ct.INDEX_SYMBOL[code] if index else _code_to_symbol(code)
     url = ''
     dataflag = ''
+    autype = '' if autype is None else autype
     if ktype.upper() in ct.K_LABELS:
         fq = autype if autype is not None else ''
         if code[:1] in ('1', '5') or index:
@@ -715,3 +716,4 @@ def _code_to_symbol(code):
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
         
+
