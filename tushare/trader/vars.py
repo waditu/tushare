@@ -10,7 +10,7 @@ import time
 
 P_TYPE = {'http': 'http://', 'https': 'https://'}
 DOMAINS = {
-           'csc': 'newetrade.csc108.com'
+           'csc': 'newetradesh.csc108.com'
            }
 PAGES = {
          'csclogin': 'loginMain.jspx',
