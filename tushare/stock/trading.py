@@ -673,6 +673,8 @@ def get_k_data(code=None, start='', end='',
                 df['date'] = df['date'].map(lambda x: '%s-%s-%s %s:%s'%(x[0:4], x[4:6], 
                                                                         x[6:8], x[8:10], 
                                                                         x[10:12]))
+            for col in df.columns[1:6]:
+                df[col] = df[col].astype(float)
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
     
