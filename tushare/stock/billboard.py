@@ -13,7 +13,7 @@ from pandas.compat import StringIO
 from tushare.stock import cons as ct
 import numpy as np
 import time
-import json
+import json, demjson
 import re
 import lxml.html
 from lxml import etree
@@ -72,6 +72,8 @@ def top_list(date = None, retry_count=3, pause=0.001):
             text = json.loads(text)
             df = pd.DataFrame(text['data'], columns=rv.LHB_TMP_COLS)
             df.columns = rv.LHB_COLS
+            df['buy'] = [s if s else 0 for s in df['buy']]
+            df['sell'] = [s if s else 0 for s in df['sell']]
             df['buy'] = df['buy'].astype(float)
             df['sell'] = df['sell'].astype(float)
             df['amount'] = df['amount'].astype(float)
@@ -342,3 +344,54 @@ def _f_rows(x):
             x[i] = np.NaN
     return x
 
+
+def stock_top_list(code, num=40, detail=True):
+    '''
+    个股龙虎榜
+    来源: http://vip.stock.finance.sina.com.cn/q/go.php/vInvestConsult/kind/lhb/index.phtml?symbol=000002
+    Parameters
+    --------
+        code:股票代码
+        num:条数
+        detail:是否加载交易详情
+    Return
+    --------
+        index: 序号
+        code：代码
+        name ：名称
+        date: 交易日期
+        close: 收盘价
+        cv: 对应值(%)
+        volume: 成交量(万股)
+        amount: 成交额(万元)
+        details: detail=True明细数据, detail=False请求明细数据参数
+
+    '''
+    symbol = 'sh' + code if code[:1] == '6' else 'sz' + code
+    data = []
+    url = 'http://vip.stock.finance.sina.com.cn/q/go.php/vInvestConsult/kind/lhb/index.phtml?symbol=%s' % (symbol)
+    res = lxml.html.document_fromstring(urlopen(url).read()).xpath('//table[@id="dataTable"]/tr')
+    if res:
+        for td in res[2:]:
+            dl = td.xpath('td')
+            if len(dl) == 9:
+                index = dl[0].xpath('text()')[0]
+                code = dl[1].xpath('a/text()')[0]
+                date = dl[3].xpath('text()')[0]
+                close = dl[4].xpath('text()')[0]
+                cv = dl[5].xpath('text()')[0]
+                volume = dl[6].xpath('text()')[0]
+                amount = dl[7].xpath('text()')[0]
+                g = re.search('showDetail\((.+?)\)', dl[8].xpath('a/@onclick')[0])
+                arge = g.group(1).replace("'", "")
+                if detail:
+                    url2 = 'http://vip.stock.finance.sina.com.cn/q/api/jsonp.php/var%%20details=/InvestConsultService.getLHBComBSData?type=%s&symbol=%s&tradedate=%s' % (tuple(arge.split(',')[:3]))
+                    details = demjson.decode(re.search('var details=\(\((\{.+\})\)\)', urlopen(url2).read()).group(1).decode('gb2312'))
+                else:
+                    details = arge
+                data.append([index, code, date, close, cv, volume, amount, details])
+                num -= 1
+                if num < 1:
+                    break
+    df = pd.DataFrame(data, columns=['index', 'code', 'date', 'close', 'cv', 'volume', 'amount', 'details'])
+    return df

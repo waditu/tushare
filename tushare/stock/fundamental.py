@@ -10,7 +10,7 @@ import pandas as pd
 from tushare.stock import cons as ct
 import lxml.html
 from lxml import etree
-import re
+import re, demjson
 from pandas.compat import StringIO
 try:
     from urllib.request import urlopen, Request
@@ -418,3 +418,113 @@ def _data_path():
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
 
+def get_stock_intro(code):
+    '''
+    股票简介
+    来源: http://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpInfo/stockid/000001.phtml
+    Parameters
+    --------
+        code:股票代码
+    Return
+    --------
+        name:公司名称
+        listed_market:上市市场
+        listed_date:上市日期
+        offering_price:发行价格
+        found_date:成立日期
+        registered_capital:注册资本
+        company_tel:公司电话
+        company_url:公司网址
+        rename_history:证券简称更名历史
+        office_address:办公地址
+        company_profile:公司简介
+        business_scope:经营范围
+    '''
+    symbol = code
+    url = 'http://vip.stock.finance.sina.com.cn/corp/go.php/vCI_CorpInfo/stockid/%s.phtml' % (symbol)
+    res = lxml.html.parse(url).xpath('//table[@id="comInfo1"]/tr')
+    if res and len(res) == 21:
+        name = res[0].xpath('td/text()')[1]
+
+        listed_market = res[2].xpath('td/text()')[1]
+        listed_date = res[2].xpath('td/a/text()')[0]
+
+        offering_price = res[3].xpath('td/text()')[1]
+
+        found_date = res[4].xpath('td/a/text()')[0]
+        registered_capital = res[4].xpath('td/text()')[2]
+
+        company_tel = res[6].xpath('td/text()')[3]
+
+        company_url = res[12].xpath('td/a/text()')[0]
+        rename_history = res[16].xpath('td/text()')[1]
+        office_address = res[18].xpath('td/text()')[1]
+        company_profile = res[19].xpath('td/text()')[1]
+        business_scope = res[20].xpath('td/text()')[1]
+
+        return pd.DataFrame([[name, listed_market, listed_date, offering_price, found_date, registered_capital, company_tel, company_url, rename_history, office_address, company_profile, business_scope]],
+            columns=['name', 'listed_market', 'listed_date', 'offering_price', 'found_date', 'registered_capital', 'company_tel', 'company_url', 'rename_history', 'office_address', 'company_profile', 'business_scope'])
+
+
+def get_stock_preliminary_earnings_estimate(code, num='all'):
+    '''
+    个股业绩快报(营业收入,净利润,现金流量)
+    来源: http://vip.stock.finance.sina.com.cn/q/go.php/vInvestConsult/kind/scbhz/index.phtml?symbol=000001
+    内容: 股票代码 股票名称 财报日期 批露日期 每股收益(元) 营业收入 净利润 每股净资产(元) 净资产收益率(%) 每股现金流量(元) 毛利率(%) 分配方案 明细 PDF报告
+    Parameters
+    --------
+        code:股票代码
+        num:数量
+    Return
+    --------
+        code:股票代码
+        name:股票名称
+        date:财报日期
+        operation_revenue:营业收入(万元)
+        retained_profits:净利润(万元)
+        cash_flow:每股现金流量(元)
+    '''
+    symbol = code
+    url = 'http://vip.stock.finance.sina.com.cn/q/go.php/vInvestConsult/kind/scbhz/index.phtml?symbol=%s' % (symbol)
+    res = lxml.html.parse(url).xpath('//div[@id="box"]/table/tbody/tr')
+    data = []
+    for td in res:
+        dl = td.xpath('td')
+        if len(dl) == 16:
+            code = dl[0].xpath('a/text()')[0]
+            name = dl[1].xpath('a/text()')[0]
+            date = dl[2].text
+            operation_revenue = dl[5].text
+            retained_profits = dl[7].text
+            cash_flow = dl[11].text
+            data.append([code, name, date, operation_revenue, retained_profits, cash_flow])
+            if len(data) >= num:
+                break
+    df = pd.DataFrame(data, columns=['code', 'name', 'date', 'operation_revenue', 'retained_profits', 'cash_flow'])
+    return df
+
+def get_stock_list(page='all', limit=100, ispd=False):
+    '''
+    A股列表
+    来源: http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?&node=hs_a&symbol=&_s_r_a=page&sort=code&asc=1&num=100&page=1
+    网页：http://vip.stock.finance.sina.com.cn/mkt/#stock_hs_up
+    内容:
+    Parameters
+    --------
+        page:取多少页
+        limit:每页条数
+    Return
+    --------
+
+    '''
+    dataList = []
+    i = 1
+    while 1:
+        url = 'http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/Market_Center.getHQNodeData?&node=hs_a&symbol=&_s_r_a=page&sort=code&asc=1&num=%s&page=%s' % (limit, i)
+        data = urlopen(Request(url), timeout=30).read().decode('gbk')
+        jdata = demjson.decode(data)
+        dataList += jdata
+        i += 1
+        if i > page or len(jdata) < limit:
+            break
+    return pd.DataFrame(dataList) if ispd else dataList
