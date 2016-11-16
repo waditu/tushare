@@ -218,3 +218,204 @@ def _random(n=16):
     end = (10 ** n) - 1
     return str(randint(start, end))
 
+
+def get_stock_information(code, num=40):
+    '''
+    个股资讯
+
+    来源: http://vip.stock.finance.sina.com.cn/corp/view/vCB_AllNewsStock.php?symbol=sz000001&Page=1
+    Parameters
+    --------
+        code:股票代码
+        num:条数
+    Return
+    --------
+        DataFrame，属性列表：
+        title:信息标题
+        date:公告日期
+        url:信息内容URL
+    '''
+    symbol = 'sh' + code if code[:1] == '6' else 'sz' + code
+    data = []
+    page = 1
+    while 1:
+        url = 'http://vip.stock.finance.sina.com.cn/corp/view/vCB_AllNewsStock.php?symbol=%s&Page=%s' % (symbol, page)
+        res = lxml.html.parse(url).xpath('//div[@class=\"datelist\"]/ul')
+        if res:
+            td = res[0]
+            date = [d.replace(u'\xa0', ' ').strip() for d in td.xpath('text()') if d.strip()]
+            title = td.xpath('a/text()')
+            url = td.xpath('a/@href')
+            data.extend(zip(date, title, url))
+            if len(data) >= num:
+                data = data[:num]
+                break
+        else:
+            break
+        page += 1
+    df = pd.DataFrame(data, columns=['date', 'title', 'url'])
+    return df
+
+def get_industry_information(code, num=40):
+    '''
+    行业资讯
+
+    来源: http://vip.stock.finance.sina.com.cn/corp/view/stockIndustryNews.php?symbol=sz000001&Page=1
+    Parameters
+    --------
+        code:股票代码
+        num:条数
+    Return
+    --------
+        DataFrame，属性列表：
+        title:信息标题
+        date:公告日期
+        url:信息内容URL
+    '''
+    symbol = 'sh' + code if code[:1] == '6' else 'sz' + code
+    data = []
+    page = 1
+    while 1:
+        url = 'http://vip.stock.finance.sina.com.cn/corp/view/stockIndustryNews.php?symbol=%s&Page=%s' % (symbol, page)
+        res = lxml.html.parse(url).xpath('//div[@class=\"datelist\"]/ul')
+        if res:
+            td = res[0]
+            date = [d.replace(u'\xa0', ' ').strip() for d in td.xpath('text()') if d.strip()]
+            title = td.xpath('a/text()')
+            url = td.xpath('a/@href')
+            data.extend(zip(date, title, url))
+            if len(data) >= num:
+                data = data[:num]
+                break
+        else:
+            break
+        page += 1
+    df = pd.DataFrame(data, columns=['date', 'title', 'url'])
+    return df
+
+def get_financial_planner_unscramble(code, num=None):
+    '''
+    理财师解读
+
+    来源: http://vip.stock.finance.sina.com.cn/corp/view/vCB_FinManDiv.php?symbol=sz000001
+    Parameters
+    --------
+        code:股票代码
+    Return
+    --------
+        DataFrame，属性列表：
+        title:信息标题
+        date:公告日期
+        url:信息内容URL
+        name:作者名称
+        author_url:作者url
+    '''
+    symbol = 'sh' + code if code[:1] == '6' else 'sz' + code
+    data = []
+    url = 'http://vip.stock.finance.sina.com.cn/corp/view/vCB_FinManDiv.php?symbol=%s' % (symbol)
+    res = lxml.html.parse(url).xpath('//div[@class=\"datelist\"]/ul')
+    if res:
+        td = res[0]
+        date = [d.replace(u'\xa0', ' ').strip() for d in td.xpath('text()') if d.strip()]
+        title = td.xpath('a/text()')
+        url = td.xpath('a/@href')
+        data.extend(zip(date[0::2], title[1::2], url[1::2], title[0::2], url[0::2]))
+    df = pd.DataFrame(data, columns=['date', 'title', 'url', 'name', 'author_url'])
+    return df
+
+def get_research_report(code, num=40):
+    '''
+    研究报告
+    来源: http://vip.stock.finance.sina.com.cn/q/go.php/vReport_List/kind/search/index.phtml?t1=2&symbol=000001&p=1
+    Parameters
+    --------
+        code:股票代码
+        num:条数
+    Return
+    --------
+        DataFrame，属性列表：
+        title:信息标题
+        date:公告日期
+        url:信息内容URL
+        type:类型
+        institution:机构
+        institution_url:机构url
+        researcher:研究员
+    '''
+    symbol = code
+    data = []
+    page = 1
+    while 1:
+        url = 'http://vip.stock.finance.sina.com.cn/q/go.php/vReport_List/kind/search/index.phtml?t1=2&symbol=%s&p=%s' % (symbol, page)
+        res = lxml.html.parse(url).xpath('//table[@class=\"tb_01\"]/tr')
+        if res:
+            aNum = len(data)
+            for td in res:
+                dl = td.xpath('td')
+                if len(dl) == 6:
+                    date = dl[3].xpath('text()')[0]
+                    title = dl[1].xpath('a/text()')[0].strip()
+                    url = dl[1].xpath('a/@href')[0]
+                    types = dl[2].xpath('text()')[0]
+                    institution = dl[4].xpath('a/div/span/text()')[0]
+                    institution_url = dl[4].xpath('a/@href')[0]
+                    researcher = dl[5].xpath('div/span/text()')[0]
+                    data.append([date, title, url, types, institution, institution_url, researcher])
+            if len(data) >= num or aNum == len(data):
+                data = data[:num]
+                break
+        else:
+            break
+        page += 1
+    df = pd.DataFrame(data, columns=['date', 'title', 'url', 'type', 'institution', 'institution_url', 'researcher'])
+    return df
+
+def get_user_discuss(code, num=40):
+    '''
+    网友讨论
+    来源: http://guba.sina.com.cn/?s=bar&name=sz000001&type=0&page=1
+    Parameters
+    --------
+        code:股票代码
+        num:条数
+    Return
+    --------
+        DataFrame，属性列表：
+        date:发表日期
+        title:信息标题
+        url:信息内容URL
+        hits:点击量
+        reply:回复数
+        author:作者
+        author_url:作者url(可空)
+    '''
+    symbol = 'sh' + code if code[:1] == '6' else 'sz' + code
+    data = []
+    page = 1
+    while 1:
+        url = 'http://guba.sina.com.cn/?s=bar&name=%s&type=0&page=%s' % (symbol, page)
+        res = lxml.html.document_fromstring(urlopen(url).read()).xpath('//div[@id="blk_list_02"]/table/tbody/tr')
+        if res:
+            aNum = len(data)
+            for td in res:
+                dl = td.xpath('td')
+                if len(dl) == 5:
+                    date = dl[4].xpath('text()')[0]
+                    title = dl[2].xpath('a/text()')[0].strip()
+                    url = 'http://guba.sina.com.cn' + dl[2].xpath('a/@href')[0]
+                    hits = dl[0].xpath('span/text()')[0]
+                    reply = dl[1].xpath('span/text()')[0]
+                    x = dl[3].xpath('div/a')
+                    if x:
+                        author, author_url = x[0].xpath('text()')[0], 'http://guba.sina.com.cn' + x[0].xpath('@href')[0]
+                    else:
+                        author, author_url = dl[3].xpath('div/text()')[0], None
+                    data.append([date, title, url, hits, reply, author, author_url])
+            if len(data) >= num or aNum == len(data):
+                data = data[:num]
+                break
+        else:
+            break
+        page += 1
+    df = pd.DataFrame(data, columns=['date', 'title', 'url', 'hits', 'reply', 'author', 'author_url'])
+    return df

@@ -9,7 +9,7 @@ from tushare.stock.trading import (get_hist_data, get_tick_data,
                                    get_h_data, get_today_ticks,
                                    get_index, get_hists,
                                    get_k_data,
-                                   get_sina_dd)
+                                   get_sina_dd, get_stock_now_market)
 
 """
 for trading data
@@ -17,7 +17,9 @@ for trading data
 from tushare.stock.fundamental import (get_stock_basics, get_report_data,
                                        get_profit_data,
                                        get_operation_data, get_growth_data,
-                                       get_debtpaying_data, get_cashflow_data)
+                                       get_debtpaying_data, get_cashflow_data,
+                                       get_stock_intro, get_stock_preliminary_earnings_estimate,
+                                       get_stock_list)
 
 """
 for macro data
@@ -43,7 +45,9 @@ for macro data
 """
 from tushare.stock.newsevent import (get_latest_news, latest_content,
                                      get_notices, notice_content,
-                                     guba_sina)
+                                     guba_sina, get_stock_information, get_industry_information,
+                                     get_financial_planner_unscramble, get_research_report,
+                                     get_user_discuss)
 
 """
 for reference
@@ -65,7 +69,7 @@ from tushare.stock.shibor import (shibor_data, shibor_quote_data,
 for LHB
 """
 from tushare.stock.billboard import (top_list, cap_tops, broker_tops,
-                                     inst_tops, inst_detail)
+                                     inst_tops, inst_detail, stock_top_list)
 
 
 """
