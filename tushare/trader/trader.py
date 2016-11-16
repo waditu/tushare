@@ -15,6 +15,7 @@ from threading import Thread
 from tushare.trader import vars as vs
 from tushare.trader import utils
 from tushare.util import upass as up
+from tushare.util.upass import get_broker, set_broker
 
 
 class TraderAPI(object):
@@ -45,7 +46,10 @@ class TraderAPI(object):
         self.s.headers.update(vs.AGENT)
         self.s.get(vs.CSC_PREFIX % (vs.P_TYPE['https'], vs.DOMAINS['csc'],
                                              vs.PAGES['csclogin']))
-        if self._login('') is False:
+        res = self.s.get(vs.V_CODE_URL%(vs.P_TYPE['https'],
+                                          vs.DOMAINS['csc'],
+                                          vs.PAGES['vimg']))
+        if self._login(utils.get_vcode('csc', res)) is False:
             print('请确认账号或密码是否正确 ，或券商服务器是否处于维护中。 ')
         self.keepalive()
         
@@ -57,6 +61,11 @@ class TraderAPI(object):
             inputid = user,                                 
             j_username = user,
             j_inputid = user,
+            AppendCode = v_code,
+            isCheckAppendCode = 'false',
+            logined = 'false',
+            f_tdx = '',
+            j_cpu = '',
             j_password = brokerinfo['passwd'][0]
         )
         logined = self.s.post(vs.CSC_LOGIN_ACTION % (vs.P_TYPE['https'], 
@@ -81,7 +90,7 @@ class TraderAPI(object):
                     response = self.heartbeat()
                     self.check_account_live(response)
                 except:
-                    self._login('')
+                    self.login()
                 time.sleep(100)
             else:
                 time.sleep(10)
