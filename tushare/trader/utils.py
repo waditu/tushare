@@ -28,8 +28,7 @@ def get_jdata(txtdata):
 def get_vcode(broker, res):
     from PIL import Image
     import pytesseract as pt
-    import requests
-    from StringIO import StringIO
+    from pandas.compat import StringIO
     
     if broker == 'csc':
         img = Image.open(StringIO(res.content))

@@ -102,5 +102,11 @@ def last_tddate():
         return day_last_week(-1)
         
 
+def tt_dates(start='', end=''):
+    startyear = int(start[0:4])
+    endyear = int(end[0:4])
+    dates = [d for d in range(startyear, endyear+1, 2)]
+    return dates
+    
     
     

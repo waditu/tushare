@@ -607,9 +607,9 @@ def get_k_data(code=None, start='', end='',
       code:string
                   股票代码 e.g. 600848
       start:string
-                  开始日期 format：YYYY-MM-DD 为空时取当前日期
+                  开始日期 format：YYYY-MM-DD 为空时取上市首日
       end:string
-                  结束日期 format：YYYY-MM-DD 为空时取去年今日
+                  结束日期 format：YYYY-MM-DD 为空时取最近一个交易日
       autype:string
                   复权类型，qfq-前复权 hfq-后复权 None-不复权，默认为qfq
       ktype：string
@@ -633,52 +633,83 @@ def get_k_data(code=None, start='', end='',
     url = ''
     dataflag = ''
     autype = '' if autype is None else autype
+    if (start is not None) & (start != ''):
+        end = du.today() if end is None or end == '' else end
     if ktype.upper() in ct.K_LABELS:
         fq = autype if autype is not None else ''
         if code[:1] in ('1', '5') or index:
             fq = ''
         kline = '' if autype is None else 'fq'
-        url = ct.KLINE_TT_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
-                                kline, fq, symbol, 
-                                ct.TT_K_TYPE[ktype.upper()], start, end,
-                                fq, _random(17))
+        if (start is None or start == '') & (end is None or end == ''):
+            urls = [ct.KLINE_TT_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
+                                    kline, fq, symbol, 
+                                    ct.TT_K_TYPE[ktype.upper()], start, end,
+                                    fq, _random(17))]
+        else:
+            years = du.tt_dates(start, end)
+            urls = []
+            for year in years:
+                startdate = str(year) + '-01-01'
+                enddate = str(year+1) + '-12-31'
+                url = ct.KLINE_TT_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
+                                    kline, fq+str(year), symbol, 
+                                    ct.TT_K_TYPE[ktype.upper()], startdate, enddate,
+                                    fq, _random(17))
+                urls.append(url)
         dataflag = '%s%s'%(fq, ct.TT_K_TYPE[ktype.upper()])
     elif ktype in ct.K_MIN_LABELS:
-        url = ct.KLINE_TT_MIN_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
+        urls = [ct.KLINE_TT_MIN_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
                                     symbol, ktype, ktype,
-                                    _random(16))
+                                    _random(16))]
         dataflag = 'm%s'%ktype
     else:
         raise TypeError('ktype input error.')
-    
-    for _ in range(retry_count):
-        time.sleep(pause)
-        try:
-            request = Request(url)
-            lines = urlopen(request, timeout = 10).read()
-            if len(lines) < 100: #no data
-                return None
-        except Exception as e:
-            print(e)
-        else:
-            lines = lines.decode('utf-8') if ct.PY3 else lines
-            lines = lines.split('=')[1]
-            reg = re.compile(r',{"nd.*?}') 
-            lines = re.subn(reg, '', lines) 
-            js = json.loads(lines[0])
-            dataflag = dataflag if dataflag in list(js['data'][symbol].keys()) else ct.TT_K_TYPE[ktype.upper()]
-            df = pd.DataFrame(js['data'][symbol][dataflag], columns=ct.KLINE_TT_COLS)
-            df['code'] = symbol if index else code
-            if ktype in ct.K_MIN_LABELS:
-                df['date'] = df['date'].map(lambda x: '%s-%s-%s %s:%s'%(x[0:4], x[4:6], 
-                                                                        x[6:8], x[8:10], 
-                                                                        x[10:12]))
-            for col in df.columns[1:6]:
-                df[col] = df[col].astype(float)
-            return df
+    data = pd.DataFrame()
+    for url in urls:
+        data = data.append(_get_k_data(url, dataflag, 
+                                       symbol, code,
+                                       index, ktype,
+                                       retry_count, pause), 
+                           ignore_index=True)
+    if ktype not in ct.K_MIN_LABELS:
+        if ((start is not None) & (start != '')) & ((end is not None) & (end != '')):
+            data = data[(data.date >= start) & (data.date <= end)]
+    return data
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
     
 
+def _get_k_data(url, dataflag='',
+                symbol='',
+                code = '',
+                index = False,
+                ktype = '',
+                retry_count=3,
+                pause=0.001):
+    for _ in range(retry_count):
+            time.sleep(pause)
+            try:
+                request = Request(url)
+                lines = urlopen(request, timeout = 10).read()
+                if len(lines) < 100: #no data
+                    return None
+            except Exception as e:
+                print(e)
+            else:
+                lines = lines.decode('utf-8') if ct.PY3 else lines
+                lines = lines.split('=')[1]
+                reg = re.compile(r',{"nd.*?}') 
+                lines = re.subn(reg, '', lines) 
+                js = json.loads(lines[0])
+                dataflag = dataflag if dataflag in list(js['data'][symbol].keys()) else ct.TT_K_TYPE[ktype.upper()]
+                df = pd.DataFrame(js['data'][symbol][dataflag], columns=ct.KLINE_TT_COLS)
+                df['code'] = symbol if index else code
+                if ktype in ct.K_MIN_LABELS:
+                    df['date'] = df['date'].map(lambda x: '%s-%s-%s %s:%s'%(x[0:4], x[4:6], 
+                                                                            x[6:8], x[8:10], 
+                                                                            x[10:12]))
+                for col in df.columns[1:6]:
+                    df[col] = df[col].astype(float)
+                return df
 
 def get_hists(symbols, start=None, end=None,
                   ktype='D', retry_count=3,
@@ -718,4 +749,3 @@ def _code_to_symbol(code):
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
         
-
