@@ -181,6 +181,12 @@ Quick Start
 Change Logs
 -----------
 
+0.6.2 2016/12/03
+==========
+- 新增十大股东和十大流通股接口 top10_holders
+- 新增全球实时指数列表接口 global_realtime
+- 修复部分bug
+
 0.6.1 2016/11/22
 ===========
 - 修正get_k_databug

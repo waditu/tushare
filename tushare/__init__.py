@@ -1,4 +1,4 @@
-__version__ = '0.6.1'
+__version__ = '0.6.2'
 __author__ = 'Jimmy Liu'
 
 """
@@ -52,7 +52,8 @@ from tushare.stock.reference import (profit_data, forecast_data,
                                      xsg_data, fund_holdings,
                                      new_stocks, sh_margins,
                                      sh_margin_details,
-                                     sz_margins, sz_margin_details)
+                                     sz_margins, sz_margin_details,
+                                     top10_holders)
 
 """
 for shibor
@@ -101,3 +102,6 @@ from tushare.trader.trader import TraderAPI
 for futures API
 """
 from tushare.futures.intlfutures import (get_intlfuture)
+
+
+from tushare.stock.globals import (global_realtime)
