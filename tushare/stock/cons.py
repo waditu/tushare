@@ -71,7 +71,7 @@ KLINE_TT_COLS = ['date', 'open', 'close', 'high', 'low', 'volume']
 TICK_PRICE_URL = '%smarket.%s/%s?date=%s&symbol=%s'
 TODAY_TICKS_PAGE_URL = '%s%s/quotes_service/api/%s/CN_Transactions.getAllPageTime?date=%s&symbol=%s'
 TODAY_TICKS_URL = '%s%s/quotes_service/view/%s?symbol=%s&date=%s&page=%s'
-KLINE_TT_URL = '%sweb.ifzq.%s/appstock/app/%skline/get?_var=kline_day%s&param=%s,%s,%s,%s,640,%s&r=0.%s'
+KLINE_TT_URL = '%sweb.ifzq.%s/appstock/app/%skline/get?_var=kline_day%s&param=%s,%s,%s,%s,380,%s&r=0.%s'
 KLINE_TT_MIN_URL = '%sifzq.%s/appstock/app/kline/mkline?param=%s,m%s,,640&_var=m%s_today&r=0.%s'
 DAY_PRICE_URL = '%sapi.finance.%s/%s/?code=%s&type=last'
 LIVE_DATA_URL = '%shq.%s/rn=%s&list=%s'
