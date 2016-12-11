@@ -18,9 +18,6 @@ import json
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
-from bokeh.charts.builders.line_builder import Line
-from _csv import Error
-
 try:
     from urllib.request import urlopen, Request
 except ImportError:
