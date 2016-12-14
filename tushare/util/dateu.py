@@ -111,7 +111,7 @@ def last_tddate():
 def tt_dates(start='', end=''):
     startyear = int(start[0:4])
     endyear = int(end[0:4])
-    dates = [d for d in range(startyear, endyear+1, 2)]
+    dates = [d for d in range(startyear, endyear+1, 1)]
     return dates
     
     
