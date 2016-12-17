@@ -77,7 +77,7 @@ def get_report_data(year, quarter):
         ct._write_head()
         df =  _get_report_data(year, quarter, 1, pd.DataFrame())
         if df is not None:
-            df = df.drop_duplicates('code')
+#             df = df.drop_duplicates('code')
             df['code'] = df['code'].map(lambda x:str(x).zfill(6))
         return df
 
@@ -138,7 +138,7 @@ def get_profit_data(year, quarter):
         ct._write_head()
         data =  _get_profit_data(year, quarter, 1, pd.DataFrame())
         if data is not None:
-            data = data.drop_duplicates('code')
+#             data = data.drop_duplicates('code')
             data['code'] = data['code'].map(lambda x:str(x).zfill(6))
         return data
 
@@ -198,7 +198,7 @@ def get_operation_data(year, quarter):
         ct._write_head()
         data =  _get_operation_data(year, quarter, 1, pd.DataFrame())
         if data is not None:
-            data = data.drop_duplicates('code')
+#             data = data.drop_duplicates('code')
             data['code'] = data['code'].map(lambda x:str(x).zfill(6))
         return data
 
@@ -258,7 +258,7 @@ def get_growth_data(year, quarter):
         ct._write_head()
         data =  _get_growth_data(year, quarter, 1, pd.DataFrame())
         if data is not None:
-            data = data.drop_duplicates('code')
+#             data = data.drop_duplicates('code')
             data['code'] = data['code'].map(lambda x:str(x).zfill(6))
         return data
 
@@ -318,7 +318,7 @@ def get_debtpaying_data(year, quarter):
         ct._write_head()
         df =  _get_debtpaying_data(year, quarter, 1, pd.DataFrame())
         if df is not None:
-            df = df.drop_duplicates('code')
+#             df = df.drop_duplicates('code')
             df['code'] = df['code'].map(lambda x:str(x).zfill(6))
         return df
 
@@ -376,7 +376,7 @@ def get_cashflow_data(year, quarter):
         ct._write_head()
         df =  _get_cashflow_data(year, quarter, 1, pd.DataFrame())
         if df is not None:
-            df = df.drop_duplicates('code')
+#             df = df.drop_duplicates('code')
             df['code'] = df['code'].map(lambda x:str(x).zfill(6))
         return df
 
@@ -417,3 +417,4 @@ def _data_path():
     caller_file = inspect.stack()[1][1]  
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
+

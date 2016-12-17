@@ -421,7 +421,7 @@
 
     import tushare as ts
 
-    ts.get_terminated()
+    ts.get_suspended()
 
 结果显示：
 

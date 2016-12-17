@@ -1,4 +1,4 @@
-__version__ = '0.3.6'
+__version__ = '0.6.3'
 __author__ = 'Jimmy Liu'
 
 """
@@ -7,7 +7,9 @@ for trading data
 from tushare.stock.trading import (get_hist_data, get_tick_data,
                                    get_today_all, get_realtime_quotes,
                                    get_h_data, get_today_ticks,
-                                   get_index, get_hists)
+                                   get_index, get_hists,
+                                   get_k_data,
+                                   get_sina_dd)
 
 """
 for trading data
@@ -50,7 +52,8 @@ from tushare.stock.reference import (profit_data, forecast_data,
                                      xsg_data, fund_holdings,
                                      new_stocks, sh_margins,
                                      sh_margin_details,
-                                     sz_margins, sz_margin_details)
+                                     sz_margins, sz_margin_details,
+                                     top10_holders)
 
 """
 for shibor
@@ -64,3 +67,41 @@ for LHB
 """
 from tushare.stock.billboard import (top_list, cap_tops, broker_tops,
                                      inst_tops, inst_detail)
+
+
+"""
+for utils
+"""
+from tushare.util.dateu import (trade_cal, is_holiday)
+
+
+"""
+for DataYes Token
+"""
+from tushare.util.upass import (set_token, get_token, get_broker,
+                                set_broker, remove_broker)
+
+from tushare.datayes.api import *
+
+from tushare.internet.boxoffice import (realtime_boxoffice, day_boxoffice,
+                                        day_cinema, month_boxoffice)
+
+"""
+for fund data
+"""
+from tushare.fund.nav import (get_nav_open, get_nav_close, get_nav_grading,
+                              get_nav_history, get_fund_info)
+
+"""
+for trader API
+"""
+from tushare.trader.trader import TraderAPI
+
+
+"""
+for futures API
+"""
+from tushare.futures.intlfutures import (get_intlfuture)
+
+
+from tushare.stock.globals import (global_realtime)
