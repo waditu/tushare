@@ -294,6 +294,8 @@ def get_today_all():
     if df is not None:
         for i in range(2, ct.PAGE_NUM[0]):
             newdf = _parsing_dayprice_json(i)
+            if newdf.empty:
+                break
             df = df.append(newdf, ignore_index=True)
     return df
 
