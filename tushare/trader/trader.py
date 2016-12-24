@@ -15,9 +15,6 @@ from threading import Thread
 from tushare.trader import vars as vs
 from tushare.trader import utils
 from tushare.util import upass as up
-from tushare.util.upass import get_broker, set_broker
-from astropy.units import acount
-
 
 class TraderAPI(object):
     """

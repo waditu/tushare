@@ -650,11 +650,12 @@ def get_k_data(code=None, start='', end='',
             urls = []
             for year in years:
                 startdate = str(year) + '-01-01'
-                enddate = str(year+1) + '-06-30'
+                enddate = str(year+1) + '-12-30'
                 url = ct.KLINE_TT_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
                                     kline, fq+str(year), symbol, 
                                     ct.TT_K_TYPE[ktype.upper()], startdate, enddate,
                                     fq, _random(17))
+                print(url)
                 urls.append(url)
         dataflag = '%s%s'%(fq, ct.TT_K_TYPE[ktype.upper()])
     elif ktype in ct.K_MIN_LABELS:
@@ -748,4 +749,4 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
-        
+  
