@@ -1,7 +1,9 @@
 from setuptools import setup, find_packages
 import codecs
 import os
-import tushare
+# import tushare
+exec(open('tushare/version.py').read())
+
 
 def read(fname):
     return codecs.open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -65,23 +67,28 @@ return::
 
 setup(
     name='tushare',
-    version=tushare.__version__,
+    version=__version__,
     description='A utility for crawling historical and Real-time Quotes data of China stocks',
-#     long_description=read("READM.rst"),
-    long_description = long_desc,
+    #     long_description=read("READM.rst"),
+    long_description=long_desc,
     author='Jimmy Liu',
     author_email='jimmysoa@sina.cn',
     license='BSD',
     url='http://tushare.org',
     keywords='China stock data',
+    install_requires=[
+        'lxml',
+        'pandas',
+        'requests',
+    ],
     classifiers=['Development Status :: 4 - Beta',
-    'Programming Language :: Python :: 2.6',
-    'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3.2',
-    'Programming Language :: Python :: 3.3',
-    'Programming Language :: Python :: 3.4',
-    'License :: OSI Approved :: BSD License'],
-    packages=['tushare','tushare.stock', 'tushare.data', 'tushare.util', 'tushare.datayes',
+                 'Programming Language :: Python :: 2.6',
+                 'Programming Language :: Python :: 2.7',
+                 'Programming Language :: Python :: 3.2',
+                 'Programming Language :: Python :: 3.3',
+                 'Programming Language :: Python :: 3.4',
+                 'License :: OSI Approved :: BSD License'],
+    packages=['tushare', 'tushare.stock', 'tushare.data', 'tushare.util', 'tushare.datayes',
               'tushare.internet', 'tushare.fund', 'tushare.trader', 'tushare.futures'],
     package_data={'': ['*.csv']},
 )
