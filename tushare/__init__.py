@@ -1,4 +1,4 @@
-__version__ = '0.6.5'
+__version__ = '0.6.7'
 __author__ = 'Jimmy Liu'
 """
 for trading data

@@ -18,6 +18,7 @@ from tushare.stock import cons as ct
 import re
 from pandas.compat import StringIO
 from tushare.util import dateu as du
+from tushare.stock.reference import new_stocks
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -650,12 +651,11 @@ def get_k_data(code=None, start='', end='',
             urls = []
             for year in years:
                 startdate = str(year) + '-01-01'
-                enddate = str(year+1) + '-12-30'
+                enddate = str(year+1) + '-12-31'
                 url = ct.KLINE_TT_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
                                     kline, fq+str(year), symbol, 
                                     ct.TT_K_TYPE[ktype.upper()], startdate, enddate,
                                     fq, _random(17))
-                print(url)
                 urls.append(url)
         dataflag = '%s%s'%(fq, ct.TT_K_TYPE[ktype.upper()])
     elif ktype in ct.K_MIN_LABELS:

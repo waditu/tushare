@@ -34,7 +34,7 @@ XSG_COLS = ['code', 'name', 'date', 'count', 'ratio']
 QUARTS_DIC = {'1':('%s-12-31', '%s-03-31'), '2':('%s-03-31', '%s-06-30'), 
               '3':('%s-06-30', '%s-09-30'), '4':('%s-9-30', '%s-12-31')}
 FUND_HOLDS_COLS = ['count', 'clast', 'date', 'ratio', 'amount', 'nums','nlast', 'name', 'code']
-NEW_STOCKS_COLS = ['code', 'name', 'ipo_date', 'issue_date', 'amount', 'markets', 'price', 'pe',
+NEW_STOCKS_COLS = ['code', 'xcode', 'name', 'ipo_date', 'issue_date', 'amount', 'markets', 'price', 'pe',
                    'limit', 'funds', 'ballot']
 MAR_SH_COOKIESTR = '_gscu_1808689395=27850607moztu036'
 MAR_SH_HZ_COLS = ['opDate', 'rzye', 'rzmre', 'rqyl', 'rqylje', 'rqmcl', 'rzrqjyzl']

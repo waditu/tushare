@@ -353,6 +353,7 @@ def new_stocks(retry_count=3, pause=0.001):
     ------
     DataFrame
     code:股票代码
+    xcode:申购代码
     name:名称
     ipo_date:上网发行日期
     issue_date:上市日期
@@ -387,9 +388,10 @@ def _newstocks(data, pageNo, retry_count, pause):
             sarr = sarr.replace('<font color="red">*</font>', '')
             sarr = '<table>%s</table>'%sarr
             df = pd.read_html(StringIO(sarr), skiprows=[0, 1])[0]
-            df = df.drop([df.columns[idx] for idx in [1, 12, 13, 14]], axis=1)
+            df = df.drop([df.columns[idx] for idx in [12, 13, 14]], axis=1)
             df.columns = rv.NEW_STOCKS_COLS
             df['code'] = df['code'].map(lambda x : str(x).zfill(6))
+            df['xcode'] = df['xcode'].map(lambda x : str(x).zfill(6))
             res = html.xpath('//table[@class=\"table2\"]/tr[1]/td[1]/a/text()')
             tag = '下一页' if ct.PY3 else unicode('下一页', 'utf-8')
             hasNext = True if tag in res else False 
