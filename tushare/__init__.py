@@ -17,7 +17,7 @@ from tushare.stock.fundamental import (get_stock_basics, get_report_data,
                                        get_profit_data,
                                        get_operation_data, get_growth_data,
                                        get_debtpaying_data, get_cashflow_data,
-									   get_balance_sheet, get_profit_statement, get_cash_flow)
+                                       get_balance_sheet, get_profit_statement, get_cash_flow)
 
 """
 for macro data
