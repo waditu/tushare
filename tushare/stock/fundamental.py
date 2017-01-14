@@ -418,3 +418,65 @@ def _data_path():
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
 
+def get_balance_sheet(code):
+    """
+        获取某股票的历史所有时期资产负债表
+    Parameters
+    --------
+    code:str 股票代码 e.g:600518
+       
+    Return
+    --------
+    DataFrame
+        行列名称为中文且数目较多，建议获取数据后保存到本地查看
+    """
+    if code.isdigit():
+        request = Request(ct.SINA_BALANCESHEET_URL%(code))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        text = text.replace('\t\n', '\r\n')
+        text = text.replace('\t', ',')
+        df = pd.read_csv(StringIO(text), dtype={'code':'object'})
+        return df
+
+def get_profit_statement(code):
+    """
+        获取某股票的历史所有时期利润表
+    Parameters
+    --------
+    code:str 股票代码 e.g:600518
+       
+    Return
+    --------
+    DataFrame
+        行列名称为中文且数目较多，建议获取数据后保存到本地查看
+    """
+    if code.isdigit():
+        request = Request(ct.SINA_PROFITSTATEMENT_URL%(code))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        text = text.replace('\t\n', '\r\n')
+        text = text.replace('\t', ',')
+        df = pd.read_csv(StringIO(text), dtype={'code':'object'})
+        return df
+
+def get_cash_flow(code):
+    """
+        获取某股票的历史所有时期现金流表
+    Parameters
+    --------
+    code:str 股票代码 e.g:600518
+       
+    Return
+    --------
+    DataFrame
+        行列名称为中文且数目较多，建议获取数据后保存到本地查看
+    """
+    if code.isdigit():
+        request = Request(ct.SINA_CASHFLOW_URL%(code))
+        text = urlopen(request, timeout=10).read()
+        text = text.decode('GBK')
+        text = text.replace('\t\n', '\r\n')
+        text = text.replace('\t', ',')
+        df = pd.read_csv(StringIO(text), dtype={'code':'object'})
+        return df
