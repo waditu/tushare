@@ -27,7 +27,8 @@ from tushare.stock.macro import (get_gdp_year, get_gdp_quarter,
                                  get_gdp_contrib, get_cpi,
                                  get_ppi, get_deposit_rate,
                                  get_loan_rate, get_rrr,
-                                 get_money_supply, get_money_supply_bal)
+                                 get_money_supply, get_money_supply_bal,
+                                 get_gold_and_foreign_reserves)
 
 """
 for classifying data

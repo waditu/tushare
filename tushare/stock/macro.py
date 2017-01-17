@@ -392,3 +392,30 @@ def get_money_supply_bal():
     for i in df.columns:
         df[i] = df[i].apply(lambda x:np.where(x is None, '--', x))
     return df
+
+
+def get_gold_and_foreign_reserves():
+    """
+    获取外汇储备
+    Returns
+    -------
+    DataFrame
+        month :统计时间
+        gold:黄金储备(万盎司)
+        foreign_reserves:外汇储备(亿美元)
+    """
+    rdint = vs.random()
+    request = Request(vs.MACRO_URL % (vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                      rdint, vs.MACRO_TYPE[2], 5, 200,
+                                      rdint))
+    text = urlopen(request,timeout=10).read()
+    text = text.decode('gbk')
+    regSym = re.compile(r'\,count:(.*?)\}')
+    datastr = regSym.findall(text)
+    datastr = datastr[0]
+    datastr = datastr.split('data:')[1]
+    js = json.loads(datastr)
+    df = pd.DataFrame(js, columns=vs.GOLD_AND_FOREIGN_CURRENCY_RESERVES)
+    for i in df.columns:
+        df[i] = df[i].apply(lambda x: np.where(x is None, '--', x))
+    return df
