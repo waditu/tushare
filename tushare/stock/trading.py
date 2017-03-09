@@ -651,7 +651,7 @@ def get_k_data(code=None, start='', end='',
             urls = []
             for year in years:
                 startdate = str(year) + '-01-01'
-                enddate = str(year+1) + '-12-31'
+                enddate = str(year) + '-12-31'
                 url = ct.KLINE_TT_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
                                     kline, fq+str(year), symbol, 
                                     ct.TT_K_TYPE[ktype.upper()], startdate, enddate,
