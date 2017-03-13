@@ -106,9 +106,9 @@ def _parsing_dayprice_json(pageNum=1):
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
     """
-    ct._write_console()
+#     ct._write_console()
     request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                 ct.PAGES['jv'], pageNum))
+                                 ct.PAGES['jv']))
     text = urlopen(request, timeout=10).read()
     if text == 'null':
         return None
@@ -290,12 +290,12 @@ def get_today_all():
       DataFrame
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率，成交额，市盈率，市净率，总市值，流通市值
     """
-    ct._write_head()
+#     ct._write_head()
     df = _parsing_dayprice_json(1)
-    if df is not None:
-        for i in range(2, ct.PAGE_NUM[0]):
-            newdf = _parsing_dayprice_json(i)
-            df = df.append(newdf, ignore_index=True)
+#     if df is not None:
+#         for i in range(2, ct.PAGE_NUM[0]):
+#             newdf = _parsing_dayprice_json(i)
+#             df = df.append(newdf, ignore_index=True)
     return df
 
 
@@ -750,3 +750,4 @@ def _code_to_symbol(code):
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
   
+
