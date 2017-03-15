@@ -67,7 +67,8 @@ FOR_CLASSIFY_B_COLS = ['code','name']
 FOR_CLASSIFY_W_COLS = ['date','code', 'weight']
 FOR_CLASSIFY_W5_COLS = ['date','code', 'name', 'weight']
 THE_FIELDS = ['code','symbol','name','changepercent','trade','open','high','low','settlement','volume','turnoverratio']
-KLINE_TT_COLS = ['date', 'open', 'close', 'high', 'low', 'volume']
+KLINE_TT_COLS_MINS = ['date', 'open', 'close', 'high', 'low', 'volume']
+KLINE_TT_COLS = ['date', 'open', 'close', 'high', 'low', 'volume', 'amount', 'turnoverratio']
 TICK_PRICE_URL = '%smarket.%s/%s?date=%s&symbol=%s'
 TODAY_TICKS_PAGE_URL = '%s%s/quotes_service/api/%s/CN_Transactions.getAllPageTime?date=%s&symbol=%s'
 TODAY_TICKS_URL = '%s%s/quotes_service/view/%s?symbol=%s&date=%s&page=%s'
