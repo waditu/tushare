@@ -704,8 +704,12 @@ def _get_k_data(url, dataflag='',
                 lines = re.subn(reg, '', lines) 
                 js = json.loads(lines[0])
                 dataflag = dataflag if dataflag in list(js['data'][symbol].keys()) else ct.TT_K_TYPE[ktype.upper()]
-                df = pd.DataFrame(js['data'][symbol][dataflag], 
-                                  columns=ct.KLINE_TT_COLS_MINS if ktype in ct.K_MIN_LABELS else ct.KLINE_TT_COLS)
+                if len(js['data'][symbol][dataflag][0]) == 6:
+                    df = pd.DataFrame(js['data'][symbol][dataflag], 
+                                  columns = ct.KLINE_TT_COLS_MINS)
+                else:
+                    df = pd.DataFrame(js['data'][symbol][dataflag], 
+                                  columns = ct.KLINE_TT_COLS)
                 df['code'] = symbol if index else code
                 if ktype in ct.K_MIN_LABELS:
                     df['date'] = df['date'].map(lambda x: '%s-%s-%s %s:%s'%(x[0:4], x[4:6], 
@@ -752,4 +756,4 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
-  
+
