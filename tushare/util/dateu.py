@@ -56,6 +56,12 @@ def get_now():
     return time.strftime('%Y-%m-%d %H:%M:%S')
 
 
+def int2time(timestamp):
+    datearr = datetime.datetime.utcfromtimestamp(timestamp)
+    timestr = datearr.strftime("%Y-%m-%d %H:%M:%S")
+    return timestr
+
+
 def diff_day(start=None, end=None):
     d1 = datetime.datetime.strptime(end, '%Y-%m-%d')
     d2 = datetime.datetime.strptime(start, '%Y-%m-%d')
@@ -102,5 +108,20 @@ def last_tddate():
         return day_last_week(-1)
         
 
+def tt_dates(start='', end=''):
+    startyear = int(start[0:4])
+    endyear = int(end[0:4])
+    dates = [d for d in range(startyear, endyear+1, 2)]
+    return dates
     
     
+def _random(n=13):
+    from random import randint
+    start = 10**(n-1)
+    end = (10**n)-1
+    return str(randint(start, end))
+
+def get_q_date(year=None, quarter=None):
+    dt = {'1': '-03-31', '2': '-06-30', '3': '-09-30', '4': '-12-31'}
+    return '%s%s'%(str(year), dt[str(quarter)])
+

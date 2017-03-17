@@ -1,7 +1,5 @@
 TuShare
-----
-![](https://api.travis-ci.org/waditu/tushare.png?branch=master)
-[![](https://pypip.in/v/tushare/badge.png)](https://pypi.python.org/pypi/tushare/0.1.5)
+
 
 TuShare是实现对股票/期货等金融数据从**数据采集**、**清洗加工** 到 **数据存储**过程的工具，满足金融量化分析师和学习数据分析的人在数据获取方面的需求，它的特点是数据覆盖范围广，接口调用简单,响应快速。
 
@@ -11,7 +9,9 @@ TuShare是实现对股票/期货等金融数据从**数据采集**、**清洗加
 
 ![](http://tushare.waditu.com/_images/8.jpg)
 
-如有需要，也可以加入TuShare QQ群：14934432
+
+提示：目前正在规划和开发tushare全新版本，数据内容、数据质量和稳定性将得到明显提高，敬请期待。老版本代码暂不作更新，不过有兴趣的朋友还是可以愉快的玩耍。
+
 
 Dependencies
 =========
@@ -40,6 +40,7 @@ Quick Start
     import tushare as ts
 
 	ts.get_hist_data('600848') #一次性获取全部数据
+	另外，参考get_k_data函数
 
 结果显示：
 
@@ -180,6 +181,35 @@ Quick Start
 Change Logs
 -----------
 
+0.7.0 2017/03/12
+=============
+- get\_today\_all接口提速
+- 版本累积更新
+
+
+0.6.2 2016/12/03
+==========
+- 新增十大股东和十大流通股接口 top10_holders
+- 新增全球实时指数列表接口 global_realtime
+- 修复部分bug
+
+0.6.1 2016/11/22
+===========
+- 修正get_k_databug
+- 修正实盘交易登录问题
+
+0.5.6 2016/11/06
+=============
+- 新增全新行情数据接口get_k_data(请关注tushare公众号“挖地兔”后查看历史文章《全新的免费行情数据接口》)
+- 修复程序和文档bug
+
+
+0.5.1 2016/10/16
+=============
+- 新增实盘交易接口
+- 修复bug
+
+
 0.4.9 2016/03/26
 =============
 - 新增申万行业分类get_industry_classified(standard='sw')
@@ -207,17 +237,16 @@ Change Logs
 0.3.8 2015/09/19
 ============
 
-- 完成通联数据SDK v0.2.0开发
 - 沪深300成份股和权重接口问题修复
 - 其它bug的修复
-- [通联数据API文档](http://tushare.org/datayes.html)发布
+
 
 
 0.3.5 2015/07/27
 ==========
 
 - 部分代码修正
-- 新增通联数据SDK0.1版
+
 
 0.3.4 2015/06/15
 ===========
