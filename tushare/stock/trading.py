@@ -106,9 +106,9 @@ def _parsing_dayprice_json(pageNum=1):
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
     """
-    ct._write_console()
+#     ct._write_console()
     request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                 ct.PAGES['jv'], pageNum))
+                                 ct.PAGES['jv']))
     text = urlopen(request, timeout=10).read()
     if text == 'null':
         return None
@@ -290,12 +290,12 @@ def get_today_all():
       DataFrame
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率，成交额，市盈率，市净率，总市值，流通市值
     """
-    ct._write_head()
+#     ct._write_head()
     df = _parsing_dayprice_json(1)
-    if df is not None:
-        for i in range(2, ct.PAGE_NUM[0]):
-            newdf = _parsing_dayprice_json(i)
-            df = df.append(newdf, ignore_index=True)
+#     if df is not None:
+#         for i in range(2, ct.PAGE_NUM[0]):
+#             newdf = _parsing_dayprice_json(i)
+#             df = df.append(newdf, ignore_index=True)
     return df
 
 
@@ -628,6 +628,8 @@ def get_k_data(code=None, start='', end='',
           close 收盘价
           low 最低价
           volume 成交量
+          amount 成交额
+          turnoverratio 换手率
           code 股票代码
     """
     symbol = ct.INDEX_SYMBOL[code] if index else _code_to_symbol(code)
@@ -702,7 +704,12 @@ def _get_k_data(url, dataflag='',
                 lines = re.subn(reg, '', lines) 
                 js = json.loads(lines[0])
                 dataflag = dataflag if dataflag in list(js['data'][symbol].keys()) else ct.TT_K_TYPE[ktype.upper()]
-                df = pd.DataFrame(js['data'][symbol][dataflag], columns=ct.KLINE_TT_COLS)
+                if len(js['data'][symbol][dataflag][0]) == 6:
+                    df = pd.DataFrame(js['data'][symbol][dataflag], 
+                                  columns = ct.KLINE_TT_COLS_MINS)
+                else:
+                    df = pd.DataFrame(js['data'][symbol][dataflag], 
+                                  columns = ct.KLINE_TT_COLS)
                 df['code'] = symbol if index else code
                 if ktype in ct.K_MIN_LABELS:
                     df['date'] = df['date'].map(lambda x: '%s-%s-%s %s:%s'%(x[0:4], x[4:6], 
@@ -749,4 +756,4 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
-  
+

@@ -25,7 +25,7 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'idx': 'www.csindex.com.cn', '163': 'money.163.com',
            'em': 'eastmoney.com', 'sseq': 'query.sse.com.cn',
            'sse': 'www.sse.com.cn', 'szse': 'www.szse.cn',
-           'oss': '218.244.146.57', 'idxip':'115.29.204.48',
+           'oss': 'file.tushare.org', 'idxip':'115.29.204.48',
            'shibor': 'www.shibor.org', 'mbox':'www.cbooo.cn',
            'tt': 'gtimg.cn', 'gw': 'gw.com.cn'}
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
@@ -67,7 +67,8 @@ FOR_CLASSIFY_B_COLS = ['code','name']
 FOR_CLASSIFY_W_COLS = ['date','code', 'weight']
 FOR_CLASSIFY_W5_COLS = ['date','code', 'name', 'weight']
 THE_FIELDS = ['code','symbol','name','changepercent','trade','open','high','low','settlement','volume','turnoverratio']
-KLINE_TT_COLS = ['date', 'open', 'close', 'high', 'low', 'volume']
+KLINE_TT_COLS_MINS = ['date', 'open', 'close', 'high', 'low', 'volume']
+KLINE_TT_COLS = ['date', 'open', 'close', 'high', 'low', 'volume', 'amount', 'turnoverratio']
 TICK_PRICE_URL = '%smarket.%s/%s?date=%s&symbol=%s'
 TODAY_TICKS_PAGE_URL = '%s%s/quotes_service/api/%s/CN_Transactions.getAllPageTime?date=%s&symbol=%s'
 TODAY_TICKS_URL = '%s%s/quotes_service/view/%s?symbol=%s&date=%s&page=%s'
@@ -76,7 +77,8 @@ KLINE_TT_MIN_URL = '%sifzq.%s/appstock/app/kline/mkline?param=%s,m%s,,640&_var=m
 DAY_PRICE_URL = '%sapi.finance.%s/%s/?code=%s&type=last'
 LIVE_DATA_URL = '%shq.%s/rn=%s&list=%s'
 DAY_PRICE_MIN_URL = '%sapi.finance.%s/akmin?scode=%s&type=%s'
-SINA_DAY_PRICE_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?num=80&sort=code&asc=0&node=hs_a&symbol=&_s_r_a=page&page=%s'
+# SINA_DAY_PRICE_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?num=80&sort=code&asc=0&node=hs_a&symbol=&_s_r_a=page&page=%s'
+SINA_DAY_PRICE_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?num=10000&node=hs_a'
 REPORT_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/mainindex/%s?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=%s'
 FORECAST_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/performance/%s?s_i=&s_a=&s_c=&s_type=&reportdate=%s&quarter=%s&p=%s&num=%s'
 PROFIT_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/profit/%s?s_i=&s_a=&s_c=&reportdate=%s&quarter=%s&p=%s&num=%s'
@@ -87,8 +89,8 @@ CASHFLOW_URL = '%s%s/q/go.php/vFinanceAnalyze/kind/cashflow/%s?s_i=&s_a=&s_c=&re
 SHIBOR_TYPE ={'Shibor': 'Shibor数据', 'Quote': '报价数据', 'Tendency': 'Shibor均值数据',
               'LPR': 'LPR数据', 'LPR_Tendency': 'LPR均值数据'}
 SHIBOR_DATA_URL = '%s%s/shibor/web/html/%s?nameNew=Historical_%s_Data_%s.xls&downLoadPath=data&nameOld=%s%s.xls&shiborSrc=http://www.shibor.org/shibor/'
-ALL_STOCK_BASICS_FILE = P_TYPE['http'] + DOMAINS['oss'] + '/static/%sall%s.csv'
-ALL_CAL_FILE = '%s%s/static/calAll.csv'%(P_TYPE['http'], DOMAINS['oss'])
+ALL_STOCK_BASICS_FILE = P_TYPE['http'] + DOMAINS['oss'] + '/tsdata/%sall%s.csv'
+ALL_CAL_FILE = '%s%s/tsdata/calAll.csv'%(P_TYPE['http'], DOMAINS['oss'])
 SINA_CONCEPTS_INDEX_URL = '%smoney.%s/q/view/%s?param=class'
 SINA_INDUSTRY_INDEX_URL = '%s%s/q/view/%s'
 SINA_DATA_DETAIL_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?page=1&num=1000&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'

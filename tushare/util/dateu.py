@@ -125,3 +125,4 @@ def get_q_date(year=None, quarter=None):
     dt = {'1': '-03-31', '2': '-06-30', '3': '-09-30', '4': '-12-31'}
     return '%s%s'%(str(year), dt[str(quarter)])
 
+
