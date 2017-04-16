@@ -704,6 +704,8 @@ def _get_k_data(url, dataflag='',
                 lines = re.subn(reg, '', lines) 
                 js = json.loads(lines[0])
                 dataflag = dataflag if dataflag in list(js['data'][symbol].keys()) else ct.TT_K_TYPE[ktype.upper()]
+                if len(js['data'][symbol][dataflag]) == 0:
+                    return None
                 if len(js['data'][symbol][dataflag][0]) == 6:
                     df = pd.DataFrame(js['data'][symbol][dataflag], 
                                   columns = ct.KLINE_TT_COLS_MINS)
