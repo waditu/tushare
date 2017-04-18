@@ -676,7 +676,8 @@ def get_k_data(code=None, start='', end='',
                            ignore_index=True)
     if ktype not in ct.K_MIN_LABELS:
         if ((start is not None) & (start != '')) & ((end is not None) & (end != '')):
-            data = data[(data.date >= start) & (data.date <= end)]
+            if data.empty==False:       
+                data = data[(data.date >= start) & (data.date <= end)]
     return data
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
     
