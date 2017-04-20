@@ -444,7 +444,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
                 data = data.drop('factor', axis=1)
             df = _parase_fq_factor(code, start, end)
             df = df.drop_duplicates('date')
-            df = df.sort('date', ascending=False)
+            df = df.sort_values(by='date', ascending=False)
             firstDate = data.head(1)['date']
             frow = df[df.date == firstDate[0]]
             rt = get_realtime_quotes(code)
