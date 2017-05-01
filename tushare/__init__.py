@@ -109,3 +109,9 @@ from tushare.stock.globals import (global_realtime)
 
 
 from tushare.util.mailmerge import (MailMerge)
+
+"""
+for investor relations database API
+"""
+
+from tushare.investor_relations import (grab_from_sh_unreplied, grab_from_sh_replied, grab_from_sz_all, grab_from_sz_replied)
