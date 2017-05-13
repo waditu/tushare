@@ -183,9 +183,10 @@ def forecast_data(year, quarter):
 def _get_forecast_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
+        gparser = etree.HTMLParser(encoding='gbk')
         html = lxml.html.parse(ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], 
                                                 ct.PAGES['fd'], year, quarter, pageNo,
-                                                ct.PAGE_NUM[1]))
+                                                ct.PAGE_NUM[1]), parser=gparser)
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -377,8 +378,9 @@ def _newstocks(data, pageNo, retry_count, pause):
         time.sleep(pause)
         ct._write_console()
         try:
+            gparser = etree.HTMLParser(encoding='gbk')
             html = lxml.html.parse(rv.NEW_STOCKS_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],
-                         ct.PAGES['newstock'], pageNo))
+                         ct.PAGES['newstock'], pageNo), parser=gparser)
             res = html.xpath('//table[@id=\"NewStockTable\"]/tr')
             if ct.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
