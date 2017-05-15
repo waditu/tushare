@@ -30,6 +30,13 @@ class Test(unittest.TestCase):
         
     def test_inst_detail(self):
         print(fd.inst_detail())  
-        
+
+    def test_get_em_gdzjc(self):
+        self.set_data()
+        print(fd.get_em_gdzjc(1, '2017-05-10', '2017-05-15'))
+        print(fd.get_em_gdzjc())
+        print(fd.get_em_gdzjc(1))
+        print(fd.get_em_gdzjc(0))
+
 if __name__ == "__main__":
     unittest.main()

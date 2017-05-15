@@ -15,6 +15,7 @@ import numpy as np
 import time
 import json
 import re
+import demjson
 import lxml.html
 from lxml import etree
 from tushare.util import dateu as du
@@ -342,3 +343,54 @@ def _f_rows(x):
             x[i] = np.NaN
     return x
 
+
+def get_em_gdzjc(type=True, start=None, end=None):
+    """
+        获取东方财富网数据中心股东增减持数据
+    http://datainterface3.eastmoney.com/EM_DataCenter_V3/api/GDZC/GetGDZC?tkn=eastmoney&cfg=gdzc&secucode=&fx=&sharehdname=&pageSize=50&pageNum=2&sortFields=NOTICEDATE&sortDirec=1&startDate=2016-05-01&endDate=2016-05-15
+    Parameters
+    --------
+    type:bool 增减持 e.g:True:增持, False:减持
+    start:string e.g: default today
+              公告开始日期 format：YYYY-MM-DD
+    end:string e.g: default today
+              公告截止日期 format：YYYY-MM-DD
+
+       说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
+
+    Return
+    --------
+    DataFrame
+        FieldName: SHCode,CompanyCode,SCode,Close,ChangePercent,SName,ShareHdName,FX,ChangeNum,BDSLZLTB,BDZGBBL,JYFS,BDHCGZS,BDHCGBL,BDHCYLTGSL,BDHCYLTSLZLTGB,BDKS,BDJZ,NOTICEDATE
+    --------
+    TableName: RptShareholdersIncreaseMap
+    TotalPage: 6
+    SplitSymbol: |
+    FieldName: SHCode,CompanyCode,SCode,Close,ChangePercent,SName,ShareHdName,FX,ChangeNum,BDSLZLTB,BDZGBBL,JYFS,BDHCGZS,BDHCGBL,BDHCYLTGSL,BDHCYLTSLZLTGB,BDKS,BDJZ,NOTICEDATE
+    Data: []
+    """
+    dataList = []
+    fx = 1 if type else 2
+    pageNum = 1
+    pageSize = 50
+    startDate = start if start else du.today()
+    endDate = end if end else du.today()
+    columns = []
+    splitSymbol = ''
+    while 1:
+        url = 'http://datainterface3.eastmoney.com/EM_DataCenter_V3/api/GDZC/GetGDZC?tkn=eastmoney&cfg=gdzc&secucode=&fx={}&sharehdname=&pageSize={}&pageNum={}&sortFields=BDJZ&sortDirec=1&startDate={}&endDate={}'.format(fx, pageSize, pageNum, startDate, endDate)
+        # data = urlopen(Request(url), timeout=30).read().decode('gbk')
+        data = urlopen(Request(url), timeout=30).read()
+        jdata = demjson.decode(data)
+        dataList += jdata['Data'][0]['Data']
+        if pageNum == 1:
+            splitSymbol = jdata['Data'][0]['SplitSymbol']
+            totalPage = jdata['Data'][0]['TotalPage']
+            # columns = "'{}'".format("', '".join(jdata.Data[0].FieldName.split(',')))
+            columns = jdata['Data'][0]['FieldName'].split(',')
+        pageNum += 1
+        if pageNum > totalPage:
+            break
+    df_tmp = pd.DataFrame(dataList, columns=['tmp_col'])
+    return pd.DataFrame(df_tmp.tmp_col.str.split(splitSymbol).tolist(), columns=columns)
+        # columns = ['SHCode', 'CompanyCode', 'SCode', 'Close', 'ChangePercent', 'SName', 'ShareHdName', 'FX', 'ChangeNum', 'BDSLZLTB', 'BDZGBBL', 'JYFS', 'BDHCGZS', 'BDHCGBL', 'BDHCYLTGSL', 'BDHCYLTSLZLTGB', 'BDKS', 'BDJZ', 'NOTICEDATE']
