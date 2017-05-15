@@ -9,7 +9,6 @@ Created on 2015/03/21
 from __future__ import division
 from tushare.stock import cons as ct
 from tushare.stock import ref_vars as rv
-from tushare.util import dateu as dt
 import pandas as pd
 import time
 import lxml.html
@@ -19,7 +18,6 @@ import json
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
-
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -232,8 +230,8 @@ def xsg_data(year=None, month=None,
     count:解禁数量（万股）
     ratio:占总盘比率
     """
-    year = dt.get_year() if year is None else year
-    month = dt.get_month() if month is None else month
+    year = du.get_year() if year is None else year
+    month = du.get_month() if month is None else month
     for _ in range(retry_count):
         time.sleep(pause)
         try:
@@ -355,6 +353,7 @@ def new_stocks(retry_count=3, pause=0.001):
     ------
     DataFrame
     code:股票代码
+    xcode:申购代码
     name:名称
     ipo_date:上网发行日期
     issue_date:上市日期
@@ -389,9 +388,10 @@ def _newstocks(data, pageNo, retry_count, pause):
             sarr = sarr.replace('<font color="red">*</font>', '')
             sarr = '<table>%s</table>'%sarr
             df = pd.read_html(StringIO(sarr), skiprows=[0, 1])[0]
-            df = df.drop([df.columns[idx] for idx in [1, 12, 13, 14]], axis=1)
+            df = df.drop([df.columns[idx] for idx in [12, 13, 14]], axis=1)
             df.columns = rv.NEW_STOCKS_COLS
             df['code'] = df['code'].map(lambda x : str(x).zfill(6))
+            df['xcode'] = df['xcode'].map(lambda x : str(x).zfill(6))
             res = html.xpath('//table[@class=\"table2\"]/tr[1]/td[1]/a/text()')
             tag = '下一页' if ct.PY3 else unicode('下一页', 'utf-8')
             hasNext = True if tag in res else False 
@@ -690,9 +690,59 @@ def sz_margin_details(date='', retry_count=3, pause=0.001):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
+def top10_holders(code=None, year=None, quarter=None, gdtype='0',
+                  retry_count=3, pause=0.001):
+    if code is None:
+        return None
+    else:
+        code = ct._code_to_symbol(code)
+    gdtype = 'LT' if gdtype == '1' else ''
+    qdate = ''
+    if (year is not None) & (quarter is not None):
+        qdate = du.get_q_date(year, quarter)
+    for _ in range(retry_count):
+        time.sleep(pause)
+        try:
+            request = Request(rv.TOP10_HOLDERS_URL%(ct.P_TYPE['http'], ct.DOMAINS['gw'],
+                                    gdtype, code.upper()))
+            lines = urlopen(request, timeout = 10).read()
+            lines = lines.decode('utf8') if ct.PY3 else lines
+            reg = re.compile(r'= \'\[(.*?)\]\';')
+            lines = reg.findall(lines)[0]
+            jss = json.loads('[%s]' %lines)
+            summ = []
+            data = pd.DataFrame()
+            for row in jss:
+                qt = row['jzrq']
+                hold = row['ljcy']
+                change = row['ljbh']
+                props = row['ljzb']
+                arow = [qt, hold, change ,props]
+                summ.append(arow)
+                ls = row['sdgdList']
+                dlist = []
+                for inrow in ls:
+                    sharetype = inrow['gbxz']
+                    name = inrow['gdmc']
+                    hold = inrow['cgs']
+                    h_pro = inrow['zzgs']
+                    status = inrow['zjqk']
+                    dlist.append([qt, name, hold, h_pro, sharetype, status])
+                ddata = pd.DataFrame(dlist, columns=rv.TOP10_PER_COLS)
+                data = data.append(ddata, ignore_index=True)
+            df = pd.DataFrame(summ, columns=rv.TOP10_SUMM_COLS)
+            if qdate != '':
+                df = df[df.quarter == qdate]
+                data = data[data.quarter == qdate]
+        except Exception as e:
+            print(e)
+        else:
+            return df, data
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
+
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))
-

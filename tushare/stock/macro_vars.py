@@ -16,6 +16,7 @@ LOAN_COLS = ['date','loan_type','rate']
 RRR_COLS = ['date','before','now','changed']
 MONEY_SUPPLY_COLS = ['month','m2','m2_yoy','m1','m1_yoy','m0','m0_yoy','cd','cd_yoy','qm','qm_yoy','ftd','ftd_yoy','sd','sd_yoy','rests','rests_yoy']
 MONEY_SUPPLY_BLA_COLS = ['year','m2','m1','m0','cd','qm','ftd','sd','rests']
+GOLD_AND_FOREIGN_CURRENCY_RESERVES = ['month','gold','foreign_reserves']
 
 def random(n=13):
     from random import randint
