@@ -445,7 +445,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
                 data = data.drop('factor', axis=1)
             df = _parase_fq_factor(code, start, end)
             df = df.drop_duplicates('date')
-            df = df.sort('date', ascending=False)
+            df = df.sort_values('date', ascending=False)
             firstDate = data.head(1)['date']
             frow = df[df.date == firstDate[0]]
             rt = get_realtime_quotes(code)
@@ -502,7 +502,7 @@ def _parase_fq_factor(code, start, end):
     df = pd.DataFrame({'date':list(text['data'].keys()), 'factor':list(text['data'].values())})
     df['date'] = df['date'].map(_fun_except) # for null case
     if df['date'].dtypes == np.object:
-        df['date'] = df['date'].astype(np.datetime64)
+        df['date'] = pd.to_datetime(df['date'])
     df = df.drop_duplicates('date')
     df['factor'] = df['factor'].astype(float)
     return df
@@ -539,7 +539,7 @@ def _parse_fq_data(url, index, retry_count, pause):
             else:
                 df.columns = ct.HIST_FQ_COLS
             if df['date'].dtypes == np.object:
-                df['date'] = df['date'].astype(np.datetime64)
+                df['date'] = pd.to_datetime(df['date'])
             df = df.drop_duplicates('date')
         except ValueError as e:
             # 时间较早，已经读不到数据
