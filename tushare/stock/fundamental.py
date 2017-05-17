@@ -54,7 +54,8 @@ def get_stock_basics(date=None):
     text = urlopen(request, timeout=10).read()
     text = text.decode('GBK')
     text = text.replace('--', '')
-    df = pd.read_csv(StringIO(text), dtype={'code':'object'})
+    df = pd.read_csv(StringIO(text), dtype={'代码':'object'})
+    df.rename(columns=ct.STOCK_BASICS_REP_COLS, inplace = True)
     df = df.set_index('code')
     return df
 

@@ -39,6 +39,24 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          't_ticks':'vMS_tradedetail.php', 'dw': 'downLoad.html',
          'qmd':'queryMargin.do', 'szsefc':'ShowReport.szse',
          'ssecq':'commonQuery.do', 'sinadd':'cn_bill_download.php', 'ids_sw':'SwHy.php'}
+STOCK_BASICS_REP_COLS = {
+        '代码': 'code',
+        '名称': 'name',
+        '细分行业': 'industry',
+        '地区': 'area',
+        '市盈(动)': 'pe',
+        '流通股本(万)': 'outstanding',
+        '总股本(万)': 'totals',
+        '总资产(万)': 'totalAssets',
+        '流动资产': 'liquidAssets',
+        '固定资产': 'fixedAssets',
+        '公积金': 'reserved',
+        '每股公积': 'reservedPerShare',
+        '每股收益': 'esp',
+        '每股净资': 'bvps',
+        '市净率': 'pb',
+        '上市日期': 'timeToMarket',
+    }
 TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
 TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
 DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
