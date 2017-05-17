@@ -96,7 +96,7 @@ def get_hist_data(code=None, start=None, end=None,
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def _parsing_dayprice_json(pageNum=1):
+def _parsing_dayprice_json(types):
     """
            处理当日行情分页数据，格式为json
      Parameters
@@ -108,7 +108,7 @@ def _parsing_dayprice_json(pageNum=1):
     """
 #     ct._write_console()
     request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                 ct.PAGES['jv']))
+                                 ct.PAGES['jv'], types))
     text = urlopen(request, timeout=10).read()
     if text == 'null':
         return None
@@ -291,7 +291,8 @@ def get_today_all():
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率，成交额，市盈率，市净率，总市值，流通市值
     """
 #     ct._write_head()
-    df = _parsing_dayprice_json(1)
+    df = _parsing_dayprice_json('hs_a').append(_parsing_dayprice_json('shfxjs'),
+                                               ignore_index=True)
 #     if df is not None:
 #         for i in range(2, ct.PAGE_NUM[0]):
 #             newdf = _parsing_dayprice_json(i)
@@ -444,7 +445,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
                 data = data.drop('factor', axis=1)
             df = _parase_fq_factor(code, start, end)
             df = df.drop_duplicates('date')
-            df = df.sort('date', ascending=False)
+            df = df.sort_values('date', ascending=False)
             firstDate = data.head(1)['date']
             frow = df[df.date == firstDate[0]]
             rt = get_realtime_quotes(code)
@@ -501,7 +502,7 @@ def _parase_fq_factor(code, start, end):
     df = pd.DataFrame({'date':list(text['data'].keys()), 'factor':list(text['data'].values())})
     df['date'] = df['date'].map(_fun_except) # for null case
     if df['date'].dtypes == np.object:
-        df['date'] = df['date'].astype(np.datetime64)
+        df['date'] = pd.to_datetime(df['date'])
     df = df.drop_duplicates('date')
     df['factor'] = df['factor'].astype(float)
     return df
@@ -538,7 +539,7 @@ def _parse_fq_data(url, index, retry_count, pause):
             else:
                 df.columns = ct.HIST_FQ_COLS
             if df['date'].dtypes == np.object:
-                df['date'] = df['date'].astype(np.datetime64)
+                df['date'] = pd.to_datetime(df['date'])
             df = df.drop_duplicates('date')
         except ValueError as e:
             # 时间较早，已经读不到数据

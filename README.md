@@ -181,6 +181,11 @@ Quick Start
 Change Logs
 -----------
 
+0.7.6 2017/05/16
+=============
+- get\_today\_all接口数据补齐
+- forecast\_data mac下编码问题修复
+
 0.7.0 2017/03/12
 =============
 - get\_today\_all接口提速

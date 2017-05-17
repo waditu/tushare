@@ -183,9 +183,11 @@ def forecast_data(year, quarter):
 def _get_forecast_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
+        gparser = etree.HTMLParser(encoding='GBK')
         html = lxml.html.parse(ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], 
                                                 ct.PAGES['fd'], year, quarter, pageNo,
-                                                ct.PAGE_NUM[1]))
+                                                ct.PAGE_NUM[1]),
+                               parser=gparser)
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -746,3 +748,4 @@ def _random(n=13):
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))
+
