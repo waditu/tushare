@@ -1,4 +1,4 @@
-__version__ = '0.7.7'
+__version__ = '0.7.8'
 __author__ = 'Jimmy Liu'
 """
 for trading data
@@ -69,7 +69,6 @@ for LHB
 from tushare.stock.billboard import (top_list, cap_tops, broker_tops,
                                      inst_tops, inst_detail,
                                      get_em_gdzjc)
-
 
 """
 for utils
