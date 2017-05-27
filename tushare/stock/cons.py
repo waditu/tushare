@@ -38,7 +38,8 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'zz500wt':'000905closeweight.xls',
          't_ticks':'vMS_tradedetail.php', 'dw': 'downLoad.html',
          'qmd':'queryMargin.do', 'szsefc':'ShowReport.szse',
-         'ssecq':'commonQuery.do', 'sinadd':'cn_bill_download.php', 'ids_sw':'SwHy.php'}
+         'ssecq':'commonQuery.do', 'sinadd':'cn_bill_download.php', 'ids_sw':'SwHy.php',
+         'idx': 'index.php'}
 TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
 TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
 DAY_TRADING_COLUMNS = ['code', 'symbol', 'name', 'changepercent',
@@ -70,6 +71,8 @@ THE_FIELDS = ['code','symbol','name','changepercent','trade','open','high','low'
 KLINE_TT_COLS_MINS = ['date', 'open', 'close', 'high', 'low', 'volume']
 KLINE_TT_COLS = ['date', 'open', 'close', 'high', 'low', 'volume', 'amount', 'turnoverratio']
 TICK_PRICE_URL = '%smarket.%s/%s?date=%s&symbol=%s'
+TICK_PRICE_URL_TT = '%sstock.%s/data/%s?appn=detail&action=download&c=%s&d=%s'
+TICK_PRICE_URL_NT = '%squotes.%s/cjmx/%s/%s/%s.xls'
 TODAY_TICKS_PAGE_URL = '%s%s/quotes_service/api/%s/CN_Transactions.getAllPageTime?date=%s&symbol=%s'
 TODAY_TICKS_URL = '%s%s/quotes_service/view/%s?symbol=%s&date=%s&page=%s'
 KLINE_TT_URL = '%sweb.ifzq.%s/appstock/app/%skline/get?_var=kline_day%s&param=%s,%s,%s,%s,640,%s&r=0.%s'
@@ -138,6 +141,8 @@ LHB_MSG = '周期输入有误，请输入数字5、10、30或60'
 TOKEN_F_P = 'tk.csv'
 TOKEN_ERR_MSG = '请设置通联数据接口的token凭证码'
 BOX_INPUT_ERR_MSG = '请输入YYYY-MM格式的年月数据'
+TICK_SRCS = ['sn', 'tt', 'nt']
+TICK_SRC_ERROR = '数据源代码只能输入sn,tt,nt其中之一'
 INDEX_SYMBOL = {"399990": "sz399990", "000006": "sh000006", "399998": "sz399998", 
                 "399436": "sz399436", "399678": "sz399678", "399804": "sz399804", 
                 "000104": "sh000104", "000070": "sh000070", "399613": "sz399613", 
@@ -293,3 +298,15 @@ def _code_to_symbol(code):
             return ''
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
+        
+def _code_to_symbol_dgt(code):
+    """
+        生成symbol代码标志
+    """
+    if code in INDEX_LABELS:
+        return INDEX_LIST[code]
+    else:
+        if len(code) != 6 :
+            return ''
+        else:
+            return '0%s'%code if code[:1] in ['5', '6', '9'] else '1%s'%code

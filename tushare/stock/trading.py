@@ -128,7 +128,8 @@ def _parsing_dayprice_json(types):
     return df
 
 
-def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
+def get_tick_data(code=None, date=None, retry_count=3, pause=0.001,
+                  src='sn'):
     """
         获取分笔数据
     Parameters
@@ -136,11 +137,12 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
         code:string
                   股票代码 e.g. 600848
         date:string
-                  日期 format：YYYY-MM-DD
+                  日期 format: YYYY-MM-DD
         retry_count : int, 默认 3
                   如遇网络等问题重复执行的次数
         pause : int, 默认 0
                  重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+        src : 数据源选择，可输入sn(新浪)、tt(腾讯)、nt(网易)，默认sn
      return
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
@@ -148,18 +150,34 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001):
     """
     if code is None or len(code)!=6 or date is None:
         return None
-    symbol = _code_to_symbol(code)
+    if (src.strip() not in ct.TICK_SRCS):
+        print(ct.TICK_SRC_ERROR)
+        return None
+    symbol = ct._code_to_symbol(code)
+    symbol_dgt = ct._code_to_symbol_dgt(code)
+    datestr = date.replace('-', '')
+    url = {
+            ct.TICK_SRCS[0] : ct.TICK_PRICE_URL % (ct.P_TYPE['http'], ct.DOMAINS['sf'], ct.PAGES['dl'],
+                                date, symbol),
+            ct.TICK_SRCS[1] : ct.TICK_PRICE_URL_TT % (ct.P_TYPE['http'], ct.DOMAINS['tt'], ct.PAGES['idx'],
+                                           symbol, datestr),
+            ct.TICK_SRCS[2] : ct.TICK_PRICE_URL_NT % (ct.P_TYPE['http'], ct.DOMAINS['163'], date[0:4], 
+                                         datestr, symbol_dgt)
+             }
     for _ in range(retry_count):
         time.sleep(pause)
         try:
-            re = Request(ct.TICK_PRICE_URL % (ct.P_TYPE['http'], ct.DOMAINS['sf'], ct.PAGES['dl'],
-                                date, symbol))
-            lines = urlopen(re, timeout=10).read()
-            lines = lines.decode('GBK') 
-            if len(lines) < 20:
-                return None
-            df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
-                               skiprows=[0])      
+            if src == ct.TICK_SRCS[2]:
+                df = pd.read_excel(url[src])
+                df.columns = ct.TICK_COLUMNS
+            else:
+                re = Request(url[src])
+                lines = urlopen(re, timeout=10).read()
+                lines = lines.decode('GBK') 
+                if len(lines) < 20:
+                    return None
+                df = pd.read_table(StringIO(lines), names=ct.TICK_COLUMNS,
+                                   skiprows=[0])      
         except Exception as e:
             print(e)
         else:
