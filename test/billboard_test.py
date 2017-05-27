@@ -31,18 +31,16 @@ class Test(unittest.TestCase):
     def test_inst_detail(self):
         print(fd.inst_detail())
 
-    def test_get_em_gdzjc(self):
-        self.set_data()
-        print(fd.get_em_gdzjc(1, '2017-05-10', '2017-05-15'))
-        print(fd.get_em_gdzjc())
-        print(fd.get_em_gdzjc(1))
-        print(fd.get_em_gdzjc(0))
-
     def test_get_em_xuangu(self):
-        args = 'type=xgq&sty=xgq&token=eastmoney&c=[gz01(4|2,5|10)]&p=1&jn=bRcdkFLB&ps=40&s=gz01(4|2,5|10)&st=1&r=1495853526526'
-        args = 'type=xgq&sty=xgq&token=eastmoney&c=[gfzs7(BK0685)]&p=1&jn=XMlOhJak&ps=40&s=gfzs7(BK0685)&st=1&r=1495858108749'
-        args = 'type=xgq&sty=xgq&token=eastmoney&c=[hqzb06(1|10)]&p=1&jn=nTiaCPKx&ps=40&s=hqzb06(1|10)&st=-1&r=1495858916202'
+        # args = 'type=xgq&sty=xgq&token=eastmoney&c=[gz01(4|2,5|10)]&p=1&jn=bRcdkFLB&ps=40&s=gz01(4|2,5|10)&st=1&r=1495853526526'
+        # args = 'type=xgq&sty=xgq&token=eastmoney&c=[gfzs7(BK0685)]&p=1&jn=XMlOhJak&ps=40&s=gfzs7(BK0685)&st=1&r=1495858108749'
+        # args = 'type=xgq&sty=xgq&token=eastmoney&c=[hqzb06(1|10)]&p=1&jn=nTiaCPKx&ps=40&s=hqzb06(1|10)&st=-1&r=1495858916202'
         args = 'type=xgq&sty=xgq&token=eastmoney&c=[hqzb06(1|10)][gz01(1|0.5)]&p=1&jn=bbANYnOi&ps=40&s=gz01(1|0.5)&st=-1&r=1495859000981'
+        # args = 'type=xgq&sty=xgq&token=eastmoney&c=[gfzs7(BK0685)]&p=3&jn=gHTyZcgx&ps=40&s=gfzs7(BK0685)&st=1&r=1495872577477'
+        args = 'type=xgq&sty=xgq&token=eastmoney&c=[gfzs7(BK0685)][gfzs7(BK0701)]&p=1&jn=eGESMvPI&ps=40&s=gfzs7(BK0701)&st=1&r=1495873571656'
+        args = 'type=xgq&sty=xgq&token=eastmoney&c=[gfzs7(BK0701)]&p=1&jn=miupWSAg&ps=40&s=gfzs7(BK0701)&st=1&r=1495873611908'
+        # args = 'type=xgq&sty=xgq&token=eastmoney&c=[gfzs7(BK0505)]&p=1&jn=PyAUJluU&ps=40&s=gfzs7(BK0505)&st=1&r=1495874071329'
+        # args = 'type=xgq&sty=xgq&token=eastmoney&c=[gz01(1|0)]&p=70&jn=ppTbgXzs&ps=40&s=gz01(1|0)&st=-1&r=1495874145609'
         print(fd.get_em_xuangu(args))
 
 if __name__ == "__main__":
