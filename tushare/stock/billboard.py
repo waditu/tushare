@@ -373,8 +373,14 @@ def get_em_xuangu(*args):
     splitSymbol = ','
     while 1:
         url = 'http://xuanguapi.eastmoney.com/Stock/JS.aspx?{}'.format(args[0])
-        # data = urlopen(Request(url), timeout=30).read().decode('gbk')
-        data = urlopen(Request(url), timeout=30).read()
+        url = re.sub(r'&p=\d*&', '&p={}&'.format(pageNum), url)
+        try:
+            # data = urlopen(Request(url), timeout=30).read().decode('gbk')
+            data = urlopen(Request(url), timeout=30).read()
+        except Exception as e:
+            print('!!!Warning!!! {}'.format(str(e)))
+            break
+
         matched = re.match(b"[^{]*(.*)", data)
         if matched:
             jdata = demjson.decode(matched.group(1))
@@ -382,7 +388,7 @@ def get_em_xuangu(*args):
         if pageNum == 1:
             pageCount = int(jdata['PageCount'])
             columns = [ 'C_{}'.format(jdata['Results'][0].split(splitSymbol).index(c)) for c in jdata['Results'][0].split(splitSymbol) if jdata['Results'][0] ]
-            pageNum += 1
+        pageNum += 1
         if pageNum > pageCount:
             break
     df_tmp = pd.DataFrame(dataList, columns=['tmp_col'])
