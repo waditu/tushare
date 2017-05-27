@@ -421,6 +421,7 @@ def get_em_xuangu(*args):
     dataList = []
     pageNum = 1
     pageCount = 5
+    splitSymbol = ','
     while 1:
         url = 'http://xuanguapi.eastmoney.com/Stock/JS.aspx?{}'.format(args[0])
         # data = urlopen(Request(url), timeout=30).read().decode('gbk')
@@ -431,7 +432,9 @@ def get_em_xuangu(*args):
         dataList += jdata['Results']
         if pageNum == 1:
             pageCount = int(jdata['PageCount'])
-        pageNum += 1
+            columns = [ 'C_{}'.format(jdata['Results'][0].split(splitSymbol).index(c)) for c in jdata['Results'][0].split(splitSymbol) if jdata['Results'][0] ]
+            pageNum += 1
         if pageNum > pageCount:
             break
-    return pd.DataFrame(dataList)
+    df_tmp = pd.DataFrame(dataList, columns=['tmp_col'])
+    return pd.DataFrame(df_tmp.tmp_col.str.split(splitSymbol).tolist(), columns=columns)
