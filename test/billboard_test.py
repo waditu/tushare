@@ -26,10 +26,17 @@ class Test(unittest.TestCase):
       
     def test_inst_tops(self):
         self.set_data()
-        print(fd.inst_tops(self.days))  
+        print(fd.inst_tops(self.days))
         
     def test_inst_detail(self):
-        print(fd.inst_detail())  
-        
+        print(fd.inst_detail())
+
+    def test_get_em_xuangu(self):
+        args = 'type=xgq&sty=xgq&token=eastmoney&c=[gz01(4|2,5|10)]&p=1&jn=bRcdkFLB&ps=40&s=gz01(4|2,5|10)&st=1&r=1495853526526'
+        args = 'type=xgq&sty=xgq&token=eastmoney&c=[gfzs7(BK0685)]&p=1&jn=XMlOhJak&ps=40&s=gfzs7(BK0685)&st=1&r=1495858108749'
+        args = 'type=xgq&sty=xgq&token=eastmoney&c=[hqzb06(1|10)]&p=1&jn=nTiaCPKx&ps=40&s=hqzb06(1|10)&st=-1&r=1495858916202'
+        args = 'type=xgq&sty=xgq&token=eastmoney&c=[hqzb06(1|10)][gz01(1|0.5)]&p=1&jn=bbANYnOi&ps=40&s=gz01(1|0.5)&st=-1&r=1495859000981'
+        print(fd.get_em_xuangu(args))
+
 if __name__ == "__main__":
     unittest.main()
