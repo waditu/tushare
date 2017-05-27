@@ -382,7 +382,12 @@ def get_em_gdzjc(type=True, start=None, end=None):
     while 1:
         url = 'http://datainterface3.eastmoney.com/EM_DataCenter_V3/api/GDZC/GetGDZC?tkn=eastmoney&cfg=gdzc&secucode=&fx={}&sharehdname=&pageSize={}&pageNum={}&sortFields=BDJZ&sortDirec=1&startDate={}&endDate={}'.format(fx, pageSize, pageNum, startDate, endDate)
         # data = urlopen(Request(url), timeout=30).read().decode('gbk')
-        data = urlopen(Request(url), timeout=30).read()
+        try:
+            # data = urlopen(Request(url), timeout=30).read().decode('gbk')
+            data = urlopen(Request(url), timeout=30).read()
+        except Exception as e:
+            print('!!!Warning!!! {}'.format(str(e)))
+            break
         jdata = demjson.decode(data)
         dataList += jdata['Data'][0]['Data']
         if pageNum == 1:
