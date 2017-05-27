@@ -396,3 +396,42 @@ def get_em_gdzjc(type=True, start=None, end=None):
     df_tmp = pd.DataFrame(dataList, columns=['tmp_col'])
     return pd.DataFrame(df_tmp.tmp_col.str.split(splitSymbol).tolist(), columns=columns)
         # columns = ['SHCode', 'CompanyCode', 'SCode', 'Close', 'ChangePercent', 'SName', 'ShareHdName', 'FX', 'ChangeNum', 'BDSLZLTB', 'BDZGBBL', 'JYFS', 'BDHCGZS', 'BDHCGBL', 'BDHCYLTGSL', 'BDHCYLTSLZLTGB', 'BDKS', 'BDJZ', 'NOTICEDATE']
+
+def get_em_xuangu(*args):
+    """
+        获取东方财富网数据中心选股公式
+    http://xuanguapi.eastmoney.com/Stock/JS.aspx?type=xgq&sty=xgq&token=eastmoney&c=[gfzs7(BK0685)]&p=1&jn=PBSauVYc&ps=40&s=gfzs7(BK0685)&st=1&r=1495854196624
+    Parameters
+    --------
+    type:xgq
+    sty:xgq
+    token:eastmoney
+    c:[gfzs7(BK0685)]
+    p:1
+    jn:PBSauVYc
+    ps:40
+    s:gfzs7(BK0685)
+    st:1
+    r:1495854196624
+       说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
+    Return
+    --------
+    Data: []
+    """
+    dataList = []
+    pageNum = 1
+    pageCount = 5
+    while 1:
+        url = 'http://xuanguapi.eastmoney.com/Stock/JS.aspx?{}'.format(args[0])
+        # data = urlopen(Request(url), timeout=30).read().decode('gbk')
+        data = urlopen(Request(url), timeout=30).read()
+        matched = re.match(b"[^{]*(.*)", data)
+        if matched:
+            jdata = demjson.decode(matched.group(1))
+        dataList += jdata['Results']
+        if pageNum == 1:
+            pageCount = int(jdata['PageCount'])
+        pageNum += 1
+        if pageNum > pageCount:
+            break
+    return pd.DataFrame(dataList)
