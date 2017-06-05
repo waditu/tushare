@@ -12,7 +12,7 @@ from urllib.parse import urlencode
 from datetime import date, timedelta
 from bs4 import BeautifulSoup
 import pandas as pd
-from tushare.future import domestic_cons as ct
+from tushare.futures import domestic_cons as ct
 
 def get_cffex_daily(day=None):
     """
