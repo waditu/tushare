@@ -7,13 +7,13 @@ Created on 2017年06月04日
 '''
 
 import json
-from datetime import date, timedelta
+import datetime
 from bs4 import BeautifulSoup
 import pandas as pd
 from tushare.futures import domestic_cons as ct
 try:
     from urllib.request import urlopen, Request
-    from urllib.request import urlencode
+    from urllib.parse import urlencode
     from http.client import IncompleteRead
 except ImportError:
     from urllib2 import urlopen, Request
@@ -46,7 +46,7 @@ def get_cffex_daily(date = None):
                 variety       合约类别
         或 None(给定日期没有交易数据)
     """
-    day = ct.convert_date(date) if date is not None else date.today()
+    day = ct.convert_date(date) if date is not None else datetime.date.today()
     try:
         html = urlopen(Request(ct.CFFEX_DAILY_URL % (day.strftime('%Y%m'), 
                                                      day.strftime('%d'), day.strftime('%Y%m%d')), 
@@ -109,7 +109,7 @@ def get_czce_daily(date=None):
                 variety       合约类别
         或 None(给定日期没有交易数据)
     """
-    day = ct.convert_date(date) if date is not None else date.today()
+    day = ct.convert_date(date) if date is not None else datetime.date.today()
 
     try:
         html = urlopen(Request(ct.CZCE_DAILY_URL % (day.strftime('%Y'),
@@ -163,7 +163,7 @@ def get_shfe_vwap(date = None):
                 vwap          加权平均成交均价
         或 None(给定日期没有数据)
     """    
-    day = ct.convert_date(date) if date is not None else date.today()
+    day = ct.convert_date(date) if date is not None else datetime.date.today()
 
     try:
         json_data = json.loads(urlopen(Request(ct.SHFE_VWAP_URL % (day.strftime('%Y%m%d')), 
@@ -207,7 +207,7 @@ def get_shfe_daily(date = None):
                 variety       合约类别
         或 None(给定日期没有交易数据)
     """    
-    day = ct.convert_date(date) if date is not None else date.today()
+    day = ct.convert_date(date) if date is not None else datetime.date.today()
 
     try:
         json_data = json.loads(urlopen(Request(ct.SHFE_DAILY_URL % (day.strftime('%Y%m%d')), 
@@ -262,7 +262,7 @@ def get_dce_daily(date = None, retries=0):
                 variety       合约类别
         或 None(给定日期没有交易数据)
     """
-    day = ct.convert_date(date) if date is not None else date.today()
+    day = ct.convert_date(date) if date is not None else datetime.date.today()
     if retries > 3:
         print("maximum retires for DCE market data: ", day.strftime("%Y%m%d"))
         return
@@ -357,15 +357,15 @@ def get_future_daily(start = None, end = None, market = 'CFFEX'):
         print('Invalid market.')
         return
     
-    start = ct.convert_date(start) if start is not None else date.today()
-    end = ct.convert_date(end) if end is not None else date.today()
+    start = ct.convert_date(start) if start is not None else datetime.date.today()
+    end = ct.convert_date(end) if end is not None else datetime.date.today()
 
     df_list = list()
     while start <= end:
         df = f(start)
         if df is not None:
             df_list.append(df)
-        start += timedelta(days = 1)
+        start += datetime.timedelta(days = 1)
 
     if len(df_list) > 0:
         return pd.concat(df_list)
