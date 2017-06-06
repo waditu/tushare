@@ -7,20 +7,26 @@ Created on 2017年06月04日
 '''
 
 import json
-from urllib import request, error
-from urllib.parse import urlencode
-from http.client import IncompleteRead
 from datetime import date, timedelta
 from bs4 import BeautifulSoup
 import pandas as pd
 from tushare.futures import domestic_cons as ct
+try:
+    from urllib.request import urlopen, Request
+    from urllib.request import urlencode
+    from http.client import IncompleteRead
+except ImportError:
+    from urllib2 import urlopen, Request
+    from urllib2 import HTTPError
+    from httplib import IncompleteRead
 
-def get_cffex_daily(day=None):
+
+def get_cffex_daily(date = None):
     """
         获取中金所日交易数据
     Parameters
     ------
-        day: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
+        date: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
     Return
     -------
         DataFrame
@@ -40,12 +46,15 @@ def get_cffex_daily(day=None):
                 variety       合约类别
         或 None(给定日期没有交易数据)
     """
-    day = ct.convert_date(day) if day is not None else date.today()
+    day = ct.convert_date(date) if date is not None else date.today()
     try:
-        html = request.urlopen(request.Request(ct.CFFEX_DAILY_URL % (day.strftime('%Y%m'), day.strftime('%d'), day.strftime('%Y%m%d')), headers=ct.SIM_HAEDERS)).read().decode('gbk','ignore')
-    except error.HTTPError as reason:
+        html = urlopen(Request(ct.CFFEX_DAILY_URL % (day.strftime('%Y%m'), 
+                                                     day.strftime('%d'), day.strftime('%Y%m%d')), 
+                               headers=ct.SIM_HAEDERS)).read().decode('gbk', 'ignore')
+    except HTTPError as reason:
         if reason.code != 404:
-            print(ct.CFFEX_DAILY_URL % (day.strftime('%Y%m'), day.strftime('%d'), day.strftime('%Y%m%d')), reason)
+            print(ct.CFFEX_DAILY_URL % (day.strftime('%Y%m'), day.strftime('%d'), 
+                                        day.strftime('%Y%m%d')), reason)
         return
 
     if html.find(u'网页错误') >= 0:
@@ -75,12 +84,12 @@ def get_cffex_daily(day=None):
     return pd.DataFrame(dict_data)[ct.OUTPUT_COLUMNS]
 
 
-def get_czce_daily(day=None):
+def get_czce_daily(date=None):
     """
         获取郑商所日交易数据
     Parameters
     ------
-        day: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
+        date: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
     Return
     -------
         DataFrame
@@ -100,19 +109,22 @@ def get_czce_daily(day=None):
                 variety       合约类别
         或 None(给定日期没有交易数据)
     """
-    day = ct.convert_date(day) if day is not None else date.today()
+    day = ct.convert_date(date) if date is not None else date.today()
 
     try:
-        html = request.urlopen(request.Request(ct.CZCE_DAILY_URL % (day.strftime('%Y'),day.strftime('%Y%m%d')), headers=ct.SIM_HAEDERS)).read().decode('gbk','ignore')
-    except error.HTTPError as reason:
+        html = urlopen(Request(ct.CZCE_DAILY_URL % (day.strftime('%Y'),
+                                                    day.strftime('%Y%m%d')), 
+                               headers=ct.SIM_HAEDERS)).read().decode('gbk', 'ignore')
+    except HTTPError as reason:
         if reason.code != 404:
-            print(ct.CZCE_DAILY_URL % (day.strftime('%Y'),day.strftime('%Y%m%d')), reason)            
+            print(ct.CZCE_DAILY_URL % (day.strftime('%Y'),
+                                       day.strftime('%Y%m%d')), reason)            
         return
     
-    if html.find('您的访问出错了') >= 0:
+    if html.find(u'您的访问出错了') >= 0:
         return
-    html = [i.replace(' ','').split('|') for i in html.split('\n')[:-4] if i[0][0] != '小']
-    if html[1][0]!='品种月份':
+    html = [i.replace(' ','').split('|') for i in html.split('\n')[:-4] if i[0][0] != u'小']
+    if html[1][0] != u'品种月份':
             return
     
     dict_data = list()
@@ -135,12 +147,12 @@ def get_czce_daily(day=None):
     return pd.DataFrame(dict_data)[ct.OUTPUT_COLUMNS]
 
 
-def get_shfe_vwap(day):
+def get_shfe_vwap(date = None):
     """
         获取上期所日成交均价数据
     Parameters
     ------
-        day: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
+        date: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
     Return
     -------
         DataFrame
@@ -151,11 +163,12 @@ def get_shfe_vwap(day):
                 vwap          加权平均成交均价
         或 None(给定日期没有数据)
     """    
-    day = ct.convert_date(day) if day is not None else date.today()
+    day = ct.convert_date(date) if date is not None else date.today()
 
     try:
-        json_data = json.loads(request.urlopen(request.Request(ct.SHFE_VWAP_URL % (day.strftime('%Y%m%d')), headers=ct.SIM_HAEDERS)).read().decode('utf8'))
-    except error.HTTPError as reason:
+        json_data = json.loads(urlopen(Request(ct.SHFE_VWAP_URL % (day.strftime('%Y%m%d')), 
+                                               headers=ct.SIM_HAEDERS)).read().decode('utf8'))
+    except HTTPError as reason:
         if reason.code != 404:
             print(ct.SHFE_DAILY_URL % (day.strftime('%Y%m%d')), reason)            
         return    
@@ -169,12 +182,12 @@ def get_shfe_vwap(day):
     return df.rename(columns=ct.SHFE_VWAP_COLUMNS)[list(ct.SHFE_VWAP_COLUMNS.values())]    
 
 
-def get_shfe_daily(day=None):
+def get_shfe_daily(date = None):
     """
         获取上期所日交易数据
     Parameters
     ------
-        day: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
+        date: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
     Return
     -------
         DataFrame
@@ -194,11 +207,12 @@ def get_shfe_daily(day=None):
                 variety       合约类别
         或 None(给定日期没有交易数据)
     """    
-    day = ct.convert_date(day) if day is not None else date.today()
+    day = ct.convert_date(date) if date is not None else date.today()
 
     try:
-        json_data = json.loads(request.urlopen(request.Request(ct.SHFE_DAILY_URL % (day.strftime('%Y%m%d')), headers=ct.SIM_HAEDERS)).read().decode('utf8'))
-    except error.HTTPError as reason:
+        json_data = json.loads(urlopen(Request(ct.SHFE_DAILY_URL % (day.strftime('%Y%m%d')), 
+                                               headers=ct.SIM_HAEDERS)).read().decode('utf8'))
+    except HTTPError as reason:
         if reason.code != 404:
             print(ct.SHFE_DAILY_URL % (day.strftime('%Y%m%d')), reason)            
         return    
@@ -206,7 +220,7 @@ def get_shfe_daily(day=None):
     if len(json_data['o_curinstrument']) == 0:
         return
     
-    df = pd.DataFrame([row for row in json_data['o_curinstrument'] if row['DELIVERYMONTH'] != '小计' and row['DELIVERYMONTH'] != ''])
+    df = pd.DataFrame([row for row in json_data['o_curinstrument'] if row['DELIVERYMONTH'] != u'小计' and row['DELIVERYMONTH'] != ''])
     df['variety'] = df.PRODUCTID.str.slice(0, -6)
     df['symbol'] = df['variety'].str.upper() + df['DELIVERYMONTH']
     df['date'] = day.strftime('%Y%m%d')
@@ -223,12 +237,12 @@ def get_shfe_daily(day=None):
     return df[ct.OUTPUT_COLUMNS]
 
 
-def get_dce_daily(day=None, retries=0):
+def get_dce_daily(date = None, retries=0):
     """
         获取大连商品交易所日交易数据
     Parameters
     ------
-        day: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
+        date: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
     Return
     -------
         DataFrame
@@ -248,16 +262,20 @@ def get_dce_daily(day=None, retries=0):
                 variety       合约类别
         或 None(给定日期没有交易数据)
     """
-    day = ct.convert_date(day) if day is not None else date.today()    
-
+    day = ct.convert_date(date) if date is not None else date.today()
     if retries > 3:
         print("maximum retires for DCE market data: ", day.strftime("%Y%m%d"))
         return
     
+    url = ct.DCE_DAILY_URL + '?' + urlencode({"currDate":day.strftime('%Y%m%d'),
+                                              "year":day.strftime('%Y'), 
+                                              "month": str(int(day.strftime('%m'))-1), 
+                                              "day":day.strftime('%d')})
+
     
-    url = ct.DCE_DAILY_URL + '?' + urlencode({"currDate":day.strftime('%Y%m%d'),"year":day.strftime('%Y'), "month": str(int(day.strftime('%m'))-1), "day":day.strftime('%d')})
+    
     try:
-        response = request.urlopen(request.Request(url, method='POST', headers=ct.DCE_HEADERS)).read().decode('utf8')
+        response = urlopen(request.Request(url, method='POST', headers=ct.DCE_HEADERS)).read().decode('utf8')
     except IncompleteRead as reason:
         return get_dce_daily(day, retries+1)
     except error.HTTPError as reason:
@@ -278,7 +296,7 @@ def get_dce_daily(day=None, retries=0):
     
     dict_data = list()
     for idata in data[1:]:
-        if '小计' in idata.text or '总计' in idata.text:
+        if u'小计' in idata.text or u'总计' in idata.text:
             continue
         x = idata.find_all('td')
         row_dict = dict()
@@ -300,7 +318,7 @@ def get_dce_daily(day=None, retries=0):
     return df[ct.OUTPUT_COLUMNS]
 
 
-def get_future_daily(start=None, end=None, market='CFFEX'):
+def get_future_daily(start = None, end = None, market = 'CFFEX'):
     """
         获取中金所日交易数据
     Parameters
@@ -342,13 +360,13 @@ def get_future_daily(start=None, end=None, market='CFFEX'):
     start = ct.convert_date(start) if start is not None else date.today()
     end = ct.convert_date(end) if end is not None else date.today()
 
-
     df_list = list()
     while start <= end:
         df = f(start)
         if df is not None:
             df_list.append(df)
-        start += timedelta(days=1)
+        start += timedelta(days = 1)
 
     if len(df_list) > 0:
         return pd.concat(df_list)
+
