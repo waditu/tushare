@@ -1,4 +1,4 @@
-__version__ = '0.7.9'
+__version__ = '0.8.0'
 __author__ = 'Jimmy Liu'
 """
 for trading data
@@ -109,3 +109,11 @@ from tushare.stock.globals import (global_realtime)
 
 
 from tushare.util.mailmerge import (MailMerge)
+
+
+"""
+for futures API
+"""
+from tushare.futures.domestic import (get_cffex_daily, get_czce_daily,
+                                      get_dce_daily, get_future_daily,
+                                      get_shfe_daily, get_shfe_vwap)
