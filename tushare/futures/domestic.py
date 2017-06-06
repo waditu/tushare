@@ -276,10 +276,10 @@ def get_dce_daily(date = None, retries=0):
     
     
     try:
-        response = urlopen(request.Request(url, method='POST', headers=ct.DCE_HEADERS)).read().decode('utf8')
+        response = urlopen(Request(url, method='POST', headers=ct.DCE_HEADERS)).read().decode('utf8')
     except IncompleteRead as reason:
         return get_dce_daily(day, retries+1)
-    except error.HTTPError as reason:
+    except HTTPError as reason:
         if reason.code == 504:
             return get_dce_daily(day, retries+1)
         elif reason.code != 404:
