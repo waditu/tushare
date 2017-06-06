@@ -17,6 +17,7 @@ try:
     from urllib.error import HTTPError
     from http.client import IncompleteRead
 except ImportError:
+    from urllib import urlencode
     from urllib2 import urlopen, Request
     from urllib2 import HTTPError
     from httplib import IncompleteRead
