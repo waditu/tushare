@@ -14,6 +14,7 @@ from tushare.futures import domestic_cons as ct
 try:
     from urllib.request import urlopen, Request
     from urllib.parse import urlencode
+    from urllib.error import HTTPError
     from http.client import IncompleteRead
 except ImportError:
     from urllib2 import urlopen, Request
@@ -227,7 +228,7 @@ def get_shfe_daily(date = None):
     vwap_df = get_shfe_vwap(day)
     if vwap_df is not None:
         df = pd.merge(df, vwap_df[vwap_df.time_range == '9:00-15:00'], on=['date', 'symbol'], how='left')
-        df['turnover'] = df.vwap * df.volume
+        df['turnover'] = df.vwap * df.VOLUME
     else:
         print('Failed to fetch SHFE vwap.', day.strftime('%Y%m%d'))
         df['turnover'] = .0
