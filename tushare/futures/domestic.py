@@ -14,9 +14,11 @@ from tushare.futures import domestic_cons as ct
 try:
     from urllib.request import urlopen, Request
     from urllib.request import urlencode
+    from http.client import IncompleteRead
 except ImportError:
     from urllib2 import urlopen, Request
     from urllib2 import HTTPError
+    from httplib import IncompleteRead
 
 
 def get_cffex_daily(date = None):
@@ -225,15 +227,17 @@ def get_shfe_daily(date = None):
     vwap_df = get_shfe_vwap(day)
     if vwap_df is not None:
         df = pd.merge(df, vwap_df[vwap_df.time_range == '9:00-15:00'], on=['date', 'symbol'], how='left')
+        df['turnover'] = df.vwap * df.volume
     else:
-        print('Failed to fetch SHFE vwap.')
+        print('Failed to fetch SHFE vwap.', day.strftime('%Y%m%d'))
+        df['turnover'] = .0
     df.rename(columns=ct.SHFE_COLUMNS, inplace=True)
-    df['turnover'] = df.vwap * df.volume    
+    
     df['pre_close'] = df['ZD2_CHG'] + df['close']
     return df[ct.OUTPUT_COLUMNS]
 
 
-def get_dce_daily(date = None):
+def get_dce_daily(date = None, retries=0):
     """
         获取大连商品交易所日交易数据
     Parameters
@@ -257,13 +261,30 @@ def get_dce_daily(date = None):
                 pre_settle    前结算价
                 variety       合约类别
         或 None(给定日期没有交易数据)
-    """    
-    day = ct.convert_date(date) if date is not None else date.today()    
+    """
+    day = ct.convert_date(date) if date is not None else date.today()
+    if retries > 3:
+        print("maximum retires for DCE market data: ", day.strftime("%Y%m%d"))
+        return
+    
     url = ct.DCE_DAILY_URL + '?' + urlencode({"currDate":day.strftime('%Y%m%d'),
                                               "year":day.strftime('%Y'), 
                                               "month": str(int(day.strftime('%m'))-1), 
                                               "day":day.strftime('%d')})
-    response = urlopen(Request(url, method='POST', headers=ct.DCE_HEADERS)).read().decode('utf8')
+
+    
+    
+    try:
+        response = urlopen(request.Request(url, method='POST', headers=ct.DCE_HEADERS)).read().decode('utf8')
+    except IncompleteRead as reason:
+        return get_dce_daily(day, retries+1)
+    except error.HTTPError as reason:
+        if reason.code == 504:
+            return get_dce_daily(day, retries+1)
+        elif reason.code != 404:
+            print(ct.DCE_DAILY_URL, reason)            
+        return       
+    
     if u'错误：您所请求的网址（URL）无法获取' in response:
         return
     elif u'暂无数据' in response:
