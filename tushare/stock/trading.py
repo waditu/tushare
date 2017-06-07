@@ -96,7 +96,7 @@ def get_hist_data(code=None, start=None, end=None,
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def _parsing_dayprice_json(types):
+def _parsing_dayprice_json(types=None, page=1):
     """
            处理当日行情分页数据，格式为json
      Parameters
@@ -106,9 +106,9 @@ def _parsing_dayprice_json(types):
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
     """
-#     ct._write_console()
+    ct._write_console()
     request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                 ct.PAGES['jv'], types))
+                                 ct.PAGES['jv'], types, page))
     text = urlopen(request, timeout=10).read()
     if text == 'null':
         return None
@@ -308,13 +308,14 @@ def get_today_all():
       DataFrame
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率，成交额，市盈率，市净率，总市值，流通市值
     """
-#     ct._write_head()
-    df = _parsing_dayprice_json('hs_a').append(_parsing_dayprice_json('shfxjs'),
+    ct._write_head()
+    df = _parsing_dayprice_json('hs_a', 1)
+    if df is not None:
+        for i in range(2, ct.PAGE_NUM[0]):
+            newdf = _parsing_dayprice_json('hs_a', i)
+            df = df.append(newdf, ignore_index=True)
+    df = df.append(_parsing_dayprice_json('shfxjs', 1),
                                                ignore_index=True)
-#     if df is not None:
-#         for i in range(2, ct.PAGE_NUM[0]):
-#             newdf = _parsing_dayprice_json(i)
-#             df = df.append(newdf, ignore_index=True)
     return df
 
 
