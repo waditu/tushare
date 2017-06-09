@@ -46,8 +46,10 @@ def read_url(url):
     """
     读取URL对应的内容（模拟浏览器）
     Parameters
+    ------
         url string 需要读取的链接
     Return
+    ------
         string 读取的内容
     """
     req_header_this = req_header
@@ -68,13 +70,16 @@ def query_news(keywords='*',start_date=None,end_date=None):
     """
     读取某一时间段对应的新闻链接列表
     Parameters
+    ------
         keywords string 关键词
         start_date string 开始日期，格式yyyy-mm-dd
         end_date string 结束日期，格式yyyy-mm-dd
     Return
+    ------
         List<string> 读取的内容
     """
     if start_date is None or end_date is None:
+        now_time = datetime.datetime.now()
         last_day = datetime.datetime(now_time.year,now_time.month,now_time.day,12,0) - datetime.timedelta(seconds = 3600*24)
         start_date = last_day.strftime("%Y-%m-%d")
         end_date = start_date
@@ -98,8 +103,10 @@ def is_blog(url):
     """
     判断某一链接是否博客
     Parameters
+    ------
         url string 需要判断的链接
     Return
+    ------
         bool 该url是否是博客URL
     """
     return len(re.findall('blog\.caixin\.com',url))>0
@@ -108,8 +115,10 @@ def read_page(url):
     """
     读取链接的内容
     Parameters
+    ------
         url string 需要判断的链接
     Return
+    ------
         title string 文章标题
         text string 文章内容
     """
