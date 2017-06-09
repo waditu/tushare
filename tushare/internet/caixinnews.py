@@ -75,6 +75,7 @@ def query_news(keywords='*',start_date=None,end_date=None):
         List<string> 读取的内容
     """
     if start_date is None or end_date is None:
+        now_time = datetime.datetime.now()
         last_day = datetime.datetime(now_time.year,now_time.month,now_time.day,12,0) - datetime.timedelta(seconds = 3600*24)
         start_date = last_day.strftime("%Y-%m-%d")
         end_date = start_date
