@@ -37,11 +37,10 @@ def get_cffex_daily(date = None):
                 date          日期
                 open          开盘价
                 high          最高价
-                low           最低价
+                low          最低价
                 close         收盘价
-                pre_close     前收盘价
                 volume        成交量
-                open_interest 持仓量
+                open_interest   持仓量
                 turnover      成交额
                 settle        结算价
                 pre_settle    前结算价
@@ -77,76 +76,108 @@ def get_cffex_daily(date = None):
         for i,field in enumerate(ct.CFFEX_COLUMNS):
             if row[i+1] == u"":
                 row_dict[field] = 0.0
+            elif field in ['volume', 'open_interest', 'oi_chg']:
+                row_dict[field] = int(row[i+1])        
             else:
                 row_dict[field] = float(row[i+1])
-        row_dict[ct.OUTPUT_COLUMNS[ct.PRE_SETTLE_LOC]] = row_dict[ct.OUTPUT_COLUMNS[ct.CLOSE_LOC]] - row_dict['change1']
-        row_dict[ct.OUTPUT_COLUMNS[ct.PRE_CLOSE_LOC]] = row_dict[ct.OUTPUT_COLUMNS[ct.CLOSE_LOC]] - row_dict['change2']
+        row_dict['pre_settle'] = row_dict['close'] - row_dict['change1']
         dict_data.append(row_dict)
         
     return pd.DataFrame(dict_data)[ct.OUTPUT_COLUMNS]
 
 
-def get_czce_daily(date=None):
+def get_czce_daily(date=None, type="future"):
     """
         获取郑商所日交易数据
     Parameters
     ------
         date: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
+        type: 数据类型, 为'future'期货 或 'option'期权二者之一
     Return
     -------
         DataFrame
-            郑商所日交易数据(DataFrame):
+            郑商所每日期货交易数据:
                 symbol        合约代码
                 date          日期
                 open          开盘价
                 high          最高价
                 low           最低价
                 close         收盘价
-                pre_close     前收盘价
                 volume        成交量
                 open_interest 持仓量
                 turnover      成交额
                 settle        结算价
                 pre_settle    前结算价
                 variety       合约类别
-        或 None(给定日期没有交易数据)
+        或 
+        DataFrame
+           郑商所每日期权交易数据
+                symbol        合约代码
+                date          日期
+                open          开盘价
+                high          最高价
+                low           最低价
+                close         收盘价
+                pre_settle      前结算价
+                settle         结算价
+                delta          对冲值  
+                volume         成交量
+                open_interest     持仓量
+                oi_change       持仓变化
+                turnover        成交额
+                implied_volatility 隐含波动率
+                exercise_volume   行权量
+                variety        合约类别
+        None(类型错误或给定日期没有交易数据)
     """
+    if type == 'future':
+        url = ct.CZCE_DAILY_URL
+        listed_columns = ct.CZCE_COLUMNS
+        output_columns = ct.OUTPUT_COLUMNS
+    elif type == 'option':
+        url = ct.CZCE_OPTION_URL
+        listed_columns = ct.CZCE_OPTION_COLUMNS
+        output_columns = ct.OPTION_OUTPUT_COLUMNS
+    else:
+        print('invalid type :' + type + ',type should be one of "future" or "option"')
+        return
+    
     day = ct.convert_date(date) if date is not None else datetime.date.today()
 
     try:
-        html = urlopen(Request(ct.CZCE_DAILY_URL % (day.strftime('%Y'),
-                                                    day.strftime('%Y%m%d')), 
+        html = urlopen(Request(url % (day.strftime('%Y'),
+                                                    day.strftime('%Y%m%d')),
                                headers=ct.SIM_HAEDERS)).read().decode('gbk', 'ignore')
     except HTTPError as reason:
         if reason.code != 404:
             print(ct.CZCE_DAILY_URL % (day.strftime('%Y'),
                                        day.strftime('%Y%m%d')), reason)            
         return
-    
-    if html.find(u'您的访问出错了') >= 0:
+    if html.find(u'您的访问出错了') >= 0 or html.find('无期权每日行情交易记录') >= 0:
         return
     html = [i.replace(' ','').split('|') for i in html.split('\n')[:-4] if i[0][0] != u'小']
-    if html[1][0] != u'品种月份':
+    if html[1][0] not in [u'品种月份', u'品种代码']:
             return
-    
+        
     dict_data = list()
     day_const = int(day.strftime('%Y%m%d'))
-    for ihtml in html[2:]:
-        m = ct.FUTURE_SYMBOL_PATTERN.match(ihtml[0])
+    for row in html[2:]:
+        m = ct.FUTURE_SYMBOL_PATTERN.match(row[0])
         if not m:
             continue
-        row_dict = {'date': day_const, 'symbol': ihtml[0], 'variety': m.group(1)}
-        
-        for i,field in enumerate(ct.CZCE_COLUMNS):
-            if ihtml[i+1] == "\r":
+        row_dict = {'date': day_const, 'symbol': row[0], 'variety': m.group(1)}
+        for i,field in enumerate(listed_columns):
+            if row[i+1] == "\r":
                 row_dict[field] = 0.0
+            elif field in ['volume', 'open_interest', 'oi_chg', 'exercise_volume']:
+                row[i+1] = row[i+1].replace(',','')
+                row_dict[field] = int(row[i+1])                
             else:
-                ihtml[i+1] = ihtml[i+1].replace(',','')
-                row_dict[field] = float(ihtml[i+1])
-        row_dict['pre_settle'] = row_dict['close'] - row_dict['change2']
+                row[i+1] = row[i+1].replace(',','')
+                row_dict[field] = float(row[i+1])
         dict_data.append(row_dict)
-
-    return pd.DataFrame(dict_data)[ct.OUTPUT_COLUMNS]
+        
+    return pd.DataFrame(dict_data)[output_columns]
 
 
 def get_shfe_vwap(date = None):
@@ -200,12 +231,11 @@ def get_shfe_daily(date = None):
                 high          最高价
                 low           最低价
                 close         收盘价
-                pre_close     前收盘价
                 volume        成交量
                 open_interest 持仓量
                 turnover      成交额
                 settle        结算价
-                pre_settle    前结算价
+                pre_settle     前结算价
                 variety       合约类别
         或 None(给定日期没有交易数据)
     """    
@@ -223,8 +253,8 @@ def get_shfe_daily(date = None):
         return
     
     df = pd.DataFrame([row for row in json_data['o_curinstrument'] if row['DELIVERYMONTH'] != u'小计' and row['DELIVERYMONTH'] != ''])
-    df['variety'] = df.PRODUCTID.str.slice(0, -6)
-    df['symbol'] = df['variety'].str.upper() + df['DELIVERYMONTH']
+    df['variety'] = df.PRODUCTID.str.slice(0, -6).str.upper()
+    df['symbol'] = df['variety'] + df['DELIVERYMONTH']
     df['date'] = day.strftime('%Y%m%d')
     vwap_df = get_shfe_vwap(day)
     if vwap_df is not None:
@@ -234,17 +264,17 @@ def get_shfe_daily(date = None):
         print('Failed to fetch SHFE vwap.', day.strftime('%Y%m%d'))
         df['turnover'] = .0
     df.rename(columns=ct.SHFE_COLUMNS, inplace=True)
-    
-    df['pre_close'] = df['ZD2_CHG'] + df['close']
     return df[ct.OUTPUT_COLUMNS]
 
 
-def get_dce_daily(date = None, retries=0):
+def get_dce_daily(date = None, type="future", retries=0):
     """
         获取大连商品交易所日交易数据
     Parameters
     ------
         date: 日期 format：YYYY-MM-DD 或 YYYYMMDD 或 datetime.date对象 为空时为当天
+        type: 数据类型, 为'future'期货 或 'option'期权二者之一
+        retries: int, 当前重试次数，达到3次则获取数据失败
     Return
     -------
         DataFrame
@@ -255,13 +285,31 @@ def get_dce_daily(date = None, retries=0):
                 high          最高价
                 low           最低价
                 close         收盘价
-                pre_close     前收盘价
                 volume        成交量
-                open_interest 持仓量
-                turnover      成交额
+                open_interest   持仓量
+                turnover       成交额
                 settle        结算价
                 pre_settle    前结算价
                 variety       合约类别
+        或 
+        DataFrame
+           郑商所每日期权交易数据
+                symbol        合约代码
+                date          日期
+                open          开盘价
+                high          最高价
+                low           最低价
+                close         收盘价
+                pre_settle      前结算价
+                settle         结算价
+                delta          对冲值  
+                volume         成交量
+                open_interest     持仓量
+                oi_change       持仓变化
+                turnover        成交额
+                implied_volatility 隐含波动率
+                exercise_volume   行权量
+                variety        合约类别
         或 None(给定日期没有交易数据)
     """
     day = ct.convert_date(date) if date is not None else datetime.date.today()
@@ -269,26 +317,38 @@ def get_dce_daily(date = None, retries=0):
         print("maximum retires for DCE market data: ", day.strftime("%Y%m%d"))
         return
     
-    url = ct.DCE_DAILY_URL + '?' + urlencode({"currDate":day.strftime('%Y%m%d'),
-                                              "year":day.strftime('%Y'), 
-                                              "month": str(int(day.strftime('%m'))-1), 
-                                              "day":day.strftime('%d')})
+    if type == 'future':
+        url = ct.DCE_DAILY_URL + '?' + urlencode({"currDate":day.strftime('%Y%m%d'), 
+                                    "year":day.strftime('%Y'), 
+                                    "month": str(int(day.strftime('%m'))-1), 
+                                    "day":day.strftime('%d')})   
+        listed_columns = ct.DCE_COLUMNS
+        output_columns = ct.OUTPUT_COLUMNS
+    elif type == 'option':
+        url = ct.DCE_DAILY_URL + '?' + urlencode({"currDate":day.strftime('%Y%m%d'), 
+                                    "year":day.strftime('%Y'), 
+                                    "month": str(int(day.strftime('%m'))-1), 
+                                    "day":day.strftime('%d'),
+                                    "dayQuotes.trade_type": "1"})   
+        listed_columns = ct.DCE_OPTION_COLUMNS
+        output_columns = ct.OPTION_OUTPUT_COLUMNS
+    else:
+        print('invalid type :' + type + ', should be one of "future" or "option"')
+        return
 
-    
-    
     try:
         response = urlopen(Request(url, method='POST', headers=ct.DCE_HEADERS)).read().decode('utf8')
     except IncompleteRead as reason:
-        return get_dce_daily(day, retries+1)
+        return get_dce_daily(day, retries=retries+1)
     except HTTPError as reason:
         if reason.code == 504:
-            return get_dce_daily(day, retries+1)
+            return get_dce_daily(day, retries=retries+1)
         elif reason.code != 404:
             print(ct.DCE_DAILY_URL, reason)            
         return       
     
     if u'错误：您所请求的网址（URL）无法获取' in response:
-        return
+        return get_dce_daily(day, retries=retries+1)
     elif u'暂无数据' in response:
         return
     
@@ -297,27 +357,45 @@ def get_dce_daily(date = None, retries=0):
         return
     
     dict_data = list()
+    implied_data = list()
     for idata in data[1:]:
         if u'小计' in idata.text or u'总计' in idata.text:
             continue
         x = idata.find_all('td')
-        row_dict = dict()
-        for i,field in enumerate(ct.DCE_COLUMNS):
-            if i==0:
-                row_dict[field] = ct.DCE_MAP[x[i].text.strip()]
-            elif i>=2:
-                if '-' in x[i].text.strip():
-                    row_dict[field] = 0.0                
+        if type == 'future':
+            row_dict = {'variety': ct.DCE_MAP[x[0].text.strip()]}
+            row_dict['symbol'] = row_dict['variety'] + x[1].text.strip()
+            for i,field in enumerate(listed_columns):
+                field_content = x[i+2].text.strip()
+                if '-' in field_content:
+                    row_dict[field] = 0                
+                elif field in ['volume', 'open_interest']:
+                    row_dict[field] = int(field_content.replace(',',''))
                 else:
-                    row_dict[field] = float(x[i].text.strip().replace(',',''))
-            else:
-                row_dict[field] = x[i].text.strip()
-        dict_data.append(row_dict)
+                    row_dict[field] = float(field_content.replace(',',''))   
+            dict_data.append(row_dict)
+        elif len(x) == 16:
+            m = ct.FUTURE_SYMBOL_PATTERN.match(x[1].text.strip())
+            if not m:
+                continue
+            row_dict = {'symbol': x[1].text.strip(), 'variety': m.group(1).upper(), 'contract_id': m.group(0)}
+            for i,field in enumerate(listed_columns):
+                field_content = x[i+2].text.strip()
+                if '-' in field_content:
+                    row_dict[field] = 0                
+                elif field in ['volume', 'open_interest']:
+                    row_dict[field] = int(field_content.replace(',',''))
+                else:
+                    row_dict[field] = float(field_content.replace(',',''))   
+            dict_data.append(row_dict)
+        elif len(x) == 2:
+            implied_data.append({'contract_id': x[0].text.strip(), 'implied_volatility': float(x[1].text.strip())})
     df = pd.DataFrame(dict_data)
     df['date'] = day.strftime('%Y%m%d')
-    df['pre_close'] = df.close - df.change1
-    df['symbol'] = df.variety + df.month
-    return df[ct.OUTPUT_COLUMNS]
+    if type == 'future':
+        return df[output_columns]
+    else:
+        return pd.merge(df, pd.DataFrame(implied_data), on='contract_id', how='left', indicator=False)[output_columns]
 
 
 def get_future_daily(start = None, end = None, market = 'CFFEX'):
@@ -332,19 +410,18 @@ def get_future_daily(start = None, end = None, market = 'CFFEX'):
     -------
         DataFrame
             中金所日交易数据(DataFrame):
-                symbol        合约代码
-                date          日期
-                open          开盘价
-                high          最高价
-                low           最低价
-                close         收盘价
-                pre_close     前收盘价
-                volume        成交量
+                symbol      合约代码
+                date       日期
+                open       开盘价
+                high       最高价
+                low       最低价
+                close      收盘价
+                volume      成交量
                 open_interest 持仓量
-                turnover      成交额
-                settle        结算价
-                pre_settle    前结算价
-                variety       合约类别
+                turnover    成交额
+                settle     结算价
+                pre_settle   前结算价
+                variety     合约类别
         或 None(给定日期没有交易数据)
     """
     if market.upper() == 'CFFEX':
