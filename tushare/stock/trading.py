@@ -311,7 +311,7 @@ def get_today_all():
     ct._write_head()
     df = _parsing_dayprice_json('hs_a', 1)
     if df is not None:
-        for i in range(2, ct.PAGE_NUM[0]):
+        for i in range(2, ct.PAGE_NUM[1]):
             newdf = _parsing_dayprice_json('hs_a', i)
             df = df.append(newdf, ignore_index=True)
     df = df.append(_parsing_dayprice_json('shfxjs', 1),
@@ -439,19 +439,19 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             if df is None:  # 可能df为空，退出循环
                 break
             else:
-                data = data.append(df, ignore_index=True)
-    if len(data) == 0 or len(data[(data.date>=start)&(data.date<=end)]) == 0:
-        return None
+                data = data.append(df, ignore_index = True)
+    if len(data) == 0 or len(data[(data.date >= start) & (data.date <= end)]) == 0:
+        return pd.DataFrame()
     data = data.drop_duplicates('date')
     if index:
-        data = data[(data.date>=start) & (data.date<=end)]
+        data = data[(data.date >= start) & (data.date <= end)]
         data = data.set_index('date')
-        data = data.sort_index(ascending=False)
+        data = data.sort_index(ascending = False)
         return data
     if autype == 'hfq':
         if drop_factor:
             data = data.drop('factor', axis=1)
-        data = data[(data.date>=start) & (data.date<=end)]
+        data = data[(data.date >= start) & (data.date <= end)]
         for label in ['open', 'high', 'close', 'low']:
             data[label] = data[label].map(ct.FORMAT)
             data[label] = data[label].astype(float)
@@ -461,15 +461,15 @@ def get_h_data(code, start=None, end=None, autype='qfq',
     else:
         if autype == 'qfq':
             if drop_factor:
-                data = data.drop('factor', axis=1)
+                data = data.drop('factor', axis = 1)
             df = _parase_fq_factor(code, start, end)
             df = df.drop_duplicates('date')
-            df = df.sort_values('date', ascending=False)
+            df = df.sort_values('date', ascending = False)
             firstDate = data.head(1)['date']
             frow = df[df.date == firstDate[0]]
             rt = get_realtime_quotes(code)
             if rt is None:
-                return None
+                return pd.DataFrame()
             if ((float(rt['high']) == 0) & (float(rt['low']) == 0)):
                 preClose = float(rt['pre_close'])
             else:
@@ -495,7 +495,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
                 data[label] = data[label] / data['factor']
             if drop_factor:
                 data = data.drop('factor', axis=1)
-            data = data[(data.date>=start) & (data.date<=end)]
+            data = data[(data.date >= start) & (data.date <= end)]
             for label in ['open', 'high', 'close', 'low']:
                 data[label] = data[label].map(ct.FORMAT)
             data = data.set_index('date')

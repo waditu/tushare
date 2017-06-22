@@ -90,7 +90,7 @@ def query_news(keywords='*',start_date=None,end_date=None):
         next_info = soup.find_all(name='a',attrs={'class','pageNavBtn2'})[0]
         all_res = soup.find_all(name='div',attrs={'class','searchxt'})
         for res in all_res:
-             info_urls.append(res.a.attrs['href'])
+            info_urls.append(res.a.attrs['href'])
         next_info = next_info.attrs['href']    
 
         if next_info=="javascript:void();":
