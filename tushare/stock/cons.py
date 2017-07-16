@@ -13,7 +13,7 @@ K_TYPE = {'D': 'akdaily', 'W': 'akweekly', 'M': 'akmonthly'}
 TT_K_TYPE = {'D': 'day', 'W': 'week', 'M': 'month'}
 FQ_KEY = ['qfqday', 'hfqday', 'day']
 INDEX_LABELS = ['sh', 'sz', 'hs300', 'sz50', 'cyb', 'zxb', 'zx300', 'zh500']
-INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sz399300',
+INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sh000300',
               'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006', 'zx300': 'sz399008', 'zh500':'sh000905'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
 PAGE_NUM = [40, 60, 80, 100]
