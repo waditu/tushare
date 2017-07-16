@@ -311,7 +311,7 @@ def get_today_all():
     ct._write_head()
     df = _parsing_dayprice_json('hs_a', 1)
     if df is not None:
-        for i in range(2, ct.PAGE_NUM[0]):
+        for i in range(2, ct.PAGE_NUM[1]):
             newdf = _parsing_dayprice_json('hs_a', i)
             df = df.append(newdf, ignore_index=True)
     df = df.append(_parsing_dayprice_json('shfxjs', 1),
