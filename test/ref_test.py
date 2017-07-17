@@ -50,8 +50,11 @@ class Test(unittest.TestCase):
         
     def test_sz_margin_details(self):
         self.set_data()
-        print(fd.sz_margin_details(self.end))   
-        
+        print(fd.sz_margin_details(self.end))
+
+    def test_top10_holders(self):
+        self.set_data()
+        print(fd.top10_holders(self.code, self.year, self.quarter))
     
 if __name__ == "__main__":
     unittest.main()
