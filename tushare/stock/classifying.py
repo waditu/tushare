@@ -145,27 +145,35 @@ def get_st_classified():
 
 
 def _get_detail(tag, retry_count=3, pause=0.001):
-    for _ in range(retry_count):
-        time.sleep(pause)
-        try:
-            ct._write_console()
-            request = Request(ct.SINA_DATA_DETAIL_URL%(ct.P_TYPE['http'],
-                                                               ct.DOMAINS['vsf'], ct.PAGES['jv'],
-                                                               tag))
-            text = urlopen(request, timeout=10).read()
-            text = text.decode('gbk')
-        except _network_error_classes:
-            pass
-        else:
-            reg = re.compile(r'\,(.*?)\:') 
-            text = reg.sub(r',"\1":', text) 
-            text = text.replace('"{symbol', '{"symbol')
-            text = text.replace('{symbol', '{"symbol"')
-            jstr = json.dumps(text)
-            js = json.loads(jstr)
-            df = pd.DataFrame(pd.read_json(js, dtype={'code':object}), columns=ct.THE_FIELDS)
-            df = df[ct.FOR_CLASSIFY_B_COLS]
-            return df
+    dfc = pd.DataFrame()
+    p = 0
+    num_limit = 100
+    while(True):
+        p = p+1
+        for _ in range(retry_count):
+            time.sleep(pause)
+            try:
+                ct._write_console()
+                request = Request(ct.SINA_DATA_DETAIL_URL%(ct.P_TYPE['http'],
+                                                                   ct.DOMAINS['vsf'], ct.PAGES['jv'],
+                                                                   p,tag))
+                text = urlopen(request, timeout=10).read()
+                text = text.decode('gbk')
+            except _network_error_classes:
+                pass
+            else:
+                break
+        reg = re.compile(r'\,(.*?)\:')
+        text = reg.sub(r',"\1":', text)
+        text = text.replace('"{symbol', '{"symbol')
+        text = text.replace('{symbol', '{"symbol"')
+        jstr = json.dumps(text)
+        js = json.loads(jstr)
+        df = pd.DataFrame(pd.read_json(js, dtype={'code':object}), columns=ct.THE_FIELDS)
+        df = df[ct.FOR_CLASSIFY_B_COLS]
+        dfc = pd.concat([dfc, df])
+        if df.shape[0] < num_limit:
+            return dfc
         #raise IOError(ct.NETWORK_URL_ERROR_MSG)
     
 
