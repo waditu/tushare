@@ -89,8 +89,8 @@ def get_area_classified():
     """
     df = fd.get_stock_basics()
     df = df[['name', 'area']]
-    df.reset_index(level=0, inplace=True)
-    df = df.sort('area').reset_index(drop=True)
+    df.reset_index(inplace=True)
+    df = df.sort_values('area').reset_index(drop=True)
     return df
 
 
@@ -104,10 +104,10 @@ def get_gem_classified():
         name :股票名称
     """
     df = fd.get_stock_basics()
-    df.reset_index(level=0, inplace=True)
+    df.reset_index(inplace=True)
     df = df[ct.FOR_CLASSIFY_B_COLS]
     df = df.ix[df.code.str[0] == '3']
-    df = df.sort('code').reset_index(drop=True)
+    df = df.sort_values('code').reset_index(drop=True)
     return df
     
 
@@ -121,10 +121,10 @@ def get_sme_classified():
         name :股票名称
     """
     df = fd.get_stock_basics()
-    df.reset_index(level=0, inplace=True)
+    df.reset_index(inplace=True)
     df = df[ct.FOR_CLASSIFY_B_COLS]
     df = df.ix[df.code.str[0:3] == '002']
-    df = df.sort('code').reset_index(drop=True)
+    df = df.sort_values('code').reset_index(drop=True)
     return df 
 
 def get_st_classified():
@@ -137,10 +137,10 @@ def get_st_classified():
         name :股票名称
     """
     df = fd.get_stock_basics()
-    df.reset_index(level=0, inplace=True)
+    df.reset_index(inplace=True)
     df = df[ct.FOR_CLASSIFY_B_COLS]
     df = df.ix[df.name.str.contains('ST')]
-    df = df.sort('code').reset_index(drop=True)
+    df = df.sort_values('code').reset_index(drop=True)
     return df 
 
 

@@ -26,7 +26,7 @@ class Test(unittest.TestCase):
         self.set_data()
         df = fd.get_notices(self.code) 
         print(fd.notice_content(df.ix[0]['url'])) 
-    
+ 
     def test_guba_sina(self):
         self.set_data()
         print(fd.guba_sina(self.show_content)) 

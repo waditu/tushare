@@ -62,3 +62,12 @@ docs/bin
 
 # PyBuilder
 target/
+
+#Visual Studio Environment
+*.pyproj
+*.sln
+.vs/
+
+#Vim Environment
+tags
+*~
