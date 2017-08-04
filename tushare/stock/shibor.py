@@ -32,7 +32,7 @@ def shibor_data(year=None):
     """
     year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['Shibor']
-    lab = lab.encode('utf-8') if ct.PY3 else lab
+    lab = lab.encode('gb2312') if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'Shibor',
