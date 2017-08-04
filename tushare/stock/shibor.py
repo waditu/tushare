@@ -11,6 +11,7 @@ import numpy as np
 from tushare.stock import cons as ct
 from tushare.util import dateu as du
 
+shibor_encoding = 'gb2312'
 def shibor_data(year=None):
     """
     获取上海银行间同业拆放利率（Shibor）
@@ -32,7 +33,7 @@ def shibor_data(year=None):
     """
     year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['Shibor']
-    lab = lab.encode('gb2312') if ct.PY3 else lab
+    lab = lab.encode(shibor_encoding) if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'Shibor',
@@ -76,7 +77,7 @@ def shibor_quote_data(year=None):
     """
     year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['Quote']
-    lab = lab.encode('utf-8') if ct.PY3 else lab
+    lab = lab.encode(shibor_encoding) if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'Quote',
@@ -103,7 +104,7 @@ def shibor_ma_data(year=None):
     """
     year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['Tendency']
-    lab = lab.encode('utf-8') if ct.PY3 else lab
+    lab = lab.encode(shibor_encoding) if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'Shibor_Tendency',
@@ -131,7 +132,7 @@ def lpr_data(year=None):
     """
     year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['LPR']
-    lab = lab.encode('utf-8') if ct.PY3 else lab
+    lab = lab.encode(shibor_encoding) if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'LPR',
@@ -161,7 +162,7 @@ def lpr_ma_data(year=None):
     """
     year = du.get_year() if year is None else year
     lab = ct.SHIBOR_TYPE['LPR_Tendency']
-    lab = lab.encode('utf-8') if ct.PY3 else lab
+    lab = lab.encode(shibor_encoding) if ct.PY3 else lab
     try:
         df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'LPR_Tendency',
