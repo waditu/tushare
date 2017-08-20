@@ -11,24 +11,25 @@ Created on 2016/10/01
 import json
 import six
 import pandas as pd
+from tushare.util import ua
 from tushare.futures import cons as ct
 
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
-    
-    
+
+
 def get_intlfuture(symbols=None):
     symbols = ct.INTL_FUTURE_CODE if symbols is None else symbols
-    df = _get_data(ct.INTL_FUTURE_URL%(ct.P_TYPE['http'], ct.DOMAINS['EM'], 
+    df = _get_data(ct.INTL_FUTURE_URL%(ct.P_TYPE['http'], ct.DOMAINS['EM'],
                    ct.PAGES['INTL_FUT'], symbols,
                    _random(17)))
     return df
-  
+
 def _get_data(url):
     try:
-        request = Request(url)
+        request = Request(url,headers=ua.get_ua())
         data_str = urlopen(request, timeout=10).read()
         data_str = data_str.split('=')[1]
         data_str = data_str.replace('futures', '"futures"')
@@ -41,9 +42,9 @@ def _get_data(url):
         df.columns = ct.INTL_FUTURES_COL
         return df
     except Exception as er:
-        print(str(er))  
-        
-        
+        print(str(er))
+
+
 def _random(n=13):
     from random import randint
     start = 10**(n-1)

@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 """
 基本面数据接口 
 Created on 2015/01/18
@@ -14,6 +14,7 @@ import re
 import time
 from pandas.compat import StringIO
 from tushare.util import dateu as du
+from tushare.util import ua
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -50,7 +51,7 @@ def get_stock_basics(date=None):
     if wdate < '20160809':
         return None
     datepre = '' if date is None else wdate[0:4] + wdate[4:6] + '/'
-    request = Request(ct.ALL_STOCK_BASICS_FILE%(datepre, '' if date is None else wdate))
+    request = Request(ct.ALL_STOCK_BASICS_FILE%(datepre, '' if date is None else wdate),headers=ua.get_ua())
     text = urlopen(request, timeout=10).read()
     text = text.decode('GBK')
     text = text.replace('--', '')
@@ -99,7 +100,7 @@ def _get_report_data(year, quarter, pageNo, dataArr,
         time.sleep(pause)
         try:
             request = Request(ct.REPORT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['fd'],
-                             year, quarter, pageNo, ct.PAGE_NUM[1]))
+                             year, quarter, pageNo, ct.PAGE_NUM[1]),headers=ua.get_ua())
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             text = text.replace('--', '')
@@ -165,7 +166,7 @@ def _get_profit_data(year, quarter, pageNo, dataArr,
         try:
             request = Request(ct.PROFIT_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                   ct.PAGES['fd'], year,
-                                                  quarter, pageNo, ct.PAGE_NUM[1]))
+                                                  quarter, pageNo, ct.PAGE_NUM[1]),headers=ua.get_ua())
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             text = text.replace('--', '')
@@ -229,7 +230,7 @@ def _get_operation_data(year, quarter, pageNo, dataArr,
         try:
             request = Request(ct.OPERATION_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                      ct.PAGES['fd'], year,
-                                                     quarter, pageNo, ct.PAGE_NUM[1]))
+                                                     quarter, pageNo, ct.PAGE_NUM[1]),headers=ua.get_ua())
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             text = text.replace('--', '')
@@ -285,7 +286,7 @@ def get_growth_data(year, quarter):
         return data
 
 
-def _get_growth_data(year, quarter, pageNo, dataArr, 
+def _get_growth_data(year, quarter, pageNo, dataArr,
                      retry_count=3, pause=0.001):
     ct._write_console()
     for _ in range(retry_count):
@@ -357,7 +358,7 @@ def _get_debtpaying_data(year, quarter, pageNo, dataArr,
         try:
             request = Request(ct.DEBTPAYING_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                       ct.PAGES['fd'], year,
-                                                      quarter, pageNo, ct.PAGE_NUM[1]))
+                                                      quarter, pageNo, ct.PAGE_NUM[1]),headers=ua.get_ua())
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             html = lxml.html.parse(StringIO(text))
@@ -380,8 +381,8 @@ def _get_debtpaying_data(year, quarter, pageNo, dataArr,
         except Exception as e:
             pass
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
- 
- 
+
+
 def get_cashflow_data(year, quarter):
     """
         获取现金流量数据
@@ -419,7 +420,7 @@ def _get_cashflow_data(year, quarter, pageNo, dataArr,
         try:
             request = Request(ct.CASHFLOW_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                     ct.PAGES['fd'], year,
-                                                    quarter, pageNo, ct.PAGE_NUM[1]))
+                                                    quarter, pageNo, ct.PAGE_NUM[1]),headers=ua.get_ua())
             text = urlopen(request, timeout=10).read()
             text = text.decode('GBK')
             text = text.replace('--', '')
@@ -443,15 +444,15 @@ def _get_cashflow_data(year, quarter, pageNo, dataArr,
         except Exception as e:
             pass
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
-       
-       
+
+
 def _data_path():
     import os
     import inspect
-    caller_file = inspect.stack()[1][1]  
+    caller_file = inspect.stack()[1][1]
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
-  
+
 
 def get_balance_sheet(code):
     """
@@ -466,7 +467,7 @@ def get_balance_sheet(code):
         行列名称为中文且数目较多，建议获取数据后保存到本地查看
     """
     if code.isdigit():
-        request = Request(ct.SINA_BALANCESHEET_URL%(code))
+        request = Request(ct.SINA_BALANCESHEET_URL%(code),headers=ua.get_ua())
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('\t\n', '\r\n')
@@ -487,7 +488,7 @@ def get_profit_statement(code):
         行列名称为中文且数目较多，建议获取数据后保存到本地查看
     """
     if code.isdigit():
-        request = Request(ct.SINA_PROFITSTATEMENT_URL%(code))
+        request = Request(ct.SINA_PROFITSTATEMENT_URL%(code),headers=ua.get_ua())
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('\t\n', '\r\n')
@@ -495,7 +496,7 @@ def get_profit_statement(code):
         df = pd.read_csv(StringIO(text), dtype={'code':'object'})
         return df
 
-      
+
 def get_cash_flow(code):
     """
         获取某股票的历史所有时期现金流表
@@ -509,7 +510,7 @@ def get_cash_flow(code):
         行列名称为中文且数目较多，建议获取数据后保存到本地查看
     """
     if code.isdigit():
-        request = Request(ct.SINA_CASHFLOW_URL%(code))
+        request = Request(ct.SINA_CASHFLOW_URL%(code),headers=ua.get_ua())
         text = urlopen(request, timeout=10).read()
         text = text.decode('GBK')
         text = text.replace('\t\n', '\r\n')
@@ -517,4 +518,4 @@ def get_cash_flow(code):
         df = pd.read_csv(StringIO(text), dtype={'code':'object'})
         return df
 
-      
+

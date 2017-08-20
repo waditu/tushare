@@ -10,6 +10,7 @@ Created on 2015/02/07
 
 from tushare.stock import cons as ct
 from tushare.stock import news_vars as nv
+from tushare.util import ua
 import pandas as pd
 from datetime import datetime
 import lxml.html
@@ -45,11 +46,11 @@ def get_latest_news(top=None, show_content=False):
     try:
         request = Request(nv.LATEST_URL % (ct.P_TYPE['http'], ct.DOMAINS['sina'],
                                                    ct.PAGES['lnews'], top,
-                                                   _random()))
+                                                   _random()),headers=ua.get_ua())
         data_str = urlopen(request, timeout=10).read()
         data_str = data_str.decode('GBK')
         data_str = data_str.split('=')[1][:-1]
-        data_str = eval(data_str, type('Dummy', (dict,), 
+        data_str = eval(data_str, type('Dummy', (dict,),
                                        dict(__getitem__ = lambda s, n:n))())
         data_str = json.dumps(data_str)
         data_str = json.loads(data_str)
@@ -91,7 +92,7 @@ def latest_content(url):
         content = html_content.text_content()
         return content
     except Exception as er:
-        print(str(er))  
+        print(str(er))
 
 
 def get_notices(code=None, date=None):
@@ -145,7 +146,7 @@ def notice_content(url):
         res = html.xpath('//div[@id=\"content\"]/pre/text()')[0]
         return res.strip()
     except Exception as er:
-        print(str(er))  
+        print(str(er))
 
 
 def guba_sina(show_content=False):
@@ -163,7 +164,7 @@ def guba_sina(show_content=False):
         ptime, 发布时间
         rcounts,阅读次数
     """
-    
+
     from pandas.io.common import urlopen
     try:
         with urlopen(nv.GUBA_SINA_URL%(ct.P_TYPE['http'],
@@ -189,9 +190,9 @@ def guba_sina(show_content=False):
         df['rcounts'] = df['rcounts'].astype(float)
         return df if show_content is True else df.drop('content', axis=1)
     except Exception as er:
-        print(str(er))  
-    
-    
+        print(str(er))
+
+
 def _guba_content(url):
     try:
         html = lxml.html.parse(url)
@@ -205,7 +206,7 @@ def _guba_content(url):
         content = html_content.text_content()
         ptime = html.xpath('//div[@class=\"fl_left iltp_time\"]/span/text()')[0]
         rcounts = html.xpath('//div[@class=\"fl_right iltp_span\"]/span[2]/text()')[0]
-        reg = re.compile(r'\((.*?)\)') 
+        reg = re.compile(r'\((.*?)\)')
         rcounts = reg.findall(rcounts)[0]
         return [content, ptime, rcounts]
     except Exception:

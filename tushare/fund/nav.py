@@ -273,7 +273,7 @@ def _parse_fund_data(url, fund_type='open'):
     ct._write_console()
 
     try:
-        request = Request(url)
+        request = Request(url,headers=ua.get_ua())
 
         text = urlopen(request, timeout=10).read()
         if text == 'null':
@@ -304,7 +304,7 @@ def _get_fund_num(url):
 
     ct._write_console()
     try:
-        request = Request(url)
+        request = Request(url,headers=ua.get_ua())
         text = urlopen(request, timeout=10).read()
         text = text.decode('gbk')
         if text == 'null':
@@ -335,11 +335,11 @@ def _get_nav_histroy_num(code, start, end, ismonetary=False):
     if ismonetary:
         request = Request(ct.SINA_NAV_HISTROY_COUNT_CUR_URL %
                           (ct.P_TYPE['http'], ct.DOMAINS['ssf'],
-                           code, start, end))
+                           code, start, end),headers=ua.get_ua())
     else:
         request = Request(ct.SINA_NAV_HISTROY_COUNT_URL %
                           (ct.P_TYPE['http'], ct.DOMAINS['ssf'],
-                           code, start, end))
+                           code, start, end),headers=ua.get_ua())
 
     text = urlopen(request, timeout=10).read()
     text = text.decode('gbk')
@@ -365,11 +365,11 @@ def _parse_nav_history_data(code, start, end, nums, ismonetary=False, retry_coun
         if ismonetary:
             request = Request(ct.SINA_NAV_HISTROY_DATA_CUR_URL %
                               (ct.P_TYPE['http'], ct.DOMAINS['ssf'],
-                               code, start, end, nums))
+                               code, start, end, nums),headers=ua.get_ua())
         else:
             request = Request(ct.SINA_NAV_HISTROY_DATA_URL %
                               (ct.P_TYPE['http'], ct.DOMAINS['ssf'],
-                               code, start, end, nums))
+                               code, start, end, nums),headers=ua.get_ua())
         text = urlopen(request, timeout=timeout).read()
         text = text.decode('gbk')
         org_js = json.loads(text)

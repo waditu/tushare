@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 '''
 全球市场
@@ -29,16 +29,16 @@ def global_realtime(symbols=None):
                 symbols_list += 'znb_' + code + ','
         else:
             symbols_list = 'znb_' + symbols
-        symbols_list = symbols_list[:-1] if len(symbols_list) > 8 else symbols_list 
+        symbols_list = symbols_list[:-1] if len(symbols_list) > 8 else symbols_list
     request = Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['sinahq'],
-                                                du._random(), symbols_list))
+                                                du._random(), symbols_list),headers=ua.get_ua())
     content = urlopen(request,timeout=10).readlines()
     datalist = []
     for cont in content:
         arrs = []
         cont = cont.decode('GBK')
         cont = cont.split('=')
-        symbolstr = cont[0].split('_') 
+        symbolstr = cont[0].split('_')
         symbol = symbolstr[2]
         vals = cont[1][1:-3]
         valarr = vals.split(',')
