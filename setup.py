@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import codecs
 import os
-import tushare
+#import tushare
 
 def read(fname):
     return codecs.open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -61,17 +61,22 @@ return::
     2012-01-20   6.870   7.080   7.010   6.870    6813.09     1.74   6.832
     
 """
-
-
+version='0.0.0'
+with open('tushare/__init__.py') as f:
+    version_str=f.readline()
+    version=version_str.rstrip().split(' ')[-1].replace("'",'')
 setup(
     name='tushare',
-    version=tushare.__version__,
+    version=version,
     description='A utility for crawling historical and Real-time Quotes data of China stocks',
 #     long_description=read("READM.rst"),
     long_description = long_desc,
     author='Jimmy Liu',
     install_requires={
-                      'lxml>=3.4.0'
+            'lxml>=3.4.0',
+            'bs4',
+            'pandas',
+            'requests'
     },
     author_email='jimmysoa@sina.cn',
     license='BSD',

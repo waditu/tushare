@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 """
 宏观经济数据接口 
@@ -12,6 +12,7 @@ import pandas as pd
 import numpy as np
 import re
 import json
+from tushare.util import ua
 from tushare.stock import macro_vars as vs
 from tushare.stock import cons as ct
 try:
@@ -41,7 +42,7 @@ def get_gdp_year():
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
                                     rdint, vs.MACRO_TYPE[0], 0, 70,
-                                    rdint))
+                                    rdint),headers=ua.get_ua())
     text = urlopen(request, timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -54,7 +55,7 @@ def get_gdp_year():
     df[df==0] = np.NaN
     return df
 
-  
+
 def get_gdp_quarter():
     """
         获取季度国内生产总值数据
@@ -74,7 +75,7 @@ def get_gdp_quarter():
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
                                     rdint, vs.MACRO_TYPE[0], 1, 250,
-                                    rdint))
+                                    rdint),headers=ua.get_ua())
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -105,7 +106,7 @@ def get_gdp_for():
     """
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
-                                    rdint, vs.MACRO_TYPE[0], 4, 80, rdint))
+                                    rdint, vs.MACRO_TYPE[0], 4, 80, rdint),headers=ua.get_ua())
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -134,7 +135,7 @@ def get_gdp_pull():
     """
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
-                                    rdint, vs.MACRO_TYPE[0], 5, 60, rdint))
+                                    rdint, vs.MACRO_TYPE[0], 5, 60, rdint),headers=ua.get_ua())
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -163,7 +164,7 @@ def get_gdp_contrib():
     """
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'], rdint,
-                                    vs.MACRO_TYPE[0], 6, 60, rdint))
+                                    vs.MACRO_TYPE[0], 6, 60, rdint),headers=ua.get_ua())
     text = urlopen(request, timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -188,7 +189,7 @@ def get_cpi():
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
                                     rdint, vs.MACRO_TYPE[1], 0, 600,
-                                    rdint))
+                                    rdint),headers=ua.get_ua())
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -222,7 +223,7 @@ def get_ppi():
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
                                     rdint, vs.MACRO_TYPE[1], 3, 600,
-                                    rdint))
+                                    rdint),headers=ua.get_ua())
     text = urlopen(request, timeout=10).read()
     text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -251,7 +252,7 @@ def get_deposit_rate():
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
                                     rdint, vs.MACRO_TYPE[2], 2, 600,
-                                    rdint))
+                                    rdint),headers=ua.get_ua())
     text = urlopen(request, timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -278,7 +279,7 @@ def get_loan_rate():
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
                                     rdint, vs.MACRO_TYPE[2], 3, 800,
-                                    rdint))
+                                    rdint),headers=ua.get_ua())
     text = urlopen(request, timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -306,7 +307,7 @@ def get_rrr():
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
                                     rdint, vs.MACRO_TYPE[2], 4, 100,
-                                    rdint))
+                                    rdint),headers=ua.get_ua())
     text = urlopen(request, timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -347,7 +348,7 @@ def get_money_supply():
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
                                     rdint, vs.MACRO_TYPE[2], 1, 600,
-                                    rdint))
+                                    rdint),headers=ua.get_ua())
     text = urlopen(request, timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -380,7 +381,7 @@ def get_money_supply_bal():
     rdint = vs.random()
     request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
                                     rdint, vs.MACRO_TYPE[2], 0, 200,
-                                    rdint))
+                                    rdint),headers=ua.get_ua())
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
@@ -407,7 +408,7 @@ def get_gold_and_foreign_reserves():
     rdint = vs.random()
     request = Request(vs.MACRO_URL % (vs.P_TYPE['http'], vs.DOMAINS['sina'],
                                       rdint, vs.MACRO_TYPE[2], 5, 200,
-                                      rdint))
+                                      rdint),headers=ua.get_ua())
     text = urlopen(request,timeout=10).read()
     text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')

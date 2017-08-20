@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 """
 投资参考数据接口 
 Created on 2015/03/21
@@ -18,13 +18,14 @@ import json
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
+from tushare.util import ua
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
 
 
-def profit_data(year=2015, top=25, 
+def profit_data(year=2015, top=25,
               retry_count=3, pause=0.001):
     """
     获取分配预案数据
@@ -47,7 +48,7 @@ def profit_data(year=2015, top=25,
     divi:分红金额（每10股）
     shares:转增和送股数（每10股）
     """
-    
+
     if top == 'all':
         ct._write_head()
         df, pages = _dist_cotent(year, 0, retry_count, pause)
@@ -71,13 +72,13 @@ def profit_data(year=2015, top=25,
             return df.head(top)
         else:
             print(ct.TOP_PARAS_MSG)
-    
+
 
 def _fun_divi(x):
     if ct.PY3:
         reg = re.compile(r'分红(.*?)元', re.UNICODE)
         res = reg.findall(x)
-        return 0 if len(res)<1 else float(res[0]) 
+        return 0 if len(res)<1 else float(res[0])
     else:
         if isinstance(x, unicode):
             s1 = unicode('分红','utf-8')
@@ -112,8 +113,8 @@ def _fun_into(x):
             return res1 + res2
         else:
             return 0
-    
-    
+
+
 def _dist_cotent(year, pageNo, retry_count, pause):
     for _ in range(retry_count):
         time.sleep(pause)
@@ -121,7 +122,7 @@ def _dist_cotent(year, pageNo, retry_count, pause):
             if pageNo > 0:
                 ct._write_console()
             html = lxml.html.parse(rv.DP_163_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
-                     ct.PAGES['163dp'], year, pageNo))  
+                     ct.PAGES['163dp'], year, pageNo))
             res = html.xpath('//div[@class=\"fn_rp_list\"]/table')
             if ct.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -149,7 +150,7 @@ def _dist_cotent(year, pageNo, retry_count, pause):
                 return df, pages[0] if len(pages)>0 else 0
             else:
                 return df
-    raise IOError(ct.NETWORK_URL_ERROR_MSG)    
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
 def forecast_data(year, quarter):
@@ -184,7 +185,7 @@ def _get_forecast_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
         gparser = etree.HTMLParser(encoding='GBK')
-        html = lxml.html.parse(ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], 
+        html = lxml.html.parse(ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                 ct.PAGES['fd'], year, quarter, pageNo,
                                                 ct.PAGE_NUM[1]),
                                parser=gparser)
@@ -208,9 +209,9 @@ def _get_forecast_data(year, quarter, pageNo, dataArr):
             return dataArr
     except Exception as e:
             print(e)
-    
 
-def xsg_data(year=None, month=None, 
+
+def xsg_data(year=None, month=None,
             retry_count=3, pause=0.001):
     """
     获取限售股解禁数据
@@ -238,7 +239,7 @@ def xsg_data(year=None, month=None,
         time.sleep(pause)
         try:
             request = Request(rv.XSG_URL%(ct.P_TYPE['http'], ct.DOMAINS['em'],
-                                     ct.PAGES['emxsg'], year, month))
+                                     ct.PAGES['emxsg'], year, month),headers=ua.get_ua())
             lines = urlopen(request, timeout = 10).read()
             lines = lines.decode('utf-8') if ct.PY3 else lines
         except Exception as e:
@@ -258,7 +259,7 @@ def xsg_data(year=None, month=None,
             df[6] = df[6].map(ct.FORMAT)
             df.columns = rv.XSG_COLS
             return df
-    raise IOError(ct.NETWORK_URL_ERROR_MSG)   
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
 def fund_holdings(year, quarter,
@@ -309,7 +310,7 @@ def _holding_cotent(start, end, pageNo, retry_count, pause):
         try:
             request = Request(rv.FUND_HOLDS_URL%(ct.P_TYPE['http'], ct.DOMAINS['163'],
                      ct.PAGES['163fh'], ct.PAGES['163fh'],
-                     pageNo, start, end, _random(5)))
+                     pageNo, start, end, _random(5)),headers=ua.get_ua())
             lines = urlopen(request, timeout = 10).read()
             lines = lines.decode('utf-8') if ct.PY3 else lines
             lines = lines.replace('--', '0')
@@ -329,7 +330,7 @@ def _holding_cotent(start, end, pageNo, retry_count, pause):
             df['SHIZHI'] = df['SHIZHI'].map(ct.FORMAT)
             df['SCSTC27'] = df['SCSTC27'].map(ct.FORMAT)
             df.columns = rv.FUND_HOLDS_COLS
-            df = df[['code', 'name', 'date', 'nums', 'nlast', 'count', 
+            df = df[['code', 'name', 'date', 'nums', 'nlast', 'count',
                          'clast', 'amount', 'ratio']]
         except Exception as e:
             print(e)
@@ -338,8 +339,8 @@ def _holding_cotent(start, end, pageNo, retry_count, pause):
                 return df, int(lines['pagecount'])
             else:
                 return df
-    raise IOError(ct.NETWORK_URL_ERROR_MSG)    
-    
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
 
 def new_stocks(retry_count=3, pause=0.001):
     """
@@ -396,7 +397,7 @@ def _newstocks(data, pageNo, retry_count, pause):
             df['xcode'] = df['xcode'].map(lambda x : str(x).zfill(6))
             res = html.xpath('//table[@class=\"table2\"]/tr[1]/td[1]/a/text()')
             tag = '下一页' if ct.PY3 else unicode('下一页', 'utf-8')
-            hasNext = True if tag in res else False 
+            hasNext = True if tag in res else False
             data = data.append(df, ignore_index=True)
             pageNo += 1
             if hasNext:
@@ -404,7 +405,7 @@ def _newstocks(data, pageNo, retry_count, pause):
         except Exception as ex:
             print(ex)
         else:
-            return data 
+            return data
 
 
 def sh_margins(start=None, end=None, retry_count=3, pause=0.001):
@@ -445,7 +446,7 @@ def sh_margins(start=None, end=None, retry_count=3, pause=0.001):
     return df
 
 
-def _sh_hz(data, start=None, end=None, 
+def _sh_hz(data, start=None, end=None,
            pageNo='', beginPage='',
            endPage='',
            retry_count=3, pause=0.001):
@@ -478,8 +479,8 @@ def _sh_hz(data, start=None, end=None,
             df['opDate'] = df['opDate'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
             data = data.append(df, ignore_index=True)
             if beginPage < datapage*5:
-                data = _sh_hz(data, start=start, end=end, pageNo=pageNo, 
-                       beginPage=beginPage, endPage=endPage, 
+                data = _sh_hz(data, start=start, end=end, pageNo=pageNo,
+                       beginPage=beginPage, endPage=endPage,
                        retry_count=retry_count, pause=pause)
         except Exception as e:
             print(e)
@@ -488,7 +489,7 @@ def _sh_hz(data, start=None, end=None,
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def sh_margin_details(date='', symbol='', 
+def sh_margin_details(date='', symbol='',
                       start='', end='',
                       retry_count=3, pause=0.001):
     """
@@ -535,7 +536,7 @@ def sh_margin_details(date='', symbol='',
     return df
 
 
-def _sh_mx(data, date='', start='', end='', 
+def _sh_mx(data, date='', start='', end='',
            symbol='',
            pageNo='', beginPage='',
            endPage='',
@@ -555,7 +556,7 @@ def _sh_mx(data, date='', start='', end='',
             endPage = pageNo + 4
             ref = rv.MAR_SH_HZ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
             clt = Client(rv.MAR_SH_MX_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
-                                    ct.PAGES['qmd'], _random(5), date, 
+                                    ct.PAGES['qmd'], _random(5), date,
                                     symbol, start, end, tail,
                                     _random()), ref=ref, cookie=rv.MAR_SH_COOKIESTR)
             lines = clt.gvalue()
@@ -572,8 +573,8 @@ def _sh_mx(data, date='', start='', end='',
             df['opDate'] = df['opDate'].map(lambda x: '%s-%s-%s'%(x[0:4], x[4:6], x[6:8]))
             data = data.append(df, ignore_index=True)
             if beginPage < datapage*5:
-                data = _sh_mx(data, start=start, end=end, pageNo=pageNo, 
-                       beginPage=beginPage, endPage=endPage, 
+                data = _sh_mx(data, start=start, end=end, pageNo=pageNo,
+                       beginPage=beginPage, endPage=endPage,
                        retry_count=retry_count, pause=pause)
         except Exception as e:
             print(e)
@@ -626,7 +627,7 @@ def sz_margins(start=None, end=None, retry_count=3, pause=0.001):
         ct._write_msg(ct.DATA_INPUT_ERROR_MSG)
     else:
         return data
-        
+
 
 def _sz_hz(date='', retry_count=3, pause=0.001):
     for _ in range(retry_count):
@@ -634,7 +635,7 @@ def _sz_hz(date='', retry_count=3, pause=0.001):
         ct._write_console()
         try:
             request = Request(rv.MAR_SZ_HZ_URL%(ct.P_TYPE['http'], ct.DOMAINS['szse'],
-                                    ct.PAGES['szsefc'], date))
+                                    ct.PAGES['szsefc'], date),headers=ua.get_ua())
             lines = urlopen(request, timeout = 10).read()
             if len(lines) <= 200:
                 return pd.DataFrame()
@@ -677,7 +678,7 @@ def sz_margin_details(date='', retry_count=3, pause=0.001):
         time.sleep(pause)
         try:
             request = Request(rv.MAR_SZ_MX_URL%(ct.P_TYPE['http'], ct.DOMAINS['szse'],
-                                    ct.PAGES['szsefc'], date))
+                                    ct.PAGES['szsefc'], date),headers=ua.get_ua())
             lines = urlopen(request, timeout = 10).read()
             if len(lines) <= 200:
                 return pd.DataFrame()
@@ -706,7 +707,7 @@ def top10_holders(code=None, year=None, quarter=None, gdtype='0',
         time.sleep(pause)
         try:
             request = Request(rv.TOP10_HOLDERS_URL%(ct.P_TYPE['http'], ct.DOMAINS['gw'],
-                                    gdtype, code.upper()))
+                                    gdtype, code.upper()),headers=ua.get_ua())
             lines = urlopen(request, timeout = 10).read()
             lines = lines.decode('utf8') if ct.PY3 else lines
             reg = re.compile(r'= \'\[(.*?)\]\';')

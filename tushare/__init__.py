@@ -87,7 +87,7 @@ from tushare.datayes.api import *
 from tushare.internet.boxoffice import (realtime_boxoffice, day_boxoffice,
                                         day_cinema, month_boxoffice)
 
-from tushare.internet.indexes import (bdi)
+#from tushare.internet.indexes import (bdi)
 
 """
 for fund data
@@ -119,3 +119,5 @@ for futures API
 from tushare.futures.domestic import (get_cffex_daily, get_czce_daily,
                                       get_dce_daily, get_future_daily,
                                       get_shfe_daily, get_shfe_vwap)
+
+from tushare.util.ua import (get_ua,set_ua)

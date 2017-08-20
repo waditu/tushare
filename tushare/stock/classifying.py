@@ -11,6 +11,7 @@ Created on 2015/02/01
 import pandas as pd
 from tushare.stock import cons as ct
 from tushare.stock import ref_vars as rv
+from tushare.util import ua
 import json
 import re
 from pandas.util.testing import _network_error_classes
@@ -53,7 +54,7 @@ def get_industry_classified(standard='sina'):
         data.append(rowDf)
     data = pd.concat(data, ignore_index=True)
     return data
-        
+
 
 def get_concept_classified():
     """
@@ -109,7 +110,7 @@ def get_gem_classified():
     df = df.ix[df.code.str[0] == '3']
     df = df.sort_values('code').reset_index(drop=True)
     return df
-    
+
 
 def get_sme_classified():
     """
@@ -125,7 +126,7 @@ def get_sme_classified():
     df = df[ct.FOR_CLASSIFY_B_COLS]
     df = df.ix[df.code.str[0:3] == '002']
     df = df.sort_values('code').reset_index(drop=True)
-    return df 
+    return df
 
 def get_st_classified():
     """
@@ -141,7 +142,7 @@ def get_st_classified():
     df = df[ct.FOR_CLASSIFY_B_COLS]
     df = df.ix[df.name.str.contains('ST')]
     df = df.sort_values('code').reset_index(drop=True)
-    return df 
+    return df
 
 
 def _get_detail(tag, retry_count=3, pause=0.001):
@@ -151,14 +152,14 @@ def _get_detail(tag, retry_count=3, pause=0.001):
             ct._write_console()
             request = Request(ct.SINA_DATA_DETAIL_URL%(ct.P_TYPE['http'],
                                                                ct.DOMAINS['vsf'], ct.PAGES['jv'],
-                                                               tag))
+                                                               tag),headers=ua.get_ua())
             text = urlopen(request, timeout=10).read()
             text = text.decode('gbk')
         except _network_error_classes:
             pass
         else:
-            reg = re.compile(r'\,(.*?)\:') 
-            text = reg.sub(r',"\1":', text) 
+            reg = re.compile(r'\,(.*?)\:')
+            text = reg.sub(r',"\1":', text)
             text = text.replace('"{symbol', '{"symbol')
             text = text.replace('{symbol', '{"symbol"')
             jstr = json.dumps(text)
@@ -167,7 +168,7 @@ def _get_detail(tag, retry_count=3, pause=0.001):
             df = df[ct.FOR_CLASSIFY_B_COLS]
             return df
         #raise IOError(ct.NETWORK_URL_ERROR_MSG)
-    
+
 
 def _get_type_data(url):
     try:
@@ -177,7 +178,7 @@ def _get_type_data(url):
         data_str = data_str.split('=')[1]
         data_json = json.loads(data_str)
         df = pd.DataFrame([[row.split(',')[0], row.split(',')[1]] for row in data_json.values()],
-                          columns=['tag', 'name'])
+                          columns=['tag', 'name'],headers=ua.get_ua())
         return df
     except Exception as er:
         print(str(er))
@@ -196,7 +197,7 @@ def get_hs300s():
     """
     from tushare.stock.fundamental import get_stock_basics
     try:
-        wt = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
+        wt = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'],
                                                   ct.PAGES['hs300w']), parse_cols=[0, 3, 6])
         wt.columns = ct.FOR_CLASSIFY_W_COLS
         wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
@@ -217,13 +218,13 @@ def get_sz50s():
         name :股票名称
     """
     try:
-        df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
+        df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'],
                                                   ct.PAGES['sz50b']), parse_cols=[0,1])
         df.columns = ct.FOR_CLASSIFY_B_COLS
         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
         return df
     except Exception as er:
-        print(str(er))      
+        print(str(er))
 
 
 def get_zz500s():
@@ -237,11 +238,11 @@ def get_zz500s():
     """
     from tushare.stock.fundamental import get_stock_basics
     try:
-#         df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
+#         df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'],
 #                                                   ct.PAGES['zz500b']), parse_cols=[0,1])
 #         df.columns = ct.FOR_CLASSIFY_B_COLS
 #         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
-        wt = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
+        wt = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'],
                                                    ct.PAGES['zz500wt']), parse_cols=[0, 3, 6])
         wt.columns = ct.FOR_CLASSIFY_W_COLS
         wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
@@ -249,7 +250,7 @@ def get_zz500s():
         df = df.reset_index()
         return pd.merge(df,wt)
     except Exception as er:
-        print(str(er)) 
+        print(str(er))
 
 
 def get_terminated():
@@ -264,7 +265,7 @@ def get_terminated():
         tDate:终止上市日期 
     """
     try:
-        
+
         ref = ct.SSEQ_CQ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
         clt = Client(rv.TERMINATED_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
                                     ct.PAGES['ssecq'], _random(5),
@@ -277,7 +278,7 @@ def get_terminated():
         df.columns = rv.TERMINATED_COLS
         return df
     except Exception as er:
-        print(str(er))      
+        print(str(er))
 
 
 def get_suspended():
@@ -292,7 +293,7 @@ def get_suspended():
         tDate:终止上市日期 
     """
     try:
-        
+
         ref = ct.SSEQ_CQ_REF_URL%(ct.P_TYPE['http'], ct.DOMAINS['sse'])
         clt = Client(rv.SUSPENDED_URL%(ct.P_TYPE['http'], ct.DOMAINS['sseq'],
                                     ct.PAGES['ssecq'], _random(5),
@@ -305,12 +306,12 @@ def get_suspended():
         df.columns = rv.TERMINATED_COLS
         return df
     except Exception as er:
-        print(str(er))   
-            
+        print(str(er))
+
 
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
-    return str(randint(start, end))  
+    return str(randint(start, end))
 

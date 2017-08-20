@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 """
 电影票房 
 Created on 2015/12/24
@@ -9,6 +9,7 @@ Created on 2015/12/24
 import pandas as pd
 from tushare.stock import cons as ct
 from tushare.util import dateu as du
+from tushare.util import ua
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -41,7 +42,7 @@ def realtime_boxoffice(retry_count=3,pause=0.001):
         time.sleep(pause)
         try:
             request = Request(ct.MOVIE_BOX%(ct.P_TYPE['http'], ct.DOMAINS['mbox'],
-                              ct.BOX, _random()))
+                              ct.BOX, _random()),headers=ua.get_ua())
             lines = urlopen(request, timeout = 10).read()
             if len(lines) < 15: #no data
                 return None
@@ -86,9 +87,9 @@ def day_boxoffice(date=None, retry_count=3, pause=0.001):
                 date = 0
             else:
                 date = int(du.diff_day(du.today(), date)) + 1
-                
+
             request = Request(ct.BOXOFFICE_DAY%(ct.P_TYPE['http'], ct.DOMAINS['mbox'],
-                              ct.BOX, date, _random()))
+                              ct.BOX, date, _random()),headers=ua.get_ua())
             lines = urlopen(request, timeout = 10).read()
             if len(lines) < 15: #no data
                 return None
@@ -126,7 +127,7 @@ def month_boxoffice(date=None, retry_count=3, pause=0.001):
               releaseTime   上映日期
     """
     if date is None:
-        date = du.day_last_week(-30)[0:7] 
+        date = du.day_last_week(-30)[0:7]
     elif len(date)>8:
         print(ct.BOX_INPUT_ERR_MSG)
         return
@@ -135,7 +136,7 @@ def month_boxoffice(date=None, retry_count=3, pause=0.001):
         time.sleep(pause)
         try:
             request = Request(ct.BOXOFFICE_MONTH%(ct.P_TYPE['http'], ct.DOMAINS['mbox'],
-                              ct.BOX, date))
+                              ct.BOX, date),headers=ua.get_ua())
             lines = urlopen(request, timeout = 10).read()
             if len(lines) < 15: #no data
                 return None
@@ -190,7 +191,7 @@ def _day_cinema(date=None, pNo=1, retry_count=3, pause=0.001):
         time.sleep(pause)
         try:
             request = Request(ct.BOXOFFICE_CBD%(ct.P_TYPE['http'], ct.DOMAINS['mbox'],
-                              ct.BOX, pNo, date))
+                              ct.BOX, pNo, date),headers=ua.get_ua())
             lines = urlopen(request, timeout = 10).read()
             if len(lines) < 15: #no data
                 return None
