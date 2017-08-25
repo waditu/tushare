@@ -71,7 +71,7 @@ setup(
     long_description = long_desc,
     author='Jimmy Liu',
     install_requires={
-        'pandas>=0.20', 'numpy>=1.12.0', 'scipy>=0.19.0','matplotlib>=2.0.2','lxml>=3.4.0','pytesseract>=0.1.7'
+                      'lxml>=3.4.0'
     },
     author_email='jimmysoa@sina.cn',
     license='BSD',

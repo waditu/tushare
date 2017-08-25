@@ -14,7 +14,8 @@ TT_K_TYPE = {'D': 'day', 'W': 'week', 'M': 'month'}
 FQ_KEY = ['qfqday', 'hfqday', 'day']
 INDEX_LABELS = ['sh', 'sz', 'hs300', 'sz50', 'cyb', 'zxb', 'zx300', 'zh500']
 INDEX_LIST = {'sh': 'sh000001', 'sz': 'sz399001', 'hs300': 'sh000300',
-              'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006', 'zx300': 'sz399008', 'zh500':'sh000905'}
+              'sz50': 'sh000016', 'zxb': 'sz399005', 'cyb': 'sz399006', 
+              'zx300': 'sz399008', 'zh500':'sh000905'}
 P_TYPE = {'http': 'http://', 'ftp': 'ftp://'}
 PAGE_NUM = [40, 60, 80, 100]
 FORMAT = lambda x: '%.2f' % x
@@ -27,7 +28,8 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'sse': 'www.sse.com.cn', 'szse': 'www.szse.cn',
            'oss': 'file.tushare.org', 'idxip':'115.29.204.48',
            'shibor': 'www.shibor.org', 'mbox':'www.cbooo.cn',
-           'tt': 'gtimg.cn', 'gw': 'gw.com.cn'}
+           'tt': 'gtimg.cn', 'gw': 'gw.com.cn',
+           'v500': 'value500.com'}
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
          'ntinfo':'vCB_BulletinGather.php', 'hs300b':'000300cons.xls',
@@ -93,6 +95,7 @@ SHIBOR_TYPE ={'Shibor': 'Shibor数据', 'Quote': '报价数据', 'Tendency': 'Sh
               'LPR': 'LPR数据', 'LPR_Tendency': 'LPR均值数据'}
 SHIBOR_DATA_URL = '%s%s/shibor/web/html/%s?nameNew=Historical_%s_Data_%s.xls&downLoadPath=data&nameOld=%s%s.xls&shiborSrc=http://www.shibor.org/shibor/'
 ALL_STOCK_BASICS_FILE = P_TYPE['http'] + DOMAINS['oss'] + '/tsdata/%sall%s.csv'
+ALL_DAY_FILE = P_TYPE['http'] + DOMAINS['oss'] + '/tsdata/h/%s%s.csv'
 ALL_CAL_FILE = '%s%s/tsdata/calAll.csv'%(P_TYPE['http'], DOMAINS['oss'])
 SINA_CONCEPTS_INDEX_URL = '%smoney.%s/q/view/%s?param=class'
 SINA_INDUSTRY_INDEX_URL = '%s%s/q/view/%s'
@@ -103,6 +106,7 @@ SINA_CASHFLOW_URL = 'http://money.finance.sina.com.cn/corp/go.php/vDOWN_CashFlow
 INDEX_C_COMM = 'sseportal/ps/zhs/hqjt/csi'
 HS300_CLASSIFY_URL_FTP = '%s%s/webdata/%s'
 HS300_CLASSIFY_URL_HTTP = '%s%s/%s/%s'
+BDI_URL = '%s%s/BDI.asp'
 HIST_FQ_URL = '%s%s/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml?year=%s&jidu=%s'
 HIST_INDEX_URL = '%s%s/corp/go.php/vMS_MarketHistory/stockid/%s/type/S.phtml?year=%s&jidu=%s'
 HIST_FQ_FACTOR_URL = '%s%s/api/json.php/BasicStockSrv.getStockFuQuanData?symbol=%s&type=hfq'

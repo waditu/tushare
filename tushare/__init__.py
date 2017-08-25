@@ -1,4 +1,4 @@
-__version__ = '0.8.3'
+__version__ = '0.8.6'
 __author__ = 'Jimmy Liu'
 """
 for trading data
@@ -7,7 +7,7 @@ from tushare.stock.trading import (get_hist_data, get_tick_data,
                                    get_today_all, get_realtime_quotes,
                                    get_h_data, get_today_ticks,
                                    get_index, get_hists,
-                                   get_k_data,
+                                   get_k_data, get_day_all,
                                    get_sina_dd)
 
 """
@@ -86,6 +86,8 @@ from tushare.datayes.api import *
 
 from tushare.internet.boxoffice import (realtime_boxoffice, day_boxoffice,
                                         day_cinema, month_boxoffice)
+
+from tushare.internet.indexes import (bdi)
 
 """
 for fund data
