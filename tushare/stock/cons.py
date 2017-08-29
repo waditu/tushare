@@ -133,6 +133,18 @@ HIST_FQ_COLS = ['date', 'open', 'high', 'close', 'low', 'volume', 'amount', 'fac
 SINA_DD_COLS = ['code', 'name', 'time', 'price', 'volume', 'preprice', 'type']
 GLOBAL_HQ_SYMBOL = 'sh000001,hkHSI,znb_UKX,znb_DAX,znb_INDEXCF,znb_CAC,znb_SMI,znb_FTSEMIB,znb_MADX,znb_OMX,znb_SPX,znb_HEX,znb_OSEAX,znb_ISEQ,znb_AEX,znb_ICEXI,znb_NKY,znb_TWSE,znb_FSSTI,znb_KOSPI,znb_FBMKLCI,znb_SET,znb_JCI,znb_PCOMP,znb_KSE100,znb_SENSEX,znb_VNINDEX,znb_CSEALL,znb_SASEIDX,znb_SPTSX,znb_MEXBOL,znb_IBOV,znb_MERVAL,znb_AS51,znb_NZSE50FG,znb_CASE,znb_JALSH,sz399001,znb_INDU,znb_CCMP'
 GLOBAL_HQ_COLS = ['symbol', 'name', 'price', 'chga', 'chgp', 'datetime']
+PROFIT_DIVIS = ['code',    
+                'name',    
+                'year',  
+                'bshares',  
+                'incshares',
+                'totals', 
+                'cash',
+                'plandate',    
+                'regdate',    
+                'exdate',    
+                'eventproc',
+                'anndate']
 HIST_FQ_FACTOR_COLS = ['code','value']
 DATA_GETTING_TIPS = '[Getting data:]'
 DATA_GETTING_FLAG = '#'
