@@ -70,10 +70,16 @@ def get_concept_classified():
                                                     ct.DOMAINS['sf'], ct.PAGES['cpt']))
     data = []
     for row in df.values:
-        rowDf =  _get_detail(row[0])
-        rowDf['c_name'] = row[1]
-        data.append(rowDf)
-    data = pd.concat(data,ignore_index=True)
+        try:
+            rowDf =  _get_detail(row[0])
+            rowDf['c_name'] = row[1]
+            data.append(rowDf)
+        except:
+            pass
+    try:
+        data = pd.concat(data,ignore_index=True)
+    except:
+        pass
     return data
 
 
