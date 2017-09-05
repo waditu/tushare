@@ -1,0 +1,48 @@
+2015-02-12
+-----------
+QQ群297882961：提出k线数据复权价的问题、分钟数据不够多的问题
+
+2015-03-01
+-----------
+QQ群275882700：@奇零草 提出部分k线错误的问题，检查后确实是凤凰财经数据源的问题（可改用get_h_data()接口）
+
+2015-03-02
+-----------
+QQ群275882700：@亲爱的斯坦利 提出希望提供指数的成份股和权重数据
+
+2015-03-20
+QQ群297882961:@侯主義者 提出中证100，中证800等指数的k线数据需求
+
+2015-04-09
+-------------
+QQ群297882961:@浙江-QT，提出002738股票的历史数据报错（get_hist_data），经过检查，原因是凤凰财经的接口少了一列换手率的数据。处理方式：判断一下columns列数，才用对等的colums列表。
+
+2015-04-10
+-------------
+志浩提出复权数据的数据类型为object（已修正）
+
+2015-04-16
+-------------
+微博@ariestiger，报告get_h_data()的成交量列名拼写错误
+
+
+2015-05-01
+------------------
+QQ群297882961:@Koff，提出在使用get_today_tick接口的时候报UnboundLocalError: local variable 'data' referenced before assignment异常（收盘后晚上调用的）
+
+2015-05-05
+QQ Mr.OK提出增加公司股东数的接口
+
+
+PHENXI-期货需求
+--------------------
+http://vip.stock.finance.sina.com.cn/mkt/#hqIndex
+这个页面有比较全的市场信息
+http://blog.sina.com.cn/s/blog_7ed3ed3d0101gphj.html
+这篇文章列出了一些数据结构
+http://quote.hexun.com/futures/newfutures.aspx?market=9&type=all&n=%C8%AB%B2%BF 
+http://webcffex.hermes.hexun.com/cffex/kline?code=CFFEXIH1606&start=20160206091500&number=-1000&type=5
+PHENXI 2016/2/15 8:57:44
+http://webftcn.hermes.hexun.com/ 
+
+http://webcffex.hermes.hexun.com/cffex/quotelist?code=CFFEXIH1606,CFFEXIF1609,CFFEXIC1603,dceA1611,CFFEXIC1512,&column=code,name,price,priceweight,updownrate,high,low,updown,lastclose,open&callback=getdata1&callback=jQuery111107492109271895186_1455497884413&_=1455497884414

@@ -1,0 +1,44 @@
+2015-2-10
+------------
+ASK:Stupidinsect:希望增加基金数据
+REP:后期增加
+
+2015-2-26
+------------
+ASK:Allisnone：problem with python keywords
+REP:自行解决
+
+2015-3-1
+------------
+ASK:曹欣田: 调用get_hist_data方法后存入MySQL报错，date(index)列无法入库
+REP:暂时通过增加df['date'] = df.index来解决，并在to_sql设置参数index=False，下一个版本取消index项
+
+2015-3-23
+--------------
+chendonghui1987:取前复权数据报错，TypeError: cannot convert the series to <type 'float'>
+已修正代码from v0.2.1
+
+2015-04-05
+-------------------
+蔡国琛:
+JimmyTu，您好！
+首先感谢你提供了这么好的一个库，解决了困扰我很久的难题，
+另外想提交一个bug，就是下载公司的年报数据（函数：report = ts.get_report_data(2014, 1)）
+会出现两个问题：
+1、缺乏个别公司，如平安银行（000001）
+2、个别公司的数据有重复，如附件的刷黄
+以上，感谢指导！
+
+
+2015-04-18
+---------------
+huhaook:某些个股的复权数据异常。经查实是数据源部分日期为null，需要修改程序。(4月18日晚已修正)
+
+
+2015-04-28
+----------------
+袁鼎：通过get_hist_data获取600102时报错。经查600102是退市股票无数据返回，以修正程序，直接返回None。
+
+2015-06-13
+———————
+Tales Yuan：tushare的profit_data获取2015年分配预案失败。（6月14日晚23时25分已修正）
