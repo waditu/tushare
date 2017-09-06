@@ -431,6 +431,8 @@ def _newstocks(data, pageNo, retry_count, pause):
             html = lxml.html.parse(rv.NEW_STOCKS_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],
                          ct.PAGES['newstock'], pageNo))
             res = html.xpath('//table[@id=\"NewStockTable\"]/tr')
+            if len(res) == 0:
+                return data
             if ct.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
             else:
@@ -797,5 +799,4 @@ def _random(n=13):
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))
-
 

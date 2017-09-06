@@ -313,7 +313,7 @@ def _code_to_symbol(code):
         return INDEX_LIST[code]
     else:
         if len(code) != 6 :
-            return ''
+            return code
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
         
@@ -325,6 +325,6 @@ def _code_to_symbol_dgt(code):
         return INDEX_LIST[code]
     else:
         if len(code) != 6 :
-            return ''
+            return code
         else:
             return '0%s'%code if code[:1] in ['5', '6', '9'] else '1%s'%code
