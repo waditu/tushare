@@ -18,6 +18,7 @@ import json
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
+import traceback
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -452,6 +453,8 @@ def _newstocks(data, pageNo, retry_count, pause):
                 data = _newstocks(data, pageNo, retry_count, pause)
         except Exception as ex:
             print(ex)
+            print(traceback.format_exc())
+            return data
         else:
             return data 
 

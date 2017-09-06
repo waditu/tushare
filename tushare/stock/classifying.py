@@ -17,7 +17,7 @@ from pandas.util.testing import _network_error_classes
 import time
 import tushare.stock.fundamental as fd
 from tushare.util.netbase import Client
-
+import traceback
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -70,10 +70,16 @@ def get_concept_classified():
                                                     ct.DOMAINS['sf'], ct.PAGES['cpt']))
     data = []
     for row in df.values:
-        rowDf =  _get_detail(row[0])
-        rowDf['c_name'] = row[1]
-        data.append(rowDf)
-    data = pd.concat(data,ignore_index=True)
+        try:
+            rowDf =  _get_detail(row[0])
+            rowDf['c_name'] = row[1]
+            data.append(rowDf)
+        except:
+            pass
+    try:
+        data = pd.concat(data,ignore_index=True)
+    except:
+        pass
     return data
 
 
@@ -155,7 +161,7 @@ def _get_detail(tag, retry_count=3, pause=0.001):
             text = urlopen(request, timeout=10).read()
             text = text.decode('gbk')
         except _network_error_classes:
-            pass
+            print(traceback.format_exc())
         else:
             reg = re.compile(r'\,(.*?)\:') 
             text = reg.sub(r',"\1":', text) 

@@ -313,7 +313,7 @@ def _code_to_symbol(code):
         return INDEX_LIST[code]
     else:
         if len(code) != 6 :
-            return ''
+            return code
         else:
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
         

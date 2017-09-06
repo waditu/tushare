@@ -148,8 +148,6 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001,
         DataFrame 当日所有股票交易数据(DataFrame)
               属性:成交时间、成交价格、价格变动，成交手、成交金额(元)，买卖类型
     """
-    if code is None or len(code)!=6 or date is None:
-        return None
     if (src.strip() not in ct.TICK_SRCS):
         print(ct.TICK_SRC_ERROR)
         return None
