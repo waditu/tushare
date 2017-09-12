@@ -1,4 +1,4 @@
-__version__ = '0.8.6'
+__version__ = '0.9.0'
 __author__ = 'Jimmy Liu'
 """
 for trading data
@@ -54,7 +54,7 @@ from tushare.stock.reference import (profit_data, forecast_data,
                                      new_stocks, sh_margins,
                                      sh_margin_details,
                                      sz_margins, sz_margin_details,
-                                     top10_holders)
+                                     top10_holders, profit_divis)
 
 """
 for shibor

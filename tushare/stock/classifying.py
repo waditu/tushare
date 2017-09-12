@@ -71,9 +71,11 @@ def get_concept_classified():
     data = []
     for row in df.values:
         rowDf =  _get_detail(row[0])
-        rowDf['c_name'] = row[1]
-        data.append(rowDf)
-    data = pd.concat(data,ignore_index=True)
+        if rowDf is not None:
+            rowDf['c_name'] = row[1]
+            data.append(rowDf)
+    if len(data) > 0:
+        data = pd.concat(data, ignore_index=True)
     return data
 
 

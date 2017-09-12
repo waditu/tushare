@@ -24,7 +24,7 @@ except ImportError:
     from urllib2 import urlopen, Request
 
 
-def profit_data(year=2015, top=25, 
+def profit_data(year=2017, top=25, 
               retry_count=3, pause=0.001):
     """
     获取分配预案数据
@@ -150,6 +150,55 @@ def _dist_cotent(year, pageNo, retry_count, pause):
             else:
                 return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)    
+
+
+def profit_divis():
+        '''
+                        获取分送送股数据
+            -------
+            Return:DataFrame
+                code:代码    
+                name:证券简称    
+                year:分配年度    
+                bshares:送股  
+                incshares:转增股
+                totals:送转总数 
+                cash:派现   
+                plandate:预案公布日    
+                regdate:股权登记日    
+                exdate:除权除息日    
+                eventproc:事件进程 ,预案或实施
+                anndate:公告日期
+                
+    '''
+        ct._write_head()
+        p = 'cfidata.aspx?sortfd=&sortway=&curpage=1&fr=content&ndk=A0A1934A1939A1957A1966A1983&xztj=&mystock='
+        df =  _profit_divis(1, pd.DataFrame(), p)
+        df = df.drop([3], axis=1)
+        df.columns = ct.PROFIT_DIVIS
+        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
+        return df
+
+
+def _profit_divis(pageNo, dataArr, nextPage):
+        ct._write_console()
+        html = lxml.html.parse('%sdata.cfi.cn/%s'%(ct.P_TYPE['http'], nextPage))
+        res = html.xpath("//table[@class=\"table_data\"]/tr")
+        if ct.PY3:
+            sarr = [etree.tostring(node).decode('utf-8') for node in res]
+        else:
+            sarr = [etree.tostring(node) for node in res]
+        sarr = ''.join(sarr)
+        sarr = sarr.replace('--', '0')
+        sarr = '<table>%s</table>'%sarr
+        df = pd.read_html(sarr, skiprows=[0])[0]
+        dataArr = dataArr.append(df, ignore_index=True)
+        nextPage = html.xpath('//div[@id=\"content\"]/div[2]/a[last()]/@href')[0]
+        np = nextPage.split('&')[2].split('=')[1]
+        if pageNo < int(np):
+            return _profit_divis(int(np), dataArr, nextPage)
+        else:
+            return dataArr
 
 
 def forecast_data(year, quarter):
@@ -382,6 +431,8 @@ def _newstocks(data, pageNo, retry_count, pause):
             html = lxml.html.parse(rv.NEW_STOCKS_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],
                          ct.PAGES['newstock'], pageNo))
             res = html.xpath('//table[@id=\"NewStockTable\"]/tr')
+            if len(res) == 0:
+                return data
             if ct.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
             else:
