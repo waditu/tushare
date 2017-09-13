@@ -1,4 +1,4 @@
-__version__ = '0.9.0'
+__version__ = '0.9.2'
 __author__ = 'Jimmy Liu'
 """
 for trading data
@@ -119,3 +119,7 @@ for futures API
 from tushare.futures.domestic import (get_cffex_daily, get_czce_daily,
                                       get_dce_daily, get_future_daily,
                                       get_shfe_daily, get_shfe_vwap)
+
+
+from tushare.coins.market import (coins_tick, coins_bar,
+                                  coins_snapshot, coins_trade)

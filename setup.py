@@ -70,9 +70,6 @@ setup(
 #     long_description=read("READM.rst"),
     long_description = long_desc,
     author='Jimmy Liu',
-    install_requires={
-                      'lxml>=3.4.0'
-    },
     author_email='jimmysoa@sina.cn',
     license='BSD',
     url='http://tushare.org',
@@ -85,6 +82,7 @@ setup(
     'Programming Language :: Python :: 3.4',
     'License :: OSI Approved :: BSD License'],
     packages=['tushare','tushare.stock', 'tushare.data', 'tushare.util', 'tushare.datayes',
-              'tushare.internet', 'tushare.fund', 'tushare.trader', 'tushare.futures'],
+              'tushare.internet', 'tushare.fund', 'tushare.trader', 'tushare.futures',
+              'tushare.coins'],
     package_data={'': ['*.csv']},
 )
