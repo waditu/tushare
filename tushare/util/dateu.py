@@ -1,9 +1,9 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 
 import datetime
 import time
 import pandas as pd
-
+from tushare.stock import cons as ct
 
 def year_qua(date):
     mon = date[5:7]
@@ -33,6 +33,7 @@ def get_year():
     year = datetime.datetime.today().year
     return year
 
+
 def get_month():
     month = datetime.datetime.today().month
     return month
@@ -50,8 +51,16 @@ def day_last_week(days=-7):
     lasty = datetime.datetime.today().date() + datetime.timedelta(days)
     return str(lasty)
 
+
 def get_now():
     return time.strftime('%Y-%m-%d %H:%M:%S')
+
+
+def int2time(timestamp):
+    datearr = datetime.datetime.utcfromtimestamp(timestamp)
+    timestr = datearr.strftime("%Y-%m-%d %H:%M:%S")
+    return timestr
+
 
 def diff_day(start=None, end=None):
     d1 = datetime.datetime.strptime(end, '%Y-%m-%d')
@@ -66,20 +75,30 @@ def get_quarts(start, end):
     return [str(d).split('Q') for d in idx][::-1]
 
 
-holiday = ['2015-01-01', '2015-01-02', '2015-02-18', '2015-02-19', '2015-02-20', '2015-02-23', '2015-02-24', '2015-04-06',
-                            '2015-05-01', '2015-06-22', '2015-09-03',  '2015-09-04', '2015-10-01', '2015-10-02', '2015-10-05', '2015-10-06', '2015-10-07']
-    
+def trade_cal():
+    '''
+            交易日历
+    isOpen=1是交易日，isOpen=0为休市
+    '''
+    df = pd.read_csv(ct.ALL_CAL_FILE)
+    return df
+
 
 def is_holiday(date):
+    '''
+            判断是否为交易日，返回True or False
+    '''
+    df = trade_cal()
+    holiday = df[df.isOpen == 0]['calendarDate'].values
     if isinstance(date, str):
-        date = datetime.datetime.strptime(date, '%Y-%m-%d')
-    today=int(date.strftime("%w"))
-    if today > 0 and today < 6 and date not in holiday:
-        return False
-    else:
+        today = datetime.datetime.strptime(date, '%Y-%m-%d')
+
+    if today.isoweekday() in [6, 7] or date in holiday:
         return True
-    
-    
+    else:
+        return False
+
+
 def last_tddate():
     today = datetime.datetime.today().date()
     today=int(today.strftime("%w"))
@@ -88,7 +107,22 @@ def last_tddate():
     else:
         return day_last_week(-1)
         
-    
 
+def tt_dates(start='', end=''):
+    startyear = int(start[0:4])
+    endyear = int(end[0:4])
+    dates = [d for d in range(startyear, endyear+1, 2)]
+    return dates
     
     
+def _random(n=13):
+    from random import randint
+    start = 10**(n-1)
+    end = (10**n)-1
+    return str(randint(start, end))
+
+def get_q_date(year=None, quarter=None):
+    dt = {'1': '-03-31', '2': '-06-30', '3': '-09-30', '4': '-12-31'}
+    return '%s%s'%(str(year), dt[str(quarter)])
+
+

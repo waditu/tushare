@@ -472,7 +472,7 @@ OPTVAR = '/api/options/getOptVar.csv?exchangeCD=%s&secID=%s&ticker=%s&contractTy
 NEWSINFO = '/api/subject/getNewsInfo.csv?newsID=%s&field=%s'
 NEWSINFOBYTIME = '/api/subject/getNewsInfoByTime.csv?newsPublishDate=%s&beginTime=%s&endTime=%s&field=%s'
 NEWSCONTENT = '/api/subject/getNewsContent.csv?newsID=%s&field=%s'
-NEWSCONTENTBYTIME = '/api/subject/getNewsContentByTime.csv?newsPublishDate=%s&newsPublishDate=%s&beginTime=%s&endTime=%s&field=%s'
+NEWSCONTENTBYTIME = '/api/subject/getNewsContentByTime.csv?newsPublishDate=%s&beginTime=%s&endTime=%s&field=%s'
 COMPANYBYNEWS = '/api/subject/getCompanyByNews.csv?newsID=%s&field=%s'
 NEWSBYCOMPANY = '/api/subject/getNewsByCompany.csv?partyID=%s&beginDate=%s&endDate=%s&field=%s'
 TICKERSBYNEWS = '/api/subject/getTickersByNews.csv?newsID=%s&field=%s'

@@ -4,9 +4,11 @@ DP_URL = '%sapp.finance.%s/data/stock/%s?day=&page=%s'
 DP_163_URL = '%squotes.%s/data/caibao/%s?reportdate=%s&sort=declaredate&order=desc&page=%s'
 FUND_HOLDS_URL = '%squotes.%s/hs/marketdata/service/%s?host=/hs/marketdata/service/%s&page=%s&query=start:%s;end:%s&order=desc&count=60&type=query&req=%s'
 XSG_URL = '%sdatainterface.%s/EM_DataCenter/%s?type=FD&sty=BST&st=3&sr=true&fd=%s&stat=%s'
-LHB_URL = '%sdata.%s/stock/lhb/%s.html'
+# LHB_URL = '%sdata.%s/stock/lhb/%s.html'
+LHB_URL = '%sdata.%s/DataCenter_V3/stock2016/TradeDetail/pagesize=200,page=1,sortRule=-1,sortType=,startDate=%s,endDate=%s,gpfw=0,js=vardata_tab_1.html'
 LHB_SINA_URL = '%s%s/q/go.php/vLHBData/kind/%s/%s?last=%s&p=%s'
-LHB_COLS = ['code', 'name', 'pchange', 'amount', 'buy', 'bratio', 'sell', 'sratio', 'reason']
+LHB_TMP_COLS = ['SCode', 'SName', 'Chgradio', 'ZeMoney', 'Bmoney', 'Smoney', 'Ctypedes', 'Turnover']
+LHB_COLS = ['code', 'name', 'pchange', 'amount', 'buy', 'sell', 'reason', 'Turnover']
 NEW_STOCKS_URL = '%s%s/corp/view/%s?page=%s&cngem=0&orderBy=NetDate&orderType=desc'
 MAR_SH_HZ_URL = '%s%s/marketdata/tradedata/%s?jsonCallBack=jsonpCallback%s&isPagination=true&tabType=&pageHelp.pageSize=100&beginDate=%s&endDate=%s%s&_=%s'
 MAR_SH_HZ_REF_URL = '%s%s/market/dealingdata/overview/margin/'
@@ -16,6 +18,9 @@ MAR_SZ_MX_URL = '%s%s/szseWeb/%s?SHOWTYPE=EXCEL&ACTIONID=8&CATALOGID=1837_xxpl&t
 MAR_SH_HZ_TAIL_URL = '&pageHelp.pageNo=%s&pageHelp.beginPage=%s&pageHelp.endPage=%s'
 TERMINATED_URL = '%s%s/%s?jsonCallBack=jsonpCallback%s&isPagination=true&sqlId=COMMON_SSE_ZQPZ_GPLB_MCJS_ZZSSGGJBXX_L&pageHelp.pageSize=50&_=%s'
 SUSPENDED_URL = '%s%s/%s?jsonCallBack=jsonpCallback%s&isPagination=true&sqlId=COMMON_SSE_ZQPZ_GPLB_MCJS_ZTSSGS_L&pageHelp.pageSize=50&_=%s'
+TOP10_HOLDERS_URL = '%swebf10.%s/SDGD/SD%sGD%s.js'
+TOP10_SUMM_COLS = ['quarter', 'amount', 'changed' ,'props']
+TOP10_PER_COLS = ['quarter', 'name', 'hold', 'h_pro', 'sharetype', 'status']
 TERMINATED_T_COLS = ['COMPANY_CODE', 'COMPANY_ABBR', 'LISTING_DATE', 'CHANGE_DATE']
 LHB_KINDS = ['ggtj', 'yytj', 'jgzz', 'jgmx']
 LHB_GGTJ_COLS = ['code', 'name', 'count', 'bamount', 'samount', 'net', 'bcount', 'scount']
@@ -29,7 +34,7 @@ XSG_COLS = ['code', 'name', 'date', 'count', 'ratio']
 QUARTS_DIC = {'1':('%s-12-31', '%s-03-31'), '2':('%s-03-31', '%s-06-30'), 
               '3':('%s-06-30', '%s-09-30'), '4':('%s-9-30', '%s-12-31')}
 FUND_HOLDS_COLS = ['count', 'clast', 'date', 'ratio', 'amount', 'nums','nlast', 'name', 'code']
-NEW_STOCKS_COLS = ['code', 'name', 'ipo_date', 'issue_date', 'amount', 'markets', 'price', 'pe',
+NEW_STOCKS_COLS = ['code', 'xcode', 'name', 'ipo_date', 'issue_date', 'amount', 'markets', 'price', 'pe',
                    'limit', 'funds', 'ballot']
 MAR_SH_COOKIESTR = '_gscu_1808689395=27850607moztu036'
 MAR_SH_HZ_COLS = ['opDate', 'rzye', 'rzmre', 'rqyl', 'rqylje', 'rqmcl', 'rzrqjyzl']
