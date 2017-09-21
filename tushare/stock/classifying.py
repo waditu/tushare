@@ -147,7 +147,7 @@ def get_st_classified():
     return df 
 
 
-def _get_detail(tag, retry_count=3, pause=5):
+def _get_detail(tag, retry_count=3, pause=10):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
