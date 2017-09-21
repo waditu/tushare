@@ -76,6 +76,7 @@ def get_concept_classified():
             data.append(rowDf)
     if len(data) > 0:
         data = pd.concat(data, ignore_index=True)
+
     return data
 
 
@@ -146,7 +147,7 @@ def get_st_classified():
     return df 
 
 
-def _get_detail(tag, retry_count=3, pause=0.001):
+def _get_detail(tag, retry_count=3, pause=5):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
@@ -316,3 +317,7 @@ def _random(n=13):
     end = (10**n)-1
     return str(randint(start, end))  
 
+
+if __name__ == '__main__':
+    import tushare as ts
+    print(ts.get_concept_classified())
