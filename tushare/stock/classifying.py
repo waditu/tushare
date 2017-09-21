@@ -55,7 +55,7 @@ def get_industry_classified(standard='sina'):
     return data
         
 
-def get_concept_classified():
+def get_concept_classified(detail_pause=10):
     """
         获取概念分类数据
     Return
@@ -70,7 +70,7 @@ def get_concept_classified():
                                                     ct.DOMAINS['sf'], ct.PAGES['cpt']))
     data = []
     for row in df.values:
-        rowDf =  _get_detail(row[0])
+        rowDf =  _get_detail(row[0],pause=detail_pause)
         if rowDf is not None:
             rowDf['c_name'] = row[1]
             data.append(rowDf)
@@ -318,6 +318,6 @@ def _random(n=13):
     return str(randint(start, end))  
 
 
-if __name__ == '__main__':
-    import tushare as ts
-    print(ts.get_concept_classified())
+# if __name__ == '__main__':
+#     import tushare as ts
+#     print(ts.get_concept_classified())
