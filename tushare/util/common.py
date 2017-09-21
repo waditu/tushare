@@ -20,13 +20,13 @@ class Client:
     def __init__(self , token):
         self.token = token
         self.httpClient = HTTPSConnection(vs.HTTP_URL, vs.HTTP_PORT)
-        
-        
+
+
     def __del__( self ):
         if self.httpClient is not None:
             self.httpClient.close()
-            
-            
+
+
     def encodepath(self, path):
         start = 0
         n = len(path)
@@ -44,7 +44,7 @@ class Client:
                         else:
                             re += urllib.quote(path[j])
                     else:
-                        re += path[j]  
+                        re += path[j]
                 re += '&'
                 start = i+1
             else:
@@ -55,16 +55,16 @@ class Client:
                         else:
                             re += urllib.quote(path[j])
                     else:
-                        re += path[j]  
+                        re += path[j]
                 start = n
             i = path.find('=', start)
         return re
-    
-    
+
+
     def init(self, token):
         self.token = token
-        
-        
+
+
     def getData(self, path):
         result = None
         path='/data/v1' + path

@@ -69,7 +69,7 @@ setup(
     description='A utility for crawling historical and Real-time Quotes data of China stocks',
 #     long_description=read("READM.rst"),
     long_description = long_desc,
-    author='Jimmy Liu',
+    author='Jimmy Liu m',
     author_email='jimmysoa@sina.cn',
     license='BSD',
     url='http://tushare.org',
