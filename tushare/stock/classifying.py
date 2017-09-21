@@ -317,7 +317,3 @@ def _random(n=13):
     end = (10**n)-1
     return str(randint(start, end))  
 
-
-# if __name__ == '__main__':
-#     import tushare as ts
-#     print(ts.get_concept_classified())
