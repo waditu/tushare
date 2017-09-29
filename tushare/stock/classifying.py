@@ -24,7 +24,7 @@ except ImportError:
     from urllib2 import urlopen, Request
 
 
-def get_industry_classified(standard='sina'):
+def get_industry_classified(standard='sina',detail_pause=10):
     """
         获取行业分类数据
     Parameters
@@ -48,7 +48,7 @@ def get_industry_classified(standard='sina'):
     data = []
     ct._write_head()
     for row in df.values:
-        rowDf =  _get_detail(row[0], retry_count=10, pause=0.01)
+        rowDf =  _get_detail(row[0], retry_count=10, pause=detail_pause)
         rowDf['c_name'] = row[1]
         data.append(rowDf)
     data = pd.concat(data, ignore_index=True)
