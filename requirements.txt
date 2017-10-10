@@ -10,5 +10,4 @@ python-dateutil==2.6.1
 pytz==2017.2
 requests==2.18.4
 six==1.11.0
-tushare==0.9.8
 urllib3==1.22
