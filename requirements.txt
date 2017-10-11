@@ -1,1 +1,13 @@
-lxml == 3.4.4
+beautifulsoup4==4.6.0
+bs4==0.0.1
+certifi==2017.7.27.1
+chardet==3.0.4
+idna==2.6
+lxml==4.0.0
+numpy==1.13.3
+pandas==0.20.3
+python-dateutil==2.6.1
+pytz==2017.2
+requests==2.18.4
+six==1.11.0
+urllib3==1.22
