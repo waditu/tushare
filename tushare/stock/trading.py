@@ -20,14 +20,14 @@ from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.stock.reference import new_stocks
 try:
-    from urllib.request import urlopen, Request
+    from urllib.request import urlopen, Request,ProxyHandler,build_opener
 except ImportError:
-    from urllib2 import urlopen, Request
+    from urllib2 import urlopen, Request,ProxyHandler,build_opener
 
 
 def get_hist_data(code=None, start=None, end=None,
                   ktype='D', retry_count=3,
-                  pause=0.001):
+                  pause=0.001,proxy=None):
     """
         获取个股历史交易记录
     Parameters
@@ -44,6 +44,8 @@ def get_hist_data(code=None, start=None, end=None,
                  如遇网络等问题重复执行的次数 
       pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+      proxy :string  默认 None
+               如果传入,则获取数据的时候采用代理请求
     return
     -------
       DataFrame
@@ -64,7 +66,10 @@ def get_hist_data(code=None, start=None, end=None,
         time.sleep(pause)
         try:
             request = Request(url)
-            lines = urlopen(request, timeout = 10).read()
+            if proxy is None:
+                lines = urlopen(request, timeout = 10).read()
+            else:
+                lines = build_opener(ProxyHandler(proxy)).open(request,timeout= 10).read()
             if len(lines) < 15: #no data
                 return None
         except Exception as e:
@@ -96,12 +101,14 @@ def get_hist_data(code=None, start=None, end=None,
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def _parsing_dayprice_json(types=None, page=1):
+def _parsing_dayprice_json(types=None, page=1,proxy=None):
     """
            处理当日行情分页数据，格式为json
      Parameters
      ------
         pageNum:页码
+        proxy: string  默认 None
+            如果传入, 则获取数据的时候采用代理请求
      return
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
@@ -109,7 +116,10 @@ def _parsing_dayprice_json(types=None, page=1):
     ct._write_console()
     request = Request(ct.SINA_DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                  ct.PAGES['jv'], types, page))
-    text = urlopen(request, timeout=10).read()
+    if proxy is None:
+        text = urlopen(request, timeout=10).read()
+    else:
+        text = build_opener(ProxyHandler(proxy)).open(request, timeout=10).read()
     if text == 'null':
         return None
     reg = re.compile(r'\,(.*?)\:') 
@@ -129,7 +139,7 @@ def _parsing_dayprice_json(types=None, page=1):
 
 
 def get_tick_data(code=None, date=None, retry_count=3, pause=0.001,
-                  src='sn'):
+                  src='sn',proxy=None):
     """
         获取分笔数据
     Parameters
@@ -143,6 +153,8 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001,
         pause : int, 默认 0
                  重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
         src : 数据源选择，可输入sn(新浪)、tt(腾讯)、nt(网易)，默认sn
+        proxy: string  默认 None
+            如果传入, 则获取数据的时候采用代理请求
      return
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
@@ -170,7 +182,10 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001,
                 df.columns = ct.TICK_COLUMNS
             else:
                 re = Request(url[src])
-                lines = urlopen(re, timeout=10).read()
+                if proxy is None:
+                    lines = urlopen(re, timeout=10).read()
+                else:
+                    lines = build_opener(ProxyHandler(proxy)).open(re, timeout=10).read()
                 lines = lines.decode('GBK') 
                 if len(lines) < 20:
                     return None
@@ -183,7 +198,7 @@ def get_tick_data(code=None, date=None, retry_count=3, pause=0.001,
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def get_sina_dd(code=None, date=None, vol=400, retry_count=3, pause=0.001):
+def get_sina_dd(code=None, date=None, vol=400, retry_count=3, pause=0.001,proxy=None):
     """
         获取sina大单数据
     Parameters
@@ -196,6 +211,8 @@ def get_sina_dd(code=None, date=None, vol=400, retry_count=3, pause=0.001):
                   如遇网络等问题重复执行的次数
         pause : int, 默认 0
                  重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+        proxy: string  默认 None
+            如果传入, 则获取数据的时候采用代理请求
      return
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
@@ -210,7 +227,10 @@ def get_sina_dd(code=None, date=None, vol=400, retry_count=3, pause=0.001):
         try:
             re = Request(ct.SINA_DD % (ct.P_TYPE['http'], ct.DOMAINS['vsf'], ct.PAGES['sinadd'],
                                 symbol, vol, date))
-            lines = urlopen(re, timeout=10).read()
+            if proxy is None:
+                lines = urlopen(re, timeout=10).read()
+            else:
+                lines = build_opener(ProxyHandler(proxy)).open(re, timeout=10).read()
             lines = lines.decode('GBK') 
             if len(lines) < 100:
                 return None
@@ -225,7 +245,7 @@ def get_sina_dd(code=None, date=None, vol=400, retry_count=3, pause=0.001):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def get_today_ticks(code=None, retry_count=3, pause=0.001):
+def get_today_ticks(code=None, retry_count=3, pause=0.001,proxy=None):
     """
         获取当日分笔明细数据
     Parameters
@@ -236,6 +256,8 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
                   如遇网络等问题重复执行的次数
         pause : int, 默认 0
                  重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+        proxy: string  默认 None
+                 如果传入, 则获取数据的时候采用代理请求
      return
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
@@ -251,7 +273,10 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
             request = Request(ct.TODAY_TICKS_PAGE_URL % (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                                                        ct.PAGES['jv'], date,
                                                        symbol))
-            data_str = urlopen(request, timeout=10).read()
+            if proxy is None:
+                data_str = urlopen(request, timeout=10).read()
+            else:
+                data_str = build_opener(ProxyHandler(proxy)).open(request, timeout=10).read()
             data_str = data_str.decode('GBK')
             data_str = data_str[1:-1]
             data_str = eval(data_str, type('Dummy', (dict,), 
@@ -298,32 +323,36 @@ def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
         
     
-def get_today_all():
+def get_today_all(proxy=None):
     """
         一次性获取最近一个日交易日所有股票的交易数据
+        proxy: string  默认 None
+            如果传入, 则获取数据的时候采用代理请求
     return
     -------
       DataFrame
            属性：代码，名称，涨跌幅，现价，开盘价，最高价，最低价，最日收盘价，成交量，换手率，成交额，市盈率，市净率，总市值，流通市值
     """
     ct._write_head()
-    df = _parsing_dayprice_json('hs_a', 1)
+    df = _parsing_dayprice_json('hs_a', 1,proxy=proxy)
     if df is not None:
         for i in range(2, ct.PAGE_NUM[1]):
-            newdf = _parsing_dayprice_json('hs_a', i)
+            newdf = _parsing_dayprice_json('hs_a', i,proxy=proxy)
             df = df.append(newdf, ignore_index=True)
-    df = df.append(_parsing_dayprice_json('shfxjs', 1),
+    df = df.append(_parsing_dayprice_json('shfxjs', 1,proxy=proxy),
                                                ignore_index=True)
     return df
 
 
-def get_realtime_quotes(symbols=None):
+def get_realtime_quotes(symbols=None,proxy=None):
     """
         获取实时交易数据 getting real time quotes data
        用于跟踪交易情况（本次执行的结果-上一次执行的数据）
     Parameters
     ------
         symbols : string, array-like object (list, tuple, Series).
+        proxy: string  默认 None
+            如果传入, 则获取数据的时候采用代理请求
         
     return
     -------
@@ -364,7 +393,11 @@ def get_realtime_quotes(symbols=None):
     symbols_list = symbols_list[:-1] if len(symbols_list) > 8 else symbols_list 
     request = Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['sinahq'],
                                                 _random(), symbols_list))
-    text = urlopen(request,timeout=10).read()
+    if proxy is None:
+        text = urlopen(request, timeout=10).read()
+    else:
+        text = build_opener(ProxyHandler(proxy)).open(request, timeout=10).read()
+
     text = text.decode('GBK')
     reg = re.compile(r'\="(.*?)\";')
     data = reg.findall(text)
@@ -388,7 +421,7 @@ def get_realtime_quotes(symbols=None):
 
 
 def get_h_data(code, start=None, end=None, autype='qfq',
-               index=False, retry_count=3, pause=0.001, drop_factor=True):
+               index=False, retry_count=3, pause=0.001, drop_factor=True,proxy=None,*args,**kwargs):
     '''
     获取历史复权数据
     Parameters
@@ -407,6 +440,8 @@ def get_h_data(code, start=None, end=None, autype='qfq',
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
       drop_factor : bool, 默认 True
                 是否移除复权因子，在分析过程中可能复权因子意义不大，但是如需要先储存到数据库之后再分析的话，有该项目会更加灵活
+      proxy :string  默认 None
+               如果传入,则获取数据的时候采用代理请求
     return
     -------
       DataFrame
@@ -425,7 +460,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
     qt = qs[0]
     ct._write_head()
     data = _parse_fq_data(_get_index_url(index, code, qt), index,
-                          retry_count, pause)
+                          retry_count, pause,proxy)
     if data is None:
         data = pd.DataFrame()
     if len(qs)>1:
@@ -433,7 +468,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             qt = qs[d]
             ct._write_console()
             df = _parse_fq_data(_get_index_url(index, code, qt), index,
-                                retry_count, pause)
+                                retry_count, pause,proxy)
             if df is None:  # 可能df为空，退出循环
                 break
             else:
@@ -465,7 +500,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             df = df.sort_values('date', ascending = False)
             firstDate = data.head(1)['date']
             frow = df[df.date == firstDate[0]]
-            rt = get_realtime_quotes(code)
+            rt = get_realtime_quotes(code,proxy=proxy)
             if rt is None:
                 return pd.DataFrame()
             if ((float(rt['high']) == 0) & (float(rt['low']) == 0)):
@@ -502,11 +537,14 @@ def get_h_data(code, start=None, end=None, autype='qfq',
             return data
 
 
-def _parase_fq_factor(code, start, end):
+def _parase_fq_factor(code, start, end,proxy=None):
     symbol = _code_to_symbol(code)
     request = Request(ct.HIST_FQ_FACTOR_URL%(ct.P_TYPE['http'],
                                              ct.DOMAINS['vsf'], symbol))
-    text = urlopen(request, timeout=10).read()
+    if proxy is None:
+        text = urlopen(request, timeout=10).read()
+    else:
+        text = build_opener(ProxyHandler(proxy)).open(request, timeout=10).read()
     text = text[1:len(text)-1]
     text = text.decode('utf-8') if ct.PY3 else text
     text = text.replace('{_', '{"')
@@ -532,12 +570,16 @@ def _fun_except(x):
         return x
 
 
-def _parse_fq_data(url, index, retry_count, pause):
+def _parse_fq_data(url, index, retry_count, pause,proxy=None):
     for _ in range(retry_count):
         time.sleep(pause)
         try:
             request = Request(url)
-            text = urlopen(request, timeout=10).read()
+            if proxy is None:
+                text = urlopen(request, timeout=10).read()
+            else:
+                text = build_opener(ProxyHandler(proxy)).open(request, timeout=10).read()
+
             text = text.decode('GBK')
             html = lxml.html.parse(StringIO(text))
             res = html.xpath('//table[@id=\"FundHoldSharesTable\"]')
@@ -568,9 +610,11 @@ def _parse_fq_data(url, index, retry_count, pause):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def get_index():
+def get_index(proxy=None):
     """
     获取大盘指数行情
+    proxy: string  默认 None
+            如果传入, 则获取数据的时候采用代理请求
     return
     -------
       DataFrame
@@ -587,7 +631,10 @@ def get_index():
     """
     request = Request(ct.INDEX_HQ_URL%(ct.P_TYPE['http'],
                                              ct.DOMAINS['sinahq']))
-    text = urlopen(request, timeout=10).read()
+    if proxy is None:
+        text = urlopen(request, timeout=10).read()
+    else:
+        text = build_opener(ProxyHandler(proxy)).open(request, timeout=10).read()
     text = text.decode('GBK')
     text = text.replace('var hq_str_sh', '').replace('var hq_str_sz', '')
     text = text.replace('";', '').replace('"', '').replace('=', ',')
@@ -618,7 +665,7 @@ def get_k_data(code=None, start='', end='',
                   ktype='D', autype='qfq', 
                   index=False,
                   retry_count=3,
-                  pause=0.001):
+                  pause=0.001,proxy=None):
     """
     获取k线数据
     ---------
@@ -637,6 +684,8 @@ def get_k_data(code=None, start='', end='',
                  如遇网络等问题重复执行的次数 
       pause : int, 默认 0
                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+      proxy :string  默认 None
+               如果传入,则获取数据的时候采用代理请求
     return
     -------
       DataFrame
@@ -690,7 +739,7 @@ def get_k_data(code=None, start='', end='',
         data = data.append(_get_k_data(url, dataflag, 
                                        symbol, code,
                                        index, ktype,
-                                       retry_count, pause), 
+                                       retry_count, pause,proxy),
                            ignore_index=True)
     if ktype not in ct.K_MIN_LABELS:
         if ((start is not None) & (start != '')) & ((end is not None) & (end != '')):
@@ -700,18 +749,21 @@ def get_k_data(code=None, start='', end='',
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
     
 
-def _get_k_data(url, dataflag='',
+def     _get_k_data(url, dataflag='',
                 symbol='',
                 code = '',
                 index = False,
                 ktype = '',
                 retry_count=3,
-                pause=0.001):
+                pause=0.001,proxy=None):
     for _ in range(retry_count):
             time.sleep(pause)
             try:
                 request = Request(url)
-                lines = urlopen(request, timeout = 10).read()
+                if proxy is None:
+                    lines = urlopen(request, timeout = 10).read()
+                else:
+                    lines = build_opener(ProxyHandler(proxy)).open(request, timeout=10).read()
                 if len(lines) < 100: #no data
                     return None
             except Exception as e:
@@ -742,7 +794,7 @@ def _get_k_data(url, dataflag='',
 
 def get_hists(symbols, start=None, end=None,
                   ktype='D', retry_count=3,
-                  pause=0.001):
+                  pause=0.001,proxy=None):
     """
     批量获取历史行情数据，具体参数和返回数据类型请参考get_hist_data接口
     """
@@ -751,7 +803,7 @@ def get_hists(symbols, start=None, end=None,
         for symbol in symbols:
             data = get_hist_data(symbol, start=start, end=end,
                                  ktype=ktype, retry_count=retry_count,
-                                 pause=pause)
+                                 pause=pause,proxy=proxy)
             data['code'] = symbol
             df = df.append(data, ignore_index=True)
         return df
