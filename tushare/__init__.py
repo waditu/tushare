@@ -67,7 +67,9 @@ from tushare.stock.shibor import (shibor_data, shibor_quote_data,
 for LHB
 """
 from tushare.stock.billboard import (top_list, cap_tops, broker_tops,
-                                     inst_tops, inst_detail)
+                                     inst_tops, inst_detail,
+                                     get_em_gdzjc,
+                                     get_em_xuangu)
 
 
 """
