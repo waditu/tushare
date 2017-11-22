@@ -1,5 +1,8 @@
-__version__ = '0.9.2'
+# -*- coding:utf-8 -*- 
+
+__version__ = '1.0.5'
 __author__ = 'Jimmy Liu'
+
 """
 for trading data
 """
@@ -8,7 +11,9 @@ from tushare.stock.trading import (get_hist_data, get_tick_data,
                                    get_h_data, get_today_ticks,
                                    get_index, get_hists,
                                    get_k_data, get_day_all,
-                                   get_sina_dd)
+                                   get_sina_dd, bar, tick,
+                                   get_markets, quotes,
+                                   get_instrument, reset_instrument)
 
 """
 for trading data
@@ -48,13 +53,15 @@ from tushare.stock.newsevent import (get_latest_news, latest_content,
 
 """
 for reference
+moneyflow_hsgt:沪深港通资金流向
 """
 from tushare.stock.reference import (profit_data, forecast_data,
                                      xsg_data, fund_holdings,
-                                     new_stocks, sh_margins,
+                                     new_stocks, new_cbonds, sh_margins,
                                      sh_margin_details,
                                      sz_margins, sz_margin_details,
-                                     top10_holders, profit_divis)
+                                     top10_holders, profit_divis,
+                                     moneyflow_hsgt)
 
 """
 for shibor
@@ -123,3 +130,5 @@ from tushare.futures.domestic import (get_cffex_daily, get_czce_daily,
 
 from tushare.coins.market import (coins_tick, coins_bar,
                                   coins_snapshot, coins_trade)
+
+from tushare.util.conns import (get_apis, close_apis)

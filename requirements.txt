@@ -1,1 +1,3 @@
-lxml == 3.4.4
+pandas>=0.18.0
+requests>=2.0.0
+lxml>=3.8.0

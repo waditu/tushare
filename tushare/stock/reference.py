@@ -10,6 +10,7 @@ from __future__ import division
 from tushare.stock import cons as ct
 from tushare.stock import ref_vars as rv
 import pandas as pd
+import numpy as np
 import time
 import lxml.html
 from lxml import etree
@@ -458,6 +459,82 @@ def _newstocks(data, pageNo, retry_count, pause):
             return data 
 
 
+def new_cbonds(default=1, retry_count=3, pause=0.001):
+    """
+    获取可转债申购列表
+    Parameters
+    --------
+    retry_count : int, 默认 3
+                 如遇网络等问题重复执行的次数 
+    pause : int, 默认 0
+                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    
+    Return
+    ------
+    DataFrame
+    bcode:债券代码
+    bname:债券名称
+    scode:股票代码
+    sname:股票名称
+    xcode:申购代码
+    amount:发行总数(亿元)
+    marketprice:最新市场价格
+    convprice:转股价格
+    firstdayprice:首日收盘价
+    ipo_date:上网发行日期
+    issue_date:上市日期
+    ballot:中签率(%)
+    return：打新收益率(%)
+    perreturn:每中一股收益（万元）
+    
+    """
+    data = pd.DataFrame()
+    if default == 1:
+        data = _newcbonds(1, retry_count,
+                    pause)
+    else:
+        for page in range(1, 50):
+            df = _newcbonds(page, retry_count,
+                    pause)
+            if df is not None:
+                data = data.append(df, ignore_index=True)
+            else:
+                break
+    return data
+
+
+def _newcbonds(pageNo, retry_count, pause):
+    for _ in range(retry_count):
+        time.sleep(pause)
+        if pageNo != 1:
+            ct._write_console()
+        try:
+            html = lxml.html.parse(rv.NEW_CBONDS_URL%(ct.P_TYPE['http'],ct.DOMAINS['sstar'],
+                         pageNo))
+            res = html.xpath('//table/tr')
+            if len(res) == 0:
+                return None
+            if ct.PY3:
+                sarr = [etree.tostring(node).decode('utf-8') for node in res]
+            else:
+                sarr = [etree.tostring(node) for node in res]
+            sarr = ''.join(sarr)
+            sarr = '<table>%s</table>'%sarr
+            df = pd.read_html(StringIO(sarr), skiprows=[0])
+            if len(df) < 1:
+                return None
+            df = df[0]
+            df = df.drop([df.columns[14], df.columns[15]], axis=1)
+            df.columns = rv.NEW_CBONDS_COLS
+            df['scode'] = df['scode'].map(lambda x: str(x).zfill(6))
+            df['xcode'] = df['xcode'].map(lambda x: str(x).zfill(6))
+        except Exception as ex:
+            print(ex)
+        else:
+            return df 
+
+
+
 def sh_margins(start=None, end=None, retry_count=3, pause=0.001):
     """
     获取沪市融资融券数据列表
@@ -794,9 +871,36 @@ def top10_holders(code=None, year=None, quarter=None, gdtype='0',
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
+def moneyflow_hsgt():
+    """
+    获取沪深港通资金流向
+    return:
+    DataFrame,单位: 百万元
+    --------------
+    date: 交易日期
+    ggt_ss: 港股通(沪)
+    ggt_sz: 港股通(深)
+    hgt: 沪港通
+    sgt: 深港通
+    north_money: 北向资金流入
+    south_money: 南向资金流入
+    """
+    clt = Client(rv.HSGT_DATA%(ct.P_TYPE['http'], ct.DOMAINS['em']), 
+                        ref=rv.HSGT_REF%(ct.P_TYPE['http'], ct.DOMAINS['em'], ct.PAGES['index']))
+    content = clt.gvalue()
+    content = content.decode('utf-8') if ct.PY3 else content
+    js = json.loads(content)
+    df = pd.DataFrame(js)
+    df['DateTime'] = df['DateTime'].map(lambda x: x[0:10])
+    df = df.replace('-', np.NaN)
+    df = df[rv.HSGT_TEMP]
+    df.columns = rv.HSGT_COLS
+    df = df.sort_values('date', ascending=False)
+    return df
+    
+    
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))
-

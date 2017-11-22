@@ -62,6 +62,11 @@ return::
     
 """
 
+def read_install_requires():
+    with open('requirements.txt', 'r') as f:
+        res = f.readlines()
+    res = list(map(lambda s: s.replace('\n', ''), res))
+    return res
 
 setup(
     name='tushare',
@@ -69,20 +74,20 @@ setup(
     description='A utility for crawling historical and Real-time Quotes data of China stocks',
 #     long_description=read("READM.rst"),
     long_description = long_desc,
+    install_requires=read_install_requires(),
     author='Jimmy Liu',
     author_email='jimmysoa@sina.cn',
     license='BSD',
     url='http://tushare.org',
-    keywords='China stock data',
+    keywords='Global Financial Data',
     classifiers=['Development Status :: 4 - Beta',
     'Programming Language :: Python :: 2.6',
     'Programming Language :: Python :: 2.7',
     'Programming Language :: Python :: 3.2',
     'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
+    'Programming Language :: Python :: 3.5',
     'License :: OSI Approved :: BSD License'],
-    packages=['tushare','tushare.stock', 'tushare.data', 'tushare.util', 'tushare.datayes',
-              'tushare.internet', 'tushare.fund', 'tushare.trader', 'tushare.futures',
-              'tushare.coins'],
+    packages=find_packages(),
     package_data={'': ['*.csv']},
 )

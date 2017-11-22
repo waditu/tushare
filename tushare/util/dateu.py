@@ -93,7 +93,7 @@ def is_holiday(date):
     if isinstance(date, str):
         today = datetime.datetime.strptime(date, '%Y-%m-%d')
 
-    if today.isoweekday() in [6, 7] or date in holiday:
+    if today.isoweekday() in [6, 7] or str(date) in holiday:
         return True
     else:
         return False
