@@ -81,8 +81,8 @@ def _fun_divi(x):
         return 0 if len(res)<1 else float(res[0]) 
     else:
         if isinstance(x, unicode):
-            s1 = unicode('分红','utf-8')
-            s2 = unicode('元','utf-8')
+            s1 = u'分红'
+            s2 = u'元'
             reg = re.compile(r'%s(.*?)%s'%(s1, s2), re.UNICODE)
             res = reg.findall(x)
             return 0 if len(res)<1 else float(res[0])
@@ -101,9 +101,9 @@ def _fun_into(x):
             return res1 + res2
     else:
         if isinstance(x, unicode):
-            s1 = unicode('转增','utf-8')
-            s2 = unicode('送股','utf-8')
-            s3 = unicode('股','utf-8')
+            s1 = u'转增'
+            s2 = u'送股'
+            s3 = u'股'
             reg1 = re.compile(r'%s(.*?)%s'%(s1, s3), re.UNICODE)
             reg2 = re.compile(r'%s(.*?)%s'%(s2, s3), re.UNICODE)
             res1 = reg1.findall(x)
@@ -447,7 +447,7 @@ def _newstocks(data, pageNo, retry_count, pause):
             df['code'] = df['code'].map(lambda x : str(x).zfill(6))
             df['xcode'] = df['xcode'].map(lambda x : str(x).zfill(6))
             res = html.xpath('//table[@class=\"table2\"]/tr[1]/td[1]/a/text()')
-            tag = '下一页' if ct.PY3 else unicode('下一页', 'utf-8')
+            tag = u'下一页'
             hasNext = True if tag in res else False 
             data = data.append(df, ignore_index=True)
             pageNo += 1
