@@ -130,7 +130,7 @@
     roe,净资产收益率(%)
     net_profit_ratio,净利率(%)
     gross_profit_rate,毛利率(%)
-    net_profits,净利润(万元)
+    net_profits,净利润(百万元)
     eps,每股收益
     business_income,营业收入(百万元)
     bips,每股主营业务收入(元)
