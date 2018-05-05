@@ -37,6 +37,12 @@ class Idx():
         code, result = self.client.getData(vs.IDXCONS%(secID, ticker, intoDate,
                                                        isNew, field))
         return _ret_data(code, result)
+    
+    
+    def IdxWeight(self, secID='', ticker='', beginDate='', endDate='', field=''):
+        code, result = self.client.getData(vs.IDXWEIGHT%(secID, ticker, beginDate, 
+                                                       endDate, field))
+        return _ret_data(code, result)
 
 
 def _ret_data(code, result):

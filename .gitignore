@@ -26,6 +26,7 @@ lib64/
 parts/
 sdist/
 var/
+
 *.egg-info/
 .installed.cfg
 *.egg
@@ -62,3 +63,14 @@ docs/bin
 
 # PyBuilder
 target/
+
+#Visual Studio Environment
+*.pyproj
+*.sln
+.vs/
+
+#Vim Environment
+tags
+*~
+
+
