@@ -153,7 +153,7 @@ def get_czce_daily(date=None, type="future"):
             print(ct.CZCE_DAILY_URL % (day.strftime('%Y'),
                                        day.strftime('%Y%m%d')), reason)            
         return
-    if html.find(u'您的访问出错了') >= 0 or html.find('无期权每日行情交易记录') >= 0:
+    if html.find(u'您的访问出错了') >= 0 or html.find(u'无期权每日行情交易记录') >= 0:
         return
     html = [i.replace(' ','').split('|') for i in html.split('\n')[:-4] if i[0][0] != u'小']
     if html[1][0] not in [u'品种月份', u'品种代码']:
