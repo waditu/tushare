@@ -525,3 +525,495 @@
     7   501943282  2015-04-20  
     8  1385066620  2015-04-20  
     9  2473786493  2015-04-20
+
+常用股票技术指标
+----------------
+**概要**
+
+用户可以调用tushare.get_k_data()获得的股票原始数据，再使用tushare.indictor中的方法计算出相应指标。
+例如：计算“工商银行(601398)”自2018-01-01到2018-05-27收盘价的12日MA移动平均线指标
+
+::
+
+    import tushare as ts
+    data = ts.get_k_data("601398", start="2018-01-01", end="2018-05-27")
+    #数据按日期升序列排序
+    data = data.sort_values(by=["date"], ascending=True)
+    MA = ts.indictor.ma(data, n=12)
+    data["ma"] = MA
+
+显示结果：
+
+::
+
+            date  open  close  high   low     volume    code        ma
+    0   2018-01-02  6.19   6.18  6.39  6.11  5374662.0  601398  6.180000
+    1   2018-01-03  6.18   6.16  6.32  6.12  3493611.0  601398  6.170000
+    2   2018-01-04  6.18   6.07  6.18  6.06  4351365.0  601398  6.136667
+    3   2018-01-05  6.09   6.08  6.11  6.06  2817842.0  601398  6.122500
+    4   2018-01-08  6.09   6.07  6.10  6.04  2184876.0  601398  6.112000
+    5   2018-01-09  6.07   6.09  6.11  6.04  1671857.0  601398  6.108333
+    6   2018-01-10  6.08   6.16  6.19  6.06  2487389.0  601398  6.115714
+    7   2018-01-11  6.18   6.21  6.24  6.14  1970473.0  601398  6.127500
+    8   2018-01-12  6.20   6.25  6.30  6.20  2188517.0  601398  6.141111
+
+**注意事项**
+
+如上面12日移动平均线的例子，当n取12时，前12日数据将不可信。对于大多数需要设置计算周期n的算法，前n项指标将不可信。
+因此用户务必根据参数设定在输入数据前部留够余量。
+
+**MA (Moving Average) 移动平均线指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/MA指标/10230874?fr=aladdin>`__
+
+参数说明：
+
+-  **data**:通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：计算周期,默认为10
+-  **val_name**: 需要计算的列名，默认为"close"收盘价
+
+返回值说明：
+
+-  **MA**:移动平均线数组
+
+调用方法：
+
+::
+
+    import tushare as ts
+
+    data = ts.get_k_data("601398")
+    MA = ts.indictor.ma(data, n=10, val_name="close")
+    MA
+
+结果显示:
+
+::
+
+    array([4.332     , 4.2775    , 4.247     , 4.234     , 4.2282    ,
+       4.22116667, 4.21228571, 4.2045    , 4.19344444, 4.1782    ,
+       4.17481818, 4.17808333, 4.169     , 4.18033333, 4.18941667,
+       4.1955    , 4.197     , 4.19625   , 4.20158333, 4.20916667,
+       4.22125   , 4.23866667, 4.24625   , 4.247     , 4.24625   ,
+    ...
+
+
+**MD (Moving Deviation) 移动标准差**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/%E5%B8%83%E6%9E%97%E7%BA%BF/3424486?fr=aladdin>`__
+
+注:移动标准差是BOLL指标中数据，这里给出BOLL指标的资料
+
+
+
+参数说明：
+
+-  **data**:通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：计算周期,默认为10
+-  **val_name**: 需要计算的列名，默认为"close"收盘价
+
+返回值说明：
+
+-  **MD**:移动平均线数组
+
+调用方法：
+
+::
+
+    MD = ts.indictor.md(data, n=10, val_name="close")
+
+结果显示:
+
+略
+
+**EMA (Exponential Moving Average) 指数平均数指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/EMA/12646151>`__
+
+参数说明：
+
+-  **data**:通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：计算周期,默认为12
+-  **val_name**: 需要计算的列名，默认为"close"收盘价
+
+返回值说明：
+
+-  **EMA**:指数平均数指标
+
+调用方法：
+
+::
+
+    EMA = ts.indictor.ema(data, n=12, val_name="close")
+
+**MACD (Moving Average Convergence / Divergence) 指数平滑移动平均线**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/MACD%E6%8C%87%E6%A0%87?fromtitle=MACD&fromid=3334786>`__
+
+参数说明：
+
+-  **data**:通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **quick_n**：DIFF差离值中快速移动天数,默认为12
+-  **slow_n**：DIFF差离值中快速移动天数,默认为26
+-  **dem_n**：DEM讯号线的移动天数,默认为9
+-  **val_name**: 需要计算的列名，默认为"close"收盘价
+
+返回值说明：
+
+-  **OSC**: MACD bar / OSC 差值柱形图 值 = DIFF - DEM
+-  **DIFF**: 差离值
+-  **DEM**: 讯号线
+
+调用方法：
+
+::
+
+    OSC, DIFF, DEM = ts.indictor.macd(data, quick_n=12, slow_n=26, dem_n=9, val_name="close")
+
+**KDJ 随机指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/KDJ%E6%8C%87%E6%A0%87?fromtitle=kdj&fromid=3423560>`__
+
+参数说明：
+
+-  **data**:通过tushare.get_k_data()获取的pandas.Dataframe数据
+
+返回值说明：
+
+-  **K**: K线
+-  **D**: D线
+-  **J**: J线
+
+调用方法：
+
+::
+
+    K, D, J = ts.indictor.kdj(data, n=12, val_name="close")
+
+**RSI (Relative Strength Index) 相对强弱指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/EMA/12646151>`__
+
+参数说明：
+
+-  **data**:通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：计算周期,默认为6
+-  **val_name**: 需要计算的列名，默认为"close"收盘价
+
+返回值说明：
+
+-  **RSI**:相对强弱指标
+
+调用方法：
+
+::
+
+    RSI = ts.indictor.rsi(data, n=6, val_name="close")
+
+**BOLL (Bollinger Bands) 布林线指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/%E5%B8%83%E6%9E%97%E7%BA%BF%E6%8C%87%E6%A0%87/3325894>`__
+
+参数说明：
+
+-  **data**:通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：计算周期,默认为10
+-  **val_name**: 需要计算的列名，默认为"close"收盘价
+-  **k**: 中轨线到上轨线或下轨线的宽度等于标准差的倍数，默认为2
+
+返回值说明：
+
+-  **BOLL**:中轨线
+-  **UPPER**:上轨线
+-  **BOLL**:下轨线
+
+调用方法：
+
+::
+
+    BOLL, UPPER, LOWER = ts.indictor.boll(data, n=10, val_name="close", k=2)
+
+**W&R (Williams %R) 威廉指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/W%26R>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：计算周期,默认为14
+
+返回值说明：
+
+-  **WNR**:威廉指标
+
+调用方法：
+
+::
+
+    WNR = ts.indictor.wnr(data, n=14)
+
+**DMI (Directional Movement Index) 动向指标或趋向指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/DMI%E6%8C%87%E6%A0%87/3423254?fromtitle=DMI&fromid=10910045>`__
+`算法参考 <https://www.mk-mode.com/octopress/2012/03/03/03002038/>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：DI统计时长，默认14
+-  **m**：ADX统计时常参数，默认14
+-  **k**：ADXR统计k个周期前数据，默认6
+
+返回值说明：
+
+-  **P_DI**:+DI指标
+-  **M_DI**:-DI指标
+-  **ADX**:ADX指标
+-  **ADXR**:ADXR指标
+
+调用方法：
+
+::
+
+    P_DI, M_DI, ADX, ADXR = ts.indictor.dmi(data, n=14, m=14, k=6)
+
+**BIAS 乖离率**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/DMI%E6%8C%87%E6%A0%87/3423254?fromtitle=DMI&fromid=10910045>`__
+`算法参考 <https://www.mk-mode.com/octopress/2012/03/03/03002038/>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：统计时长，默认5
+
+返回值说明：
+
+-  **BIAS**: 乖离率
+
+调用方法：
+
+::
+
+    BIAS = ts.indictor.bias(data, n=5)
+
+
+**ASI 震动升降指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/ASI%E6%8C%87%E6%A0%87/6341775?fr=aladdin>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：统计时长，默认5
+
+返回值说明：
+
+-  **ASI**: 震动升降指标
+
+调用方法：
+
+::
+
+    ASI = ts.indictor.asi(data, n=5)
+
+
+**VR (Volatility Volume Ratio) 成交量变异率**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/VR%E6%8C%87%E6%A0%87/4672285>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：统计时长，默认26
+
+返回值说明：
+
+-  **VR**: 成交量变异率
+
+调用方法：
+
+::
+
+    VR = ts.indictor.vr(data, n=26)
+
+**ARBR 指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/arbr%E6%8C%87%E6%A0%87>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：统计时长，默认26
+
+返回值说明：
+
+-  **AR**: AR指标
+-  **BR**: BR指标
+
+调用方法：
+
+::
+
+    VR = ts.indictor.arbr(data, n=26)
+
+**DPO (Detrended Price Oscillator) 区间震荡线指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/%E5%8C%BA%E9%97%B4%E9%9C%87%E8%8D%A1%E7%BA%BF?fromtitle=DPO%E6%8C%87%E6%A0%87&fromid=17502766>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：统计时长，默认26
+-  **m**：MADPO的参数M，默认6
+
+返回值说明：
+
+-  **DPO**: DPO指标
+-  **MADPO**: MADPO指标
+
+调用方法：
+
+::
+
+    DPO, MADPO = ts.indictor.dpo(data, n=20, m=6)
+
+**TRIX (Triple Exponentially Smoothed Average) 三重指数平滑平均线**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/TRIX%E6%8C%87%E6%A0%87>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**：统计时长，默认12
+-  **m**：TRMA的参数M，默认20
+
+返回值说明：
+
+-  **TRIX**: TRIX指标
+-  **TRMA**: TRMA指标
+
+调用方法：
+
+::
+
+    TRIX, TRMA = ts.indictor.trix(data, n=12, m=20)
+
+**BBI (Bull And Bearlndex) 多空指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/BBI%E6%8C%87%E6%A0%87>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+
+返回值说明：
+
+-  **BBI**: 多空指标
+
+调用方法：
+
+::
+
+    BBI = ts.indictor.bbi(data)
+
+**MTM (Momentum Index) 动量指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/MTM%E6%8C%87%E6%A0%87>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **n**: 统计时长，默认6
+
+返回值说明：
+
+-  **MTM**: 动量指标
+
+调用方法：
+
+::
+
+    MTM = ts.indictor.mtm(data, n=6)
+
+**OBV (On Balance Volume) 能量潮**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/%E8%83%BD%E9%87%8F%E6%BD%AE?fromtitle=OBV%E6%8C%87%E6%A0%87&fromid=5114542>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+
+返回值说明：
+
+-  **OBV**: 能量潮
+
+调用方法：
+
+::
+
+    OBV = ts.indictor.obv(data)
+
+**SAR (Stop And Reverse) 抛物线指标**
+
+指标资料：
+`百度百科 <https://baike.baidu.com/item/%E8%83%BD%E9%87%8F%E6%BD%AE?fromtitle=OBV%E6%8C%87%E6%A0%87&fromid=5114542>`__
+`算法参考 <https://virtualizedfrog.wordpress.com/2014/12/09/parabolic-sar-implementation-in-python/>`__
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **init_af**: 动量因子初始值，默认0.02
+-  **max_af**: 动量因子最大值，默认0.2
+
+返回值说明：
+
+-  **SAR**: 抛物线指标
+
+调用方法：
+
+::
+
+    SAR = ts.indictor.sar(data, init_af=0.02, max_af=0.2)
+
+
+**绘制全部指标图像**
+
+参数说明：
+
+-  **data**: 通过tushare.get_k_data()获取的pandas.Dataframe数据
+-  **is_show**: 设置为True则绘图完成后直接显示
+-  **output**: 图像输出路径，设置为None则不输出
+
+调用方法：
+
+::
+
+    import tushare as ts
+    data = ts.get_k_data("601398", start="2018-01-01", end="2018-05-27")
+    data = data.sort_values(by=["date"], ascending=True)
+    ts.indictor.plot_all(data, is_show=True, output=None)
+
+结果显示：工商银行(601398)自2018-01-01到2018-05-27的全部指标数据绘图
+
+.. figure:: _static/indictor.png
+   :width: 100%
+   :alt: 绘制“工商银行(601398)”自2018-01-01到2018-05-27的全部指标数据
