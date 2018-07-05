@@ -1,4 +1,4 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 import sys
 PY3 = (sys.version_info[0] >= 3)
 HTTP_OK = 200
@@ -24,7 +24,7 @@ FUTU = '/api/future/getFutu.csv?exchangeCD=%s&secID=%s&ticker=%s&contractObject=
 FUTUCONVF = '/api/future/getFutuConvf.csv?secID=%s&ticker=%s&field=%s'
 GUARRATING = '/api/bond/getGuarRating.csv?secID=%s&ticker=%s&beginDate=%s&endDate=%s&field=%s'
 IDX = '/api/idx/getIdx.csv?secID=%s&ticker=%s&field=%s'
-IDXCONS = '/api/idx/getIdxCons.csv?secID=%s&ticker=%s&intoDate=%s&intoDate=%s&isNew=%s&field=%s'
+IDXCONS = '/api/idx/getIdxCons.csv?secID=%s&ticker=%s&intoDate=%s&isNew=%s&field=%s'
 IDXWEIGHT = '/api/idx/getIdxCloseWeight.json?secID=%s&ticker=%s&beginDate=%s&endDate=%s&field=%s'
 ISSUERRATING = '/api/bond/getIssuerRating.csv?secID=%s&ticker=%s&beginDate=%s&endDate=%s&field=%s'
 MKTEQUD = '/api/market/getMktEqud.csv?secID=%s&ticker=%s&tradeDate=%s&beginDate=%s&endDate=%s&field=%s'
