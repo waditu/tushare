@@ -213,12 +213,12 @@ def get_sina_dd(code=None, date=None, vol=400, retry_count=3, pause=0.001):
                                 symbol, vol, date))
             lines = urlopen(re, timeout=10).read()
             lines = lines.decode('GBK') 
+            lines_j=eval(lines,type('Dummy',(dict,),dict(__getitem__=lambda s ,n:n))()) 
             if len(lines) < 100:
                 return None
-            df = pd.read_csv(StringIO(lines), names=ct.SINA_DD_COLS,
-                               skiprows=[0])    
+            df=pd.read_json(json.dumps(lines_j))
             if df is not None:
-                df['code'] = df['code'].map(lambda x: x[2:])
+                df['symbol'] = df['symbol'].map(lambda x: x[2:])
         except Exception as e:
             print(e)
         else:
