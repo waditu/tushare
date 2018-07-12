@@ -252,7 +252,7 @@ def get_zz500s():
 #         df.columns = ct.FOR_CLASSIFY_B_COLS
 #         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
         wt = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
-                                                   ct.PAGES['zz500wt']), parse_cols=[0, 3, 6])
+                                                   ct.PAGES['zz500wt']), usecols=[0, 3, 6])
         wt.columns = ct.FOR_CLASSIFY_W_COLS
         wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
         df = get_stock_basics()[['name']]
