@@ -1,7 +1,12 @@
 from setuptools import setup, find_packages
 import codecs
 import os
-import tushare
+from distutils.util import convert_path
+
+main_ns = {}
+ver_path = convert_path('tushare/version.py')
+with open(ver_path) as ver_file:
+        exec(ver_file.read(), main_ns)
 
 def read(fname):
     return codecs.open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -67,10 +72,9 @@ def read_install_requires():
         res = f.readlines()
     res = list(map(lambda s: s.replace('\n', ''), res))
     return res
-
 setup(
     name='tushare',
-    version=tushare.__version__,
+    version=main_ns['__version__'],
     description='A utility for crawling historical and Real-time Quotes data of China stocks',
 #     long_description=read("READM.rst"),
     long_description = long_desc,
