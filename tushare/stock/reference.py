@@ -844,9 +844,9 @@ def top10_holders(code=None, year=None, quarter=None, gdtype='0',
             data = pd.DataFrame()
             for row in jss:
                 qt = row['jzrq']
-                hold = row['ljcy']
-                change = row['ljbh']
-                props = row['ljzb']
+                hold = row.get('ljcy',"")
+                change = row.get('ljbh',"")
+                props = row.get('ljzb',"")
                 arow = [qt, hold, change ,props]
                 summ.append(arow)
                 ls = row['sdgdList']
