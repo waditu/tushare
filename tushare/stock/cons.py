@@ -29,12 +29,8 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'oss': 'file.tushare.org', 'idxip':'115.29.204.48',
            'shibor': 'www.shibor.org', 'mbox':'www.cbooo.cn',
            'tt': 'gtimg.cn', 'gw': 'gw.com.cn',
-<<<<<<< HEAD
-           'v500': 'value500.com', 'sstar': 'stock.stockstar.com',
-           'dfcf': 'nufm.dfcfw.com'}
-=======
+           'dfcf': 'nufm.dfcfw.com',
            'v500': 'value500.com', 'sstar': 'stock.stockstar.com'}
->>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
          'ntinfo':'vCB_BulletinGather.php', 'hs300b':'000300cons.xls',
@@ -45,11 +41,8 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'zz500wt':'000905closeweight.xls',
          't_ticks':'vMS_tradedetail.php', 'dw': 'downLoad.html',
          'qmd':'queryMargin.do', 'szsefc':'ShowReport.szse',
-<<<<<<< HEAD
          'ssecq':'commonQuery.do', 'sinadd':'cn_bill_download.php', 'ids_sw':'SwHy.php',
-=======
          'ssecq':'commonQuery.do', 'sinadd':'json_v2.php', 'ids_sw':'SwHy.php',
->>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
          'idx': 'index.php', 'index': 'index.html'}
 TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
 TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
@@ -124,16 +117,13 @@ HIST_FQ_URL = '%s%s/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml?year=%s
 HIST_INDEX_URL = '%s%s/corp/go.php/vMS_MarketHistory/stockid/%s/type/S.phtml?year=%s&jidu=%s'
 HIST_FQ_FACTOR_URL = '%s%s/api/json.php/BasicStockSrv.getStockFuQuanData?symbol=%s&type=hfq'
 ADJ_FAC_URL = '%s%s/tsdata/f/factor/%s.csv'
-<<<<<<< HEAD
 MG_URL = '%s%s/tsdata/rzrq/%s/%s%s.csv'
 MG_ZSL_URL = '%s%s/tsdata/rzrq/%s/zsl/%s_%s.csv'
 GPZY_URL = '%s%s/tsdata/gpzy/%s.csv'
 GPZY_D_URL = '%s%s/tsdata/gpzy/%s.csv'
 SHS_FAC_URL = '%s%s/tsdata/shares/%s.csv'
 ZF = '%s%s/tsdata/%s.csv'
-=======
 SHS_FAC_URL = '%s%s/tsdata/shares/%s.csv'
->>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
 INDEX_HQ_URL = '''%shq.%s/rn=xppzh&list=sh000001,sh000002,sh000003,sh000008,sh000009,sh000010,sh000011,sh000012,sh000016,sh000017,sh000300,sh000905,sz399001,sz399002,sz399003,sz399004,sz399005,sz399006,sz399008,sz399100,sz399101,sz399106,sz399107,sz399108,sz399333,sz399606'''
 SSEQ_CQ_REF_URL = '%s%s/assortment/stock/list/name'
 ALL_STK_URL = '%s%s/all.csv'
@@ -354,11 +344,8 @@ MKTS = {
 'MA': [60,  3,'主力期货合约'],
 'ZZ': [62,  5,  '中证指数'],
 'GH': [71,  2,   '港股通'],
-<<<<<<< HEAD
 'SZ': [0,   0, 'SHENZHEN'],
 'SH': [1,   1, 'SHANGHAI']
-=======
->>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
 }
 SLIST = ['180.153.18.170', '180.153.18.171', '202.108.253.130', '202.108.253.131', '60.191.117.167', '115.238.56.198', '218.75.126.9', '115.238.90.165',
              '124.160.88.183', '60.12.136.250', '218.108.98.244', '218.108.47.69', '14.17.75.71', '180.153.39.51']
@@ -430,11 +417,7 @@ def _code_to_symbol(code):
         if len(code) != 6 :
             return code
         else:
-<<<<<<< HEAD
             return 'sh%s'%code if code[:1] in ['5', '6', '9'] or code[:2] in ['11', '13'] else 'sz%s'%code
-=======
-            return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
->>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
 
         
 def _code_to_symbol_dgt(code):
@@ -466,8 +449,4 @@ def _get_xxserver():
     import random
     ips = XXLIST
     random.shuffle(ips)
-<<<<<<< HEAD
     return ips[0]
-=======
-    return ips[0]
->>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66

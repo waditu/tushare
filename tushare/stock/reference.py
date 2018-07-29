@@ -898,7 +898,6 @@ def moneyflow_hsgt():
     df = df.sort_values('date', ascending=False)
     return df
     
-<<<<<<< HEAD
 
 def margin_detail(date=''):
     """
@@ -1082,17 +1081,8 @@ def stock_issuance(start_date='', end_date=''):
     df['prem'] = df['prem'].astype(float)
     return df
  
-=======
->>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
-    
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))
-<<<<<<< HEAD
-
-
-
-=======
->>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
