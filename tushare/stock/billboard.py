@@ -123,8 +123,8 @@ def cap_tops(days= 5, retry_count= 3, pause= 0.001):
         ct._write_head()
         df =  _cap_tops(days, pageNo=1, retry_count=retry_count,
                         pause=pause)
-        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
         if df is not None:
+            df['code'] = df['code'].map(lambda x: str(x).zfill(6))
             df = df.drop_duplicates('code')
         return df
     

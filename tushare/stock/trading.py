@@ -14,11 +14,15 @@ import lxml.html
 from lxml import etree
 import pandas as pd
 import numpy as np
+import datetime
 from tushare.stock import cons as ct
 import re
 from pandas.compat import StringIO
 from tushare.util import dateu as du
-from tushare.stock.reference import new_stocks
+from tushare.util.formula import MA
+import os
+from tushare.util.conns import get_apis, close_apis
+from tushare.stock.fundamental import get_stock_basics
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -49,7 +53,7 @@ def get_hist_data(code=None, start=None, end=None,
       DataFrame
           属性:日期 ，开盘价， 最高价， 收盘价， 最低价， 成交量， 价格变动 ，涨跌幅，5日均价，10日均价，20日均价，5日均量，10日均量，20日均量，换手率
     """
-    symbol = _code_to_symbol(code)
+    symbol = ct._code_to_symbol(code)
     url = ''
     if ktype.upper() in ct.K_LABELS:
         url = ct.DAY_PRICE_URL%(ct.P_TYPE['http'], ct.DOMAINS['ifeng'],
@@ -203,7 +207,7 @@ def get_sina_dd(code=None, date=None, vol=400, retry_count=3, pause=0.001):
     """
     if code is None or len(code)!=6 or date is None:
         return None
-    symbol = _code_to_symbol(code)
+    symbol = ct._code_to_symbol(code)
     vol = vol*100
     for _ in range(retry_count):
         time.sleep(pause)
@@ -243,7 +247,7 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
     """
     if code is None or len(code)!=6 :
         return None
-    symbol = _code_to_symbol(code)
+    symbol = ct._code_to_symbol(code)
     date = du.today()
     for _ in range(retry_count):
         time.sleep(pause)
@@ -357,9 +361,9 @@ def get_realtime_quotes(symbols=None):
     symbols_list = ''
     if isinstance(symbols, list) or isinstance(symbols, set) or isinstance(symbols, tuple) or isinstance(symbols, pd.Series):
         for code in symbols:
-            symbols_list += _code_to_symbol(code) + ','
+            symbols_list += ct._code_to_symbol(code) + ','
     else:
-        symbols_list = _code_to_symbol(symbols)
+        symbols_list = ct._code_to_symbol(symbols)
         
     symbols_list = symbols_list[:-1] if len(symbols_list) > 8 else symbols_list 
     request = Request(ct.LIVE_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['sinahq'],
@@ -503,7 +507,7 @@ def get_h_data(code, start=None, end=None, autype='qfq',
 
 
 def _parase_fq_factor(code, start, end):
-    symbol = _code_to_symbol(code)
+    symbol = ct._code_to_symbol(code)
     request = Request(ct.HIST_FQ_FACTOR_URL%(ct.P_TYPE['http'],
                                              ct.DOMAINS['vsf'], symbol))
     text = urlopen(request, timeout=10).read()
@@ -650,7 +654,7 @@ def get_k_data(code=None, start='', end='',
           turnoverratio 换手率
           code 股票代码
     """
-    symbol = ct.INDEX_SYMBOL[code] if index else _code_to_symbol(code)
+    symbol = ct.INDEX_SYMBOL[code] if index else ct._code_to_symbol(code)
     url = ''
     dataflag = ''
     autype = '' if autype is None else autype
@@ -789,8 +793,481 @@ def get_day_all(date=None):
                                       'hq' if date is None else wdate), \
                                       dtype={'code':'object'})
     return df
+
+
+def get_dt_time(t):
+    tstr = str(t)[:-2]
+    tstr = tstr.replace('-', '').replace(':', '')
+    return tstr
+
+
+def bar2h5(market='', date='', freq='D', asset='E', filepath=''):
+    cons = get_apis()
+    stks = get_stock_basics()
+    fname = "%s%s%sbar%s.h5"%(filepath, market, date, freq)
+    store = pd.HDFStore(fname, "a")
+    if market in ['SH', 'SZ']:
+        if market == 'SH':
+            stks = stks.ix[stks.index.str[0]=='6', :]
+        elif market == 'SZ':
+            stks = stks.ix[stks.index.str[0]!='6', :]
+        else:
+            stks = ''
+        market = 1 if market == 'SH' else 0
+        for stk in stks.index:
+            symbol = '%s.SH'%stk
+            if 'min' in freq:
+                df = bar(stk, conn=cons, start_date=date, end_date=date, freq=freq, 
+                             market=market, asset=asset)
+                df['Time'] = df.index
+                df['Time'] = df['Time'].apply(get_dt_time) 
+                df.index = df['Time']
+                df.drop(['code','Time'], axis = 1, inplace=True)    
+                df.rename(columns={'open':'OPEN'}, inplace=True) 
+                df.rename(columns={'close':'CLOSE'}, inplace=True)
+                df.rename(columns={'low':'LOW'}, inplace=True)
+                df.rename(columns={'high':'HIGH'}, inplace=True)
+                df.rename(columns={'vol':'VOLUME'}, inplace=True) 
+                df.rename(columns={'amount':'TURNOVER'}, inplace=True) 
+                df.loc[:,'HIGH'] =  df.loc[:,'HIGH'].astype("int64")
+                df.loc[:,'LOW'] =  df.loc[:,'LOW'].astype("int64")
+                df.loc[:,'OPEN'] =  df.loc[:,'OPEN'].astype("int64")
+                df.loc[:,'CLOSE'] =  df.loc[:,'CLOSE'].astype("int64")
+                df.loc[:,'VOLUME'] =  df.loc[:,'VOLUME'].astype("int64")
+                df.loc[:,'TURNOVER'] =  df.loc[:,'TURNOVER'].astype("int64")    
+                df.loc[:,'OPEN'] *= 10000   
+                df.loc[:,'CLOSE'] *= 10000    
+                df.loc[:,'HIGH'] *= 10000    
+                df.loc[:,'LOW'] *= 10000
+                df.loc[:,'ASKPRICE1']  = 0
+                df.loc[:,'ASKPRICE2']  = 0
+                df.loc[:,'ASKPRICE3']  = 0
+                df.loc[:,'ASKPRICE4']  = 0
+                df.loc[:,'ASKPRICE5']  = 0
+                df.loc[:,'ASKPRICE6']  = 0
+                df.loc[:,'ASKPRICE7']  = 0
+                df.loc[:,'ASKPRICE8']  = 0
+                df.loc[:,'ASKPRICE9']  = 0
+                df.loc[:,'ASKPRICE10'] = 0    
+                df.loc[:,'BIDPRICE1']  = 0
+                df.loc[:,'BIDPRICE2']  = 0
+                df.loc[:,'BIDPRICE3']  = 0
+                df.loc[:,'BIDPRICE4']  = 0
+                df.loc[:,'BIDPRICE5']  = 0
+                df.loc[:,'BIDPRICE6']  = 0
+                df.loc[:,'BIDPRICE7']  = 0
+                df.loc[:,'BIDPRICE8']  = 0
+                df.loc[:,'BIDPRICE9']  = 0
+                df.loc[:,'BIDPRICE10'] = 0    
+                df.loc[:,'ASKVOL1']  = 0
+                df.loc[:,'ASKVOL2']  = 0
+                df.loc[:,'ASKVOL3']  = 0
+                df.loc[:,'ASKVOL4']  = 0
+                df.loc[:,'ASKVOL5']  = 0
+                df.loc[:,'ASKVOL6']  = 0
+                df.loc[:,'ASKVOL7']  = 0
+                df.loc[:,'ASKVOL8']  = 0
+                df.loc[:,'ASKVOL9']  = 0
+                df.loc[:,'ASKVOL10'] = 0    
+                df.loc[:,'BIDVOL1']  = 0
+                df.loc[:,'BIDVOL2']  = 0
+                df.loc[:,'BIDVOL3']  = 0
+                df.loc[:,'BIDVOL4']  = 0
+                df.loc[:,'BIDVOL5']  = 0
+                df.loc[:,'BIDVOL6']  = 0
+                df.loc[:,'BIDVOL7']  = 0
+                df.loc[:,'BIDVOL8']  = 0
+                df.loc[:,'BIDVOL9']  = 0
+                df.loc[:,'BIDVOL10'] = 0    
+                df.loc[:,'VWAP'] = 0.0
+                df.loc[:,'VOL30']=0.0
+                df.loc[:,'TOTAL_VOLUME']=0.0
+                df.loc[:,'TOTAL_TURNOVER']=0.0
+                df.loc[:,'INTEREST']=0.0
+                print(df)
+#             if market == 1 and stk[0] == '6':
+#                 df = bar(stk, conn=cons, start_date=date, end_date=date, freq=freq, market=market, asset=asset)
+                
+            store[symbol] = df
+    
+    store.close()
+    close_apis(cons)
+ 
+
+def bar(code, conn=None, start_date=None, end_date=None, freq='D', asset='E', 
+           market='',
+           adj = None,
+           ma = [],
+           factors = [],
+           retry_count = 3):
+    """
+    BAR数据
+    Parameters:
+    ------------
+    code:证券代码，支持股票,ETF/LOF,期货/期权,港股
+    con:服务器连接 ，通过ts.api()或者ts.xpi()获得
+    start_date:开始日期  YYYY-MM-DD/YYYYMMDD
+    end_date:结束日期 YYYY-MM-DD/YYYYMMDD
+    freq:支持1/5/15/30/60分钟,周/月/季/年
+    asset:证券类型 E:股票和交易所基金，INDEX:沪深指数,X:期货/期权/港股/中概美国/中证指数/国际指数
+    market:市场代码，通过ts.get_markets()获取
+    adj:复权类型,None不复权,qfq:前复权,hfq:后复权
+    ma:均线,支持自定义均线频度，如：ma5/ma10/ma20/ma60/maN
+    factors因子数据，目前支持以下两种：
+        vr:量比,默认不返回，返回需指定：factor=['vr']
+        tor:换手率，默认不返回，返回需指定：factor=['tor']
+                    以上两种都需要：factor=['vr', 'tor']
+    retry_count:网络重试次数
+    
+    Return
+    ----------
+    DataFrame
+    code:代码
+    open：开盘close/high/low/vol成交量/amount成交额/maN均价/vr量比/tor换手率
+    
+         期货(asset='X')
+    code/open/close/high/low/avg_price：均价  position：持仓量  vol：成交总量
+    """
+    code = code.strip().upper()
+    for _ in range(retry_count):
+        try:
+            if conn is None:
+                print(ct.MSG_NOT_CONNECTED)
+                return None
+            api, xapi = conn
+            ktype = freq.strip().upper()
+            asset = asset.strip().upper()
+            mkcode = _get_mkcode(code, asset=asset, xapi=xapi) if market == '' else market
+            if asset in['E', 'INDEX']:
+                func = getattr(api, ct.ASSET[asset])
+            else:
+                ktype = 'XD' if ktype == 'D' else ktype
+                func = getattr(xapi, ct.ASSET['X'])
+            if ktype in ct.KTYPE_LOW_COLS:
+                data = pd.DataFrame()
+                for i in range(100): 
+                    ds = func(ct.KTYPE[ktype], mkcode, code, i * 800, 800)
+                    df =  api.to_df(ds)
+                    data = data.append(df) if i == 0 else df.append(data,  ignore_index=True)
+                    if len(ds) < 800:
+                        break
+                data['datetime'] = data['datetime'].apply(lambda x: str(x[0:10]))
+            if ktype in ct.KTYPE_ARR:
+                data = pd.DataFrame()
+                for i in range(100): 
+                    ds = func(ct.KTYPE[ktype], mkcode, code, i * 800, 800)
+                    df =  api.to_df(ds)
+                    data = data.append(df) if i == 0 else df.append(data,  ignore_index=True)
+                    if len(ds) < 800:
+                        break
+            data['datetime'] = pd.to_datetime(data['datetime'])
+            data = data.assign(code=str(code)) \
+                .set_index('datetime', drop=True, inplace=False) \
+                .drop(ct.T_DROP_COLS, axis=1)[ None if start_date == '' else start_date : 
+                                              None if end_date == '' else end_date]
+            data = data.sort_index(ascending=False)
+            if asset in['E', 'INDEX']:
+                data = data[ct.BAR_E_COLS]
+                if ktype in ct.KTYPE_ARR:
+                    data['vol'] = data['vol'] / 100
+            else:
+                data = data[ct.BAR_X_COLS]
+                if mkcode in [28, 29, 30, 47, 60]:
+                    data.columns = ct.BAR_X_FUTURE_COLS
+                    data = data[ct.BAR_X_FUTURE_RL_COLS]
+                else:
+                    data = data.drop(['price', 'position'], axis=1)
+                    data.columns = ct.BAR_X_OTHER_COLS
+            if asset == 'E':
+                if adj is not None:
+                    df = factor_adj(code)
+                    if ktype in ct.KTYPE_LOW_COLS: 
+                        data = data.merge(df, left_index=True, right_index=True)
+                        data['adj_factor'] = data['adj_factor'].fillna(method='bfill')
+                    else:
+                        def get_val(day):
+                            return df.ix[day]['adj_factor']
+                        data['adj_factor'] = data.index.map(lambda x: get_val(str(x)[0:10]))
+                    for col in ct.BAR_E_COLS[1:5]:
+                        if adj == 'hfq':
+                            data[col] = data[col] * data['adj_factor']
+                        else:
+                            data[col] = data[col] * data['adj_factor'] / float(df['adj_factor'][0])
+                        data[col] = data[col].map(ct.FORMAT)
+                    data = data.drop('adj_factor', axis=1)
+                if factors is not None and len(factors) >0 :
+                    if 'tor' in factors:
+                        df = factor_shares(code)
+                        if ktype in ct.KTYPE_LOW_COLS: 
+                            data = data.merge(df, left_index=True, right_index=True)
+                            data['floats'] = data['floats'].fillna(method='bfill')
+                        else:
+                            def get_val(day):
+                                return df.ix[day]['floats']
+                            data['floats'] = data.index.map(lambda x: get_val(str(x)[0:10]))
+                        data['tor'] = data['vol'] / data['floats'] 
+                        data['tor'] = data['tor'].map(ct.FORMAT)
+                        data['tor'] = data['tor'].astype(float)
+                        data = data.drop('floats', axis=1)
+                    if 'vr' in factors:
+                        data['vol5'] = MA(data['vol'], 5)
+                        data['mean'] = data['vol5'].shift(-5)
+                        data['vr'] = (data['vol'] / data['mean']).map(ct.FORMAT)
+                        data['vr'] = data['vr'].astype(float)
+                        data = data.drop(['vol5', 'mean'], axis=1)
+            if ma is not None and len(ma) > 0:
+                for a in ma:
+                    if isinstance(a, int):
+                        data['ma%s'%a] = MA(data['close'], a).map(ct.FORMAT).shift(-(a-1))
+                        data['ma%s'%a] = data['ma%s'%a].astype(float)
+            for col in ['open', 'high', 'low', 'close']:
+                data[col] = data[col].astype(float)
+            data['p_change'] = data['close'].pct_change(-1) * 100
+            data['p_change'] = data['p_change'].map(ct.FORMAT).astype(float)
+            return data
+        except:
+            return None
+        else:
+            data['p_change'] = data['close'].pct_change(-1) * 100
+            data['p_change'] = data['p_change'].map(ct.FORMAT).astype(float)
+            return data
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
+
+def _get_mkcode(code='', asset='E', xapi=None):
+    mkcode = ''
+    if asset == 'E':
+        mkcode = ct._market_code(code)
+    elif asset == 'INDEX':
+        mkcode = ct._idx_market_code(code)
+    else:
+        if os.path.exists(ct.INST_PLK_F):
+            mks = pd.read_pickle(ct.INST_PLK_F)
+        else:
+            mks = get_instrument(xapi)
+            mks.to_pickle(ct.INST_PLK_F)
+        mkcode = mks[mks.code == code]['market'].values[0]
+    return mkcode
+
+
+def tick(code, conn=None, date='', asset='E', market='', retry_count = 3):
+    """
+    tick数据
+    Parameters:
+    ------------
+    code:证券代码，支持股票,ETF/LOF,期货/期权,港股
+    conn:服务器连接 ，通过ts.api()或者ts.xpi()获得
+    date:日期
+    asset:证券品种，E:沪深交易所股票和基金, INDEX:沪深交易所指数， X:其他证券品种，大致如下：
+                     支持的扩展行情包括(asset='X')：
+                            郑州商品期权         OZ 大连商品期权         OD 上海商品期权         OS
+                            上海个股期权         QQ 香港指数         FH 郑州商品         QZ 大连商品         QD 上海期货         QS
+                            香港主板         KH 香港权证         KR 开放式基金         FU 货币型基金         FB
+                            招商理财产品         LC 招商货币产品         LB 国际指数         FW 国内宏观指标         HG 中国概念股         CH
+                            美股知名公司         MG B股转H股         HB 股份转让         SB 股指期货         CZ 香港创业板         KG 香港信托基金         KT
+                             国债预发行         GY 主力期货合约         MA
+                              中证指数         ZZ 港股通         GH
+    market:市场代码，通过ts.get_markets()获取
+                  
+    Return
+    ----------
+    DataFrame
+    date:日期
+    time:时间
+    price:成交价
+    vol:成交量
+    type:买卖方向，0-买入 1-卖出 2-集合竞价成交
+            期货  0:开仓  1:多开   -1:空开
+         期货多一列数据oi_change:增仓数据
+
+    """
+    code = code.strip().upper()
+    date = int(date.replace('-', ''))
+    today = int(str(du.today()).replace('-', ''))
+    for _ in range(retry_count):
+        try:
+            if conn is None:
+                print(ct.MSG_NOT_CONNECTED)
+                return None
+            api, xapi = conn
+            data = pd.DataFrame()
+            mkcode = _get_mkcode(code, asset=asset, xapi=xapi) if market == '' else market
+            con = api if asset in['E', 'INDEX'] else xapi
+            for i in range(200):
+                if date == today:
+                    ds = con.get_transaction_data(market=mkcode, code=code, start=i * 300, count=300)
+                else:
+                    ds = con.get_history_transaction_data(market=mkcode, code=code, date=date, start=i * 300, count=300)
+                df =  api.to_df(ds)
+                data = data.append(df) if i == 0 else df.append(data,  ignore_index=True)
+                if len(ds) < 300:
+                    break
+            if asset in['E', 'INDEX']:
+                data['date'] = date
+                data['date'] = data['date'].map(lambda x: '%s-%s-%s '%(str(x)[0:4], str(x)[4:6], str(x)[6:8]))
+                data['datetime'] = data['date'] + data['time']
+                data = data[['datetime', 'price', 'vol', 'buyorsell']]
+                data.columns = ['datetime', 'price', 'vol', 'type']
+            else:
+                if mkcode in [31, 71]:
+                    if date == today:
+                        data = data.drop(['hour', 'minute', 'nature_name', 'zengcang', 'direction', 
+                                        'second', 'nature_mark', 'nature_value'], axis=1)
+                    else:
+                        data = data.drop(['hour', 'minute', 'nature_name', 'zengcang', 'direction'], axis=1)
+                    data.loc[data.nature== 512, 'nature' ] = 2
+                    data.loc[data.nature== 256, 'nature' ] = 1
+                    data = data.sort_values('date')
+                    data.columns = ['date', 'price', 'vol', 'type']
+                elif mkcode in [28, 29, 30, 47, 60]:
+                    if date == today:
+                        data = data.drop(['hour', 'minute', 'nature', 'direction', 
+                                            'second', 'nature_mark', 'nature_value'], axis=1)
+                    else:
+                        data = data.drop(['hour', 'minute', 'nature', 'direction'], axis=1)
+                    data.columns = ['date', 'price', 'vol', 'oi_change', 'type']
+                else:
+                    data = data.drop(['hour', 'minute', 'nature_name', 'zengcang', 'direction', 'nature'], axis=1)
+            
+        except Exception as e:
+            print(e)
+        else:
+            return data
+
+
+
+def quotes(symbols, conn=None, asset='E', market=[], retry_count = 3):
+    """
+        获取实时快照
+    Parameters
+    ------
+        symbols : string, array-like object (list, tuple, Series).
+        
+    return
+    -------
+        DataFrame 实时快照，5档行情
+    """
+    for _ in range(retry_count):
+        try:
+            if conn is None:
+                print(ct.MSG_NOT_CONNECTED)
+                return None
+            api, xapi = conn
+            data = pd.DataFrame()
+            if isinstance(symbols, list) or isinstance(symbols, set) or isinstance(symbols, tuple) or isinstance(symbols, pd.Series):
+                for code in symbols:
+                    mkcode = _get_mkcode(code, asset=asset, xapi=xapi)
+                    if asset == 'E':
+                        df = api.to_df(api.get_security_quotes([(mkcode, code)]))
+                    elif asset == 'INDEX':
+                        df = api.to_df(api.get_security_quotes([(mkcode, code)]))
+                    else:
+                        df = xapi.to_df(xapi.get_instrument_quote(mkcode, code))
+                    data = data.append(df)
+            else:
+                mkcode = _get_mkcode(symbols, asset=asset, xapi=xapi)
+                if asset == 'E':
+                    data = api.to_df(api.get_security_quotes([(mkcode, symbols)]))
+                elif asset == 'INDEX':
+                    data = api.to_df(api.get_security_quotes([(mkcode, symbols)]))
+                else:
+                    data = xapi.to_df(xapi.get_instrument_quote(mkcode, symbols))
+            if asset in ['E', 'INDEX']:
+                data = data.drop(['market', 'active1', 'active2', 'reversed_bytes0', 'reversed_bytes1', 'reversed_bytes2',
+                                  'reversed_bytes3',
+                                  'reversed_bytes4',
+                                  'reversed_bytes5',
+                                  'reversed_bytes6',
+                                  'reversed_bytes7',
+                                  'reversed_bytes8',
+                                  'reversed_bytes9'], axis=1)
+            else:
+                data = data.drop(['market'], axis=1)
+        except Exception as e:
+            print(e)
+        else:
+            return data
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
+
+
+def get_security(api):
+    """
+            获取股票列表
+    """
+    data = []
+    for p in range(100):
+        ds = api.get_security_list(0, p*1000)
+        data += ds
+        if len(ds) < 1000:
+            break
+    data = api.to_df(data)
+    return data
+
+
+def reset_instrument(xapi=None):
+    """
+            重新设置本地证券列表
+    """
+    import tushare.util.conns as cs 
+    xapi = cs.xapi_x() if xapi is None else xapi
+    data=[]
+    for i in range(200): 
+        ds = xapi.get_instrument_info(i * 300, 300)
+        data += ds
+        if len(ds) < 300:
+            break
+    data = xapi.to_df(data)
+    data.to_pickle(ct.INST_PLK_F)
+    return data
+
+
+
+def get_instrument(xapi=None):
+    """
+            获取证券列表
+    """
+    import tushare.util.conns as cs 
+    xapi = cs.xapi_x() if xapi is None else xapi
+    if xapi is None:
+        print(ct.MSG_NOT_CONNECTED)
+        return None
+    data=[]
+    for i in range(200): # range for python2/3
+        ds = xapi.get_instrument_info(i * 300, 300)
+        data += ds
+        if len(ds) < 300:
+            break
+    data = xapi.to_df(data)
+    return data
+
+
+def get_markets(xapi=None):
+    """
+            获取市场代码
+    """
+    if xapi is None:
+        print(ct.MSG_NOT_CONNECTED)
+        return None
+    data = xapi.get_markets()
+    data = xapi.to_df(data)
+    return data
     
     
+def factor_adj(code):
+    df = pd.read_csv(ct.ADJ_FAC_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], code))
+    df = df.set_index('datetime')
+    return df
+
+
+def factor_shares(code):
+    df = pd.read_csv(ct.SHS_FAC_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], code))[['datetime', 'floats']]
+    df = df.set_index('datetime')
+    return df
+
+
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
@@ -798,15 +1275,4 @@ def _random(n=13):
     return str(randint(start, end))
 
 
-def _code_to_symbol(code):
-    """
-        生成symbol代码标志
-    """
-    if code in ct.INDEX_LABELS:
-        return ct.INDEX_LIST[code]
-    else:
-        if len(code) != 6 :
-            return code
-        else:
-            return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
 
