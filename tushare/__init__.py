@@ -129,4 +129,3 @@ from tushare.coins.market import (coins_tick, coins_bar,
                                   coins_snapshot, coins_trade)
 
 from tushare.util.conns import (get_apis, close_apis)
-

@@ -208,7 +208,8 @@ def _get_detail(tag, retry_count=3, pause=0.001):
         jstr = json.dumps(text)
         js = json.loads(jstr)
         df = pd.DataFrame(pd.read_json(js, dtype={'code':object}), columns=ct.THE_FIELDS)
-        df = df[ct.FOR_CLASSIFY_B_COLS]
+#         df = df[ct.FOR_CLASSIFY_B_COLS]
+        df = df[['code', 'name']]
         dfc = pd.concat([dfc, df])
         if df.shape[0] < num_limit:
             return dfc

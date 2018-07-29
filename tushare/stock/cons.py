@@ -29,8 +29,8 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'oss': 'file.tushare.org', 'idxip':'115.29.204.48',
            'shibor': 'www.shibor.org', 'mbox':'www.cbooo.cn',
            'tt': 'gtimg.cn', 'gw': 'gw.com.cn',
-           'dfcf': 'nufm.dfcfw.com',
-           'v500': 'value500.com', 'sstar': 'stock.stockstar.com'}
+           'v500': 'value500.com', 'sstar': 'stock.stockstar.com',
+           'dfcf': 'nufm.dfcfw.com'}
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
          'ntinfo':'vCB_BulletinGather.php', 'hs300b':'000300cons.xls',
@@ -42,7 +42,6 @@ PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          't_ticks':'vMS_tradedetail.php', 'dw': 'downLoad.html',
          'qmd':'queryMargin.do', 'szsefc':'ShowReport.szse',
          'ssecq':'commonQuery.do', 'sinadd':'cn_bill_download.php', 'ids_sw':'SwHy.php',
-         'ssecq':'commonQuery.do', 'sinadd':'json_v2.php', 'ids_sw':'SwHy.php',
          'idx': 'index.php', 'index': 'index.html'}
 TICK_COLUMNS = ['time', 'price', 'change', 'volume', 'amount', 'type']
 TODAY_TICK_COLUMNS = ['time', 'price', 'pchange', 'change', 'volume', 'amount', 'type']
@@ -123,11 +122,10 @@ GPZY_URL = '%s%s/tsdata/gpzy/%s.csv'
 GPZY_D_URL = '%s%s/tsdata/gpzy/%s.csv'
 SHS_FAC_URL = '%s%s/tsdata/shares/%s.csv'
 ZF = '%s%s/tsdata/%s.csv'
-SHS_FAC_URL = '%s%s/tsdata/shares/%s.csv'
 INDEX_HQ_URL = '''%shq.%s/rn=xppzh&list=sh000001,sh000002,sh000003,sh000008,sh000009,sh000010,sh000011,sh000012,sh000016,sh000017,sh000300,sh000905,sz399001,sz399002,sz399003,sz399004,sz399005,sz399006,sz399008,sz399100,sz399101,sz399106,sz399107,sz399108,sz399333,sz399606'''
 SSEQ_CQ_REF_URL = '%s%s/assortment/stock/list/name'
 ALL_STK_URL = '%s%s/all.csv'
-SINA_DD = '%s%s/quotes_service/api/%s/CN_Bill.GetBillList?symbol=%s&num=60&page=1&sort=ticktime&asc=0&volume=%s&amount=0&type=0&day=%s'
+SINA_DD = '%s%s/quotes_service/view/%s?symbol=%s&num=60&page=1&sort=ticktime&asc=0&volume=%s&amount=0&type=0&day=%s'
 BOX = 'boxOffice'
 MOVIE_BOX = '%s%s/%s/GetHourBoxOffice?d=%s'
 BOXOFFICE_DAY = '%s%s/%s/GetDayBoxOffice?num=%s&d=%s'
@@ -171,7 +169,7 @@ LPR_MA_COLS = ['date', '1Y_5', '1Y_10', '1Y_20']
 INDEX_HEADER = 'code,name,open,preclose,close,high,low,0,0,volume,amount,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,d,c,3\n'
 INDEX_COLS = ['code', 'name', 'change', 'open', 'preclose', 'close', 'high', 'low', 'volume', 'amount']
 HIST_FQ_COLS = ['date', 'open', 'high', 'close', 'low', 'volume', 'amount', 'factor']
-SINA_DD_COLS = ['symbol', 'name', 'time', 'price', 'volume', 'prev_price', 'kind']
+SINA_DD_COLS = ['code', 'name', 'time', 'price', 'volume', 'preprice', 'type']
 GLOBAL_HQ_SYMBOL = 'sh000001,hkHSI,znb_UKX,znb_DAX,znb_INDEXCF,znb_CAC,znb_SMI,znb_FTSEMIB,znb_MADX,znb_OMX,znb_SPX,znb_HEX,znb_OSEAX,znb_ISEQ,znb_AEX,znb_ICEXI,znb_NKY,znb_TWSE,znb_FSSTI,znb_KOSPI,znb_FBMKLCI,znb_SET,znb_JCI,znb_PCOMP,znb_KSE100,znb_SENSEX,znb_VNINDEX,znb_CSEALL,znb_SASEIDX,znb_SPTSX,znb_MEXBOL,znb_IBOV,znb_MERVAL,znb_AS51,znb_NZSE50FG,znb_CASE,znb_JALSH,sz399001,znb_INDU,znb_CCMP'
 GLOBAL_HQ_COLS = ['symbol', 'name', 'price', 'chga', 'chgp', 'datetime']
 INST_PLK_F = 'ts_instrument.plk'

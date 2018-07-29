@@ -74,17 +74,12 @@ def get_cffex_daily(date = None):
         row_dict = {'date': day_const, 'symbol': row[0], 'variety': m.group(1)}
         
         for i,field in enumerate(ct.CFFEX_COLUMNS):
-            ## some data was missing in the csv files. e.g. 2018-01-19
-            ## using error handle to avoid crushing
-            try:
-                if row[i+1] == u"":
-                    row_dict[field] = 0.0
-                elif field in ['volume', 'open_interest', 'oi_chg']:
-                    row_dict[field] = int(row[i+1])        
-                else:
-                    row_dict[field] = float(row[i+1])
-            except Exception:
-                row_dict[field] = None
+            if row[i+1] == u"":
+                row_dict[field] = 0.0
+            elif field in ['volume', 'open_interest', 'oi_chg']:
+                row_dict[field] = int(row[i+1])        
+            else:
+                row_dict[field] = float(row[i+1])
         row_dict['pre_settle'] = row_dict['close'] - row_dict['change1']
         dict_data.append(row_dict)
         

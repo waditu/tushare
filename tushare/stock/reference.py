@@ -1081,8 +1081,12 @@ def stock_issuance(start_date='', end_date=''):
     df['prem'] = df['prem'].astype(float)
     return df
  
+    
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))
+
+
+
