@@ -1,6 +1,10 @@
 # -*- coding:utf-8 -*- 
 
+<<<<<<< HEAD
 __version__ = '1.2.4'
+=======
+__version__ = '1.0.5'
+>>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
 __author__ = 'Jimmy Liu'
 
 """
@@ -61,10 +65,14 @@ from tushare.stock.reference import (profit_data, forecast_data,
                                      sh_margin_details,
                                      sz_margins, sz_margin_details,
                                      top10_holders, profit_divis,
+<<<<<<< HEAD
                                      moneyflow_hsgt, margin_detail,
                                      margin_target, margin_offset,
                                      margin_zsl, stock_issuance,
                                      stock_pledged, pledged_detail)
+=======
+                                     moneyflow_hsgt)
+>>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
 
 """
 for shibor
@@ -128,4 +136,13 @@ from tushare.futures.domestic import (get_cffex_daily, get_czce_daily,
 from tushare.coins.market import (coins_tick, coins_bar,
                                   coins_snapshot, coins_trade)
 
+<<<<<<< HEAD
 from tushare.util.conns import (get_apis, close_apis)
+=======
+from tushare.util.conns import (get_apis, close_apis)
+
+"""
+for stock indictors
+"""
+from tushare.stock import (indictor)
+>>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66

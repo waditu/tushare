@@ -74,9 +74,13 @@ setup(
     description='A utility for crawling historical and Real-time Quotes data of China stocks',
 #     long_description=read("READM.rst"),
     long_description = long_desc,
+<<<<<<< HEAD
 #     install_requires=['pandas>=0.18.0',
 #                       'requests>=2.0.0',
 #                       'lxml>=3.8.0'],
+=======
+    install_requires=read_install_requires(),
+>>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
     author='Jimmy Liu',
     author_email='jimmysoa@sina.cn',
     license='BSD',

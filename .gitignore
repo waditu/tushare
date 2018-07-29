@@ -26,7 +26,11 @@ lib64/
 parts/
 sdist/
 var/
+<<<<<<< HEAD
 docs/
+=======
+
+>>>>>>> e89edd8e93a0bd23151456d4f27b46e5e4c46a66
 *.egg-info/
 .installed.cfg
 *.egg
