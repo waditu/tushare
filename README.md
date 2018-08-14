@@ -1,6 +1,8 @@
 TuShare
 
 
+Tushare Pro版已发布，请访问新的官网了解和查询数据接口！ [https://tushare.pro](https://tushare.pro)
+
 TuShare是实现对股票/期货等金融数据从**数据采集**、**清洗加工** 到 **数据存储**过程的工具，满足金融量化分析师和学习数据分析的人在数据获取方面的需求，它的特点是数据覆盖范围广，接口调用简单,响应快速。
 
 ![](http://tushare.org/_images/main_pic_min.png)
@@ -181,12 +183,20 @@ Quick Start
 
 更多文档
 ========
+
+[https://tushare.pro](https://tushare.pro)
+
 [http://tushare.org/](http://tushare.org/ "TuShare Docs")
  
 
 Change Logs
 -----------
 
+1.2.12 2018/08/10
+====
+
+- 发布Pro版第一稿
+- 发布Pro网站，[https://tushare.pro](https://tushare.pro)
 
 1.0.5 2017/11/12
 ======

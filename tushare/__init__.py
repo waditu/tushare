@@ -1,6 +1,8 @@
 # -*- coding:utf-8 -*- 
+import codecs
+import os
 
-__version__ = '1.2.4'
+__version__ = codecs.open(os.path.join(os.path.dirname(__file__), 'VERSION.txt')).read()
 __author__ = 'Jimmy Liu'
 
 """
@@ -73,6 +75,12 @@ from tushare.stock.shibor import (shibor_data, shibor_quote_data,
                                   shibor_ma_data, lpr_data,
                                   lpr_ma_data)
 
+
+"""
+for tushare pro api
+"""
+from tushare.pro.data_pro import pro_api
+
 """
 for LHB
 """
@@ -103,8 +111,6 @@ for trader API
 """
 from tushare.trader.trader import TraderAPI
 
-from tushare.stock.minsdata import TsData
-
 """
 for futures API
 """
@@ -129,3 +135,5 @@ from tushare.coins.market import (coins_tick, coins_bar,
                                   coins_snapshot, coins_trade)
 
 from tushare.util.conns import (get_apis, close_apis)
+
+from tushare.util.upass import (get_token, set_token)
