@@ -65,7 +65,7 @@ class DataApi:
         req = Request(
             self.__http_url,
             json.dumps(req_params).encode('utf-8'),
-#             method='POST'
+            method='POST'
         )
 
         res = urlopen(req)
