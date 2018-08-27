@@ -207,7 +207,7 @@ def get_hs300s():
     from tushare.stock.fundamental import get_stock_basics
     try:
         wt = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
-                                                  ct.PAGES['hs300w']), parse_cols=[0, 3, 6])
+                                                  ct.PAGES['hs300w']), usecols=[0, 3, 6])
         wt.columns = ct.FOR_CLASSIFY_W_COLS
         wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
         df = get_stock_basics()[['name']]
@@ -228,7 +228,7 @@ def get_sz50s():
     """
     try:
         df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
-                                                  ct.PAGES['sz50b']), parse_cols=[0,1])
+                                                  ct.PAGES['sz50b']), usecols=[0,1])
         df.columns = ct.FOR_CLASSIFY_B_COLS
         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
         return df
@@ -248,11 +248,11 @@ def get_zz500s():
     from tushare.stock.fundamental import get_stock_basics
     try:
 #         df = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
-#                                                   ct.PAGES['zz500b']), parse_cols=[0,1])
+#                                                   ct.PAGES['zz500b']), usecols=[0,1])
 #         df.columns = ct.FOR_CLASSIFY_B_COLS
 #         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
         wt = pd.read_excel(ct.HS300_CLASSIFY_URL_FTP%(ct.P_TYPE['ftp'], ct.DOMAINS['idxip'], 
-                                                   ct.PAGES['zz500wt']), parse_cols=[0, 3, 6])
+                                                   ct.PAGES['zz500wt']), usecols=[0, 3, 6])
         wt.columns = ct.FOR_CLASSIFY_W_COLS
         wt['code'] = wt['code'].map(lambda x :str(x).zfill(6))
         df = get_stock_basics()[['name']]
