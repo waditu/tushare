@@ -31,25 +31,25 @@ Installation
 --------------
 
     pip install tushare
-    
+
 Upgrade
 ---------------
 
     pip install tushare --upgrade
-    
+
 Quick Start
 --------------
 
 ::
 
     import tushare as ts
-    
+
     ts.get_hist_data('600848')
-    
+
 return::
 
                 open    high   close     low     volume    p_change  ma5 \
-    
+
     date
     2012-01-11   6.880   7.380   7.060   6.880   14129.96     2.62   7.060
     2012-01-12   7.050   7.100   6.980   6.900    7895.19    -1.13   7.020
@@ -59,7 +59,7 @@ return::
     2012-01-18   7.000   7.300   6.890   6.880   13075.40     0.44   6.788
     2012-01-19   6.690   6.950   6.890   6.680    6117.32     0.00   6.770
     2012-01-20   6.870   7.080   7.010   6.870    6813.09     1.74   6.832
-    
+
 """
 
 def read_install_requires():
@@ -69,7 +69,9 @@ def read_install_requires():
             'lxml>=3.8.0',
             'simplejson>=3.16.0',
             'msgpack>=0.5.6',
-            'pyzmq>=16.0.0'
+            'pyzmq>=16.0.0',
+            'pytdx',
+            'bs4'
             ]
     return reqs
 
