@@ -24,7 +24,7 @@ class DataApi:
 
     __token = ''
     __http_url = 'http://api.tushare.pro'
-    __tcp_url = 'tcp://tushare.pro:8003'
+    __tcp_url = 'tcp://tushare.pro'
 
     def __init__(self, token, protocol='http'):
         """

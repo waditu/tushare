@@ -79,7 +79,7 @@ from tushare.stock.shibor import (shibor_data, shibor_quote_data,
 """
 for tushare pro api
 """
-from tushare.pro.data_pro import pro_api
+from tushare.pro.data_pro import (pro_api, pro_bar)
 
 """
 for LHB
