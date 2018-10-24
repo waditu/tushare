@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 """
-获取基金净值数据接口 
+获取基金净值数据接口
 Created on 2016/04/03
 @author: leo
 @group : lazytech
@@ -22,7 +22,7 @@ except ImportError:
     from urllib2 import urlopen, Request
 
 
-def get_nav_open(fund_type='all'):
+def get_nav_open(fund_type='all', retry_count=3, pause=0.01, timeout=10):
     """
         获取开放型基金净值数据
     Parameters
@@ -58,25 +58,30 @@ def get_nav_open(fund_type='all'):
                               ct.NAV_OPEN_KEY[fund_type],
                               ct.NAV_OPEN_API[fund_type],
                               ct.NAV_OPEN_T2[fund_type],
-                              ct.NAV_OPEN_T3))
+                              ct.NAV_OPEN_T3),
+                             retry_count=retry_count,
+                             pause=pause, timeout=timeout)
 
         pages = 2  # 分两次请求数据
         limit_cnt = int(nums/pages)+1   # 每次取的数量
         fund_dfs = []
         for page in range(1, pages+1):
             fund_dfs = _parse_fund_data(ct.SINA_NAV_DATA_URL %
-                                       (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                        ct.NAV_OPEN_KEY[fund_type],
-                                        ct.NAV_OPEN_API[fund_type],
-                                        page,
-                                        limit_cnt,
-                                        ct.NAV_OPEN_T2[fund_type],
-                                        ct.NAV_OPEN_T3))
+                                        (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                         ct.NAV_OPEN_KEY[fund_type],
+                                         ct.NAV_OPEN_API[fund_type],
+                                         page,
+                                         limit_cnt,
+                                         ct.NAV_OPEN_T2[fund_type],
+                                         ct.NAV_OPEN_T3),
+                                        retry_count=retry_count,
+                                        pause=pause, timeout=timeout)
 
-        return pd.concat(fund_dfs, ignore_index=True)
+        return fund_dfs
 
 
-def get_nav_close(fund_type='all', sub_type='all'):
+def get_nav_close(fund_type='all', sub_type='all',
+                  retry_count=3, pause=0.01, timeout=10):
     """
         获取封闭型基金净值数据
     Parameters
@@ -123,16 +128,20 @@ def get_nav_close(fund_type='all', sub_type='all'):
                          (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                           ct.NAV_CLOSE_KEY, ct.NAV_CLOSE_API,
                           ct.NAV_CLOSE_T2[fund_type],
-                          ct.NAV_CLOSE_T3[sub_type]))
+                          ct.NAV_CLOSE_T3[sub_type]),
+                         retry_count=retry_count,
+                         pause=pause, timeout=timeout)
 
     fund_df = _parse_fund_data(ct.SINA_NAV_DATA_URL %
                                (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                ct.NAV_OPEN_KEY, ct.NAV_CLOSE_API, 
+                                ct.NAV_OPEN_KEY, ct.NAV_CLOSE_API,
                                 ct.NAV_DEFAULT_PAGE,
                                 nums,
                                 ct.NAV_CLOSE_T2[fund_type],
                                 ct.NAV_CLOSE_T3[sub_type]),
-                               'close')
+                               'close',
+                               retry_count=retry_count,
+                               pause=pause, timeout=timeout)
     return fund_df
 
 
@@ -181,7 +190,7 @@ def get_nav_grading(fund_type='all', sub_type='all'):
 
     fund_df = _parse_fund_data(ct.SINA_NAV_DATA_URL %
                                (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                ct.NAV_GRADING_KEY, ct.NAV_GRADING_API, 
+                                ct.NAV_GRADING_KEY, ct.NAV_GRADING_API,
                                 ct.NAV_DEFAULT_PAGE,
                                 nums,
                                 ct.NAV_GRADING_T2[fund_type],
@@ -190,7 +199,8 @@ def get_nav_grading(fund_type='all', sub_type='all'):
     return fund_df
 
 
-def get_nav_history(code, start=None, end=None, retry_count=3, pause=0.001, timeout=10):
+def get_nav_history(code, start=None, end=None, retry_count=3,
+                    pause=0.001, timeout=10):
     '''
     获取历史净值数据
     Parameters
@@ -278,58 +288,64 @@ def get_fund_info(code):
     return fund_df
 
 
-def _parse_fund_data(url, fund_type='open'):
+def _parse_fund_data(url, fund_type='open', retry_count=3,
+                     pause=0.01, timeout=10):
 
-    ct._write_console()
+    for _ in range(retry_count):
+        time.sleep(pause)
+        ct._write_console()
+        try:
+            request = Request(url)
 
-    try:
-        request = Request(url)
-
-        text = urlopen(request, timeout=10).read()
-        if text == 'null':
-            return None
-        text = text.decode('gbk') if ct.PY3 else text
-        text = text.split('data:')[1].split(',exec_time')[0]
-        reg = re.compile(r'\,(.*?)\:')
-        text = reg.sub(r',"\1":', text)
-        text = text.replace('"{symbol', '{"symbol')
-        text = text.replace('{symbol', '{"symbol"')
-        if ct.PY3:
-            jstr = json.dumps(text)
-        else:
-            jstr = json.dumps(text, encoding='gbk')
-        org_js = json.loads(jstr)
-        fund_df = pd.DataFrame(pd.read_json(org_js, dtype={'symbol': object}),
-                               columns=ct.NAV_COLUMNS[fund_type])
-        fund_df.fillna(0, inplace=True)
-        return fund_df
-    except Exception as er:
-        print(str(er))
+            text = urlopen(request, timeout=timeout).read()
+            if text == 'null':
+                return None
+            text = text.decode('gbk') if ct.PY3 else text
+            text = text.split('data:')[1].split(',exec_time')[0]
+            reg = re.compile(r'\,(.*?)\:')
+            text = reg.sub(r',"\1":', text)
+            text = text.replace('"{symbol', '{"symbol')
+            text = text.replace('{symbol', '{"symbol"')
+            if ct.PY3:
+                jstr = json.dumps(text)
+            else:
+                jstr = json.dumps(text, encoding='gbk')
+            org_js = json.loads(jstr)
+            fund_df = pd.DataFrame(pd.read_json(org_js,
+                                                dtype={'symbol': object}),
+                                   columns=ct.NAV_COLUMNS[fund_type])
+            fund_df.fillna(0, inplace=True)
+            return fund_df
+        except Exception as er:
+            print(str(er))
 
 
-def _get_fund_num(url):
+def _get_fund_num(url, retry_count=3, pause=0.01, timeout=10):
     """
         获取基金数量
     """
 
-    ct._write_console()
-    try:
-        request = Request(url)
-        text = urlopen(request, timeout=10).read()
-        text = text.decode('gbk')
-        if text == 'null':
-            raise ValueError('get fund num error')
+    for _ in range(retry_count):
+        time.sleep(pause)
+        ct._write_console()
+        try:
+            request = Request(url)
+            text = urlopen(request, timeout=timeout).read()
+            text = text.decode('gbk')
+            if text == 'null':
+                raise ValueError('get fund num error')
 
-        text = text.split('((')[1].split('))')[0]
-        reg = re.compile(r'\,(.*?)\:')
-        text = reg.sub(r',"\1":', text)
-        text = text.replace('{total_num', '{"total_num"')
-        text = text.replace('null', '0')
-        org_js = json.loads(text)
-        nums = org_js["total_num"]
-        return int(nums)
-    except Exception as er:
-        print(str(er))
+            text = text.split('((')[1].split('))')[0]
+            reg = re.compile(r'\,(.*?)\:')
+            text = reg.sub(r',"\1":', text)
+            text = text.replace('{total_num', '{"total_num"')
+            text = text.replace('null', '0')
+            org_js = json.loads(text)
+            nums = org_js["total_num"]
+            return int(nums)
+        except Exception as er:
+            print(str(er))
+            return 0
 
 
 def _get_nav_histroy_num(code, start, end, ismonetary=False):
@@ -363,7 +379,8 @@ def _get_nav_histroy_num(code, start, end, ismonetary=False):
     return int(nums)
 
 
-def _parse_nav_history_data(code, start, end, nums, ismonetary=False, retry_count=3, pause=0.01, timeout=10):
+def _parse_nav_history_data(code, start, end, nums, ismonetary=False,
+                            retry_count=3, pause=0.01, timeout=10):
     if nums == 0:
         return None
 
@@ -403,7 +420,7 @@ def _parse_nav_history_data(code, start, end, nums, ismonetary=False, retry_coun
             fund_df['dwsy'] = fund_df['dwsy'].astype(float)
             fund_df.rename(columns=ct.DICT_NAV_MONETARY, inplace=True)
 
-        #fund_df.fillna(0, inplace=True)
+        # fund_df.fillna(0, inplace=True)
 
         if fund_df['date'].dtypes == np.object:
             fund_df['date'] = pd.to_datetime(fund_df['date'])
