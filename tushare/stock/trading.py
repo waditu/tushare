@@ -671,9 +671,12 @@ def get_k_data(code=None, start='', end='',
                                     ct.TT_K_TYPE[ktype.upper()], start, end,
                                     fq, _random(17))]
         else:
+            cur_year = datetime.datetime.today().year
             years = du.tt_dates(start, end)
             urls = []
             for year in years:
+                if year == cur_year:
+                    continue
                 startdate = str(year) + '-01-01'
                 enddate = str(year+1) + '-12-31'
                 url = ct.KLINE_TT_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
@@ -681,6 +684,10 @@ def get_k_data(code=None, start='', end='',
                                     ct.TT_K_TYPE[ktype.upper()], startdate, enddate,
                                     fq, _random(17))
                 urls.append(url)
+            urls.append(ct.KLINE_TT_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
+                                    kline, fq, symbol, 
+                                    ct.TT_K_TYPE[ktype.upper()], start, end,
+                                    fq, _random(17)))
         dataflag = '%s%s'%(fq, ct.TT_K_TYPE[ktype.upper()])
     elif ktype in ct.K_MIN_LABELS:
         urls = [ct.KLINE_TT_MIN_URL%(ct.P_TYPE['http'], ct.DOMAINS['tt'],
