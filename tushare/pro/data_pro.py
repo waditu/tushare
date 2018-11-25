@@ -32,9 +32,10 @@ def pro_api(token=''):
         
 
 def pro_bar(ts_code='', pro_api=None, start_date=None, end_date=None, freq='D', asset='E', 
-           market='',
+           exchange='',
            adj = None,
            ma = [],
+           contract_type = '',
            retry_count = 3):
     """
     BAR数据
@@ -45,7 +46,7 @@ def pro_bar(ts_code='', pro_api=None, start_date=None, end_date=None, freq='D', 
     end_date:结束日期 YYYYMMDD
     freq:支持1/5/15/30/60分钟,周/月/季/年
     asset:证券类型 E:股票和交易所基金，I:沪深指数,C:数字货币,FT:期货 FD:基金/O期权/H港股/中概美国/中证指数/国际指数
-    market:市场代码，通过ts.get_markets()获取
+    exchange:市场代码，用户数字货币行情
     adj:复权类型,None不复权,qfq:前复权,hfq:后复权
     ma:均线,支持自定义均线频度，如：ma5/ma10/ma20/ma60/maN
     factors因子数据，目前支持以下两种：
@@ -63,42 +64,52 @@ def pro_bar(ts_code='', pro_api=None, start_date=None, end_date=None, freq='D', 
          期货(asset='X')
     code/open/close/high/low/avg_price：均价  position：持仓量  vol：成交总量
     """
-    ts_code = ts_code.strip().upper()
+    ts_code = ts_code.strip().upper() if asset != 'C' else ts_code.strip().lower()
     api = pro_api if pro_api is not None else pro_api()
     for _ in range(retry_count):
         try:
-            freq = freq.strip().upper()
+            freq = freq.strip().upper() if asset != 'C' else freq.strip().lower()
             asset = asset.strip().upper()
             if asset == 'E':
                 if freq == 'D':
                     df = api.daily(ts_code=ts_code, start_date=start_date, end_date=end_date)
-                    if adj is not None:
-                        fcts = api.adj_factor(ts_code=ts_code, start_date=start_date, end_date=end_date)[['trade_date', 'adj_factor']]
-                        data = df.set_index('trade_date', drop=False).merge(fcts.set_index('trade_date'), left_index=True, right_index=True, how='left')
-                        data['adj_factor'] = data['adj_factor'].fillna(method='bfill')
-                        for col in PRICE_COLS:
-                            if adj == 'hfq':
-                                data[col] = data[col] * data['adj_factor']
-                            else:
-                                data[col] = data[col] * data['adj_factor'] / float(fcts['adj_factor'][0])
-                            data[col] = data[col].map(FORMAT)
-                        for col in PRICE_COLS:
-                            data[col] = data[col].astype(float)
-                        data = data.drop('adj_factor', axis=1)
-                    else:
-                        data = df
+                if freq == 'W':
+                    df = api.weekly(ts_code=ts_code, start_date=start_date, end_date=end_date)
+                if freq == 'M':
+                    df = api.monthly(ts_code=ts_code, start_date=start_date, end_date=end_date)
+                if adj is not None:
+                    fcts = api.adj_factor(ts_code=ts_code, start_date=start_date, end_date=end_date)[['trade_date', 'adj_factor']]
+                    data = df.set_index('trade_date', drop=False).merge(fcts.set_index('trade_date'), left_index=True, right_index=True, how='left')
+                    data['adj_factor'] = data['adj_factor'].fillna(method='bfill')
+                    for col in PRICE_COLS:
+                        if adj == 'hfq':
+                            data[col] = data[col] * data['adj_factor']
+                        else:
+                            data[col] = data[col] * data['adj_factor'] / float(fcts['adj_factor'][0])
+                        data[col] = data[col].map(FORMAT)
+                    for col in PRICE_COLS:
+                        data[col] = data[col].astype(float)
+                    data = data.drop('adj_factor', axis=1)
+                    df['change'] = df['close'] - df['pre_close']
+                    df['pct_change'] = df['close'].pct_change() * 100
+                else:
+                    data = df
             elif asset == 'I':
                 if freq == 'D':
                     data = api.index_daily(ts_code=ts_code, start_date=start_date, end_date=end_date)
             elif asset == 'FT':
                 if freq == 'D':
-                    data = api.fut_daily(ts_code=ts_code, start_dae=start_date, end_date=end_date, exchange=market)
+                    data = api.fut_daily(ts_code=ts_code, start_dae=start_date, end_date=end_date, exchange=exchange)
             elif asset == 'FD':
                 if freq == 'D':
                     data = api.fund_daily(ts_code=ts_code, start_dae=start_date, end_date=end_date)
             if asset == 'C':
-                #//////////////////////// well soon
-                pass
+                if freq == 'd':
+                    freq = 'daily'
+                elif freq == 'w':
+                    freq = 'week'
+                data = api.coinbar(exchange=exchange, symbol=ts_code, freq=freq, start_dae=start_date, end_date=end_date,
+                                   contract_type=contract_type)
             if ma is not None and len(ma) > 0:
                 for a in ma:
                     if isinstance(a, int):
@@ -118,10 +129,13 @@ def pro_bar(ts_code='', pro_api=None, start_date=None, end_date=None, freq='D', 
 if __name__ == '__main__':
 #     upass.set_token('your token here')
     pro = pro_api()
-    print(pro_bar(ts_code='000001.SZ', pro_api=pro, start_date='19990101', end_date='', adj='qfq', ma=[5, 10, 15]))
-    print(pro_bar(ts_code='000905.SH', pro_api=pro, start_date='20181001', end_date='', asset='I'))
-    print(pro.trade_cal(exchange_id='', start_date='20131031', end_date='', fields='pretrade_date', is_open='0'))
-    print(pro_bar(ts_code='CU1811.SHF', pro_api=pro, start_date='20180101', end_date='', asset='FT', ma=[5, 10, 15]))
-    print(pro_bar(ts_code='150023.SZ', pro_api=pro, start_date='20180101', end_date='', asset='FD', ma=[5, 10, 15]))
-    
+#     print(pro_bar(ts_code='000001.SZ', pro_api=pro, start_date='19990101', end_date='', adj='qfq', ma=[5, 10, 15]))
+#     print(pro_bar(ts_code='000905.SH', pro_api=pro, start_date='20181001', end_date='', asset='I'))
+#     print(pro.trade_cal(exchange_id='', start_date='20131031', end_date='', fields='pretrade_date', is_open='0'))
+#     print(pro_bar(ts_code='CU1811.SHF', pro_api=pro, start_date='20180101', end_date='', asset='FT', ma=[5, 10, 15]))
+#     print(pro_bar(ts_code='150023.SZ', pro_api=pro, start_date='20180101', end_date='', asset='FD', ma=[5, 10, 15]))
+#     print(pro_bar(pro_api=pro, ts_code='000528.SZ',start_date='20180101', end_date='20181121', ma=[20]))
+#     print(pro_bar(ts_code='000528.SZ', pro_api=pro, freq='W', start_date='20180101', end_date='20180820', adj='hfq', ma=[5, 10, 15]))
+#     print(pro_bar(ts_code='000528.SZ', pro_api=pro, freq='M', start_date='20180101', end_date='20180820', adj='qfq', ma=[5, 10, 15]))
+#     print(pro_bar(ts_code='btcusdt', pro_api=pro, exchange='huobi', freq='D', start_date='20180101', end_date='20181123', asset='C', ma=[5, 10]))
     

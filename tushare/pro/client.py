@@ -19,7 +19,7 @@ class DataApi:
     __token = ''
     __http_url = 'http://api.tushare.pro'
 
-    def __init__(self, token, timeout=5):
+    def __init__(self, token, timeout=10):
         """
         Parameters
         ----------
