@@ -35,6 +35,7 @@ def pro_bar(ts_code='', pro_api=None, start_date=None, end_date=None, freq='D', 
            exchange='',
            adj = None,
            ma = [],
+           factors = None,
            contract_type = '',
            retry_count = 3):
     """
@@ -73,6 +74,16 @@ def pro_bar(ts_code='', pro_api=None, start_date=None, end_date=None, freq='D', 
             if asset == 'E':
                 if freq == 'D':
                     df = api.daily(ts_code=ts_code, start_date=start_date, end_date=end_date)
+                    if factors is not None and len(factors) >0 :
+                        ds = api.daily_basic(ts_code=ts_code, start_date=start_date, end_date=end_date)[['trade_date', 'turnover_rate', 'volume_ratio']]
+                        ds = ds.set_index('trade_date')
+                        df = df.set_index('trade_date')
+                        df = df.merge(ds, left_index=True, right_index=True)
+                        df = df.reset_index()
+                        if ('tor' in factors) and ('vr' not in factors):
+                            df = df.drop('volume_ratio', axis=1)
+                        if ('vr' in factors) and ('tor' not in factors):
+                            df = df.drop('turnover_rate', axis=1)
                 if freq == 'W':
                     df = api.weekly(ts_code=ts_code, start_date=start_date, end_date=end_date)
                 if freq == 'M':
@@ -100,6 +111,9 @@ def pro_bar(ts_code='', pro_api=None, start_date=None, end_date=None, freq='D', 
             elif asset == 'FT':
                 if freq == 'D':
                     data = api.fut_daily(ts_code=ts_code, start_dae=start_date, end_date=end_date, exchange=exchange)
+            elif asset == 'O':
+                if freq == 'D':
+                    data = api.opt_daily(ts_code=ts_code, start_dae=start_date, end_date=end_date, exchange=exchange)
             elif asset == 'FD':
                 if freq == 'D':
                     data = api.fund_daily(ts_code=ts_code, start_dae=start_date, end_date=end_date)
@@ -138,4 +152,7 @@ if __name__ == '__main__':
 #     print(pro_bar(ts_code='000528.SZ', pro_api=pro, freq='W', start_date='20180101', end_date='20180820', adj='hfq', ma=[5, 10, 15]))
 #     print(pro_bar(ts_code='000528.SZ', pro_api=pro, freq='M', start_date='20180101', end_date='20180820', adj='qfq', ma=[5, 10, 15]))
 #     print(pro_bar(ts_code='btcusdt', pro_api=pro, exchange='huobi', freq='D', start_date='20180101', end_date='20181123', asset='C', ma=[5, 10]))
+#     df = pro_bar(ts_code='000001.SZ', pro_api=pro, adj='qfq', start_date='19900101', end_date='20050509')
+    df = pro_bar(ts_code='600862.SH', pro_api=pro, start_date='20150118', end_date='20150615', factors=['tor', 'vr'])
+    print(df)
     
