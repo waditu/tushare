@@ -60,6 +60,7 @@ coverage.xml
 docs/_build/
 docs/*.md
 docs/bin
+.idea/
 
 # PyBuilder
 target/
