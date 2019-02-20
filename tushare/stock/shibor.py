@@ -10,6 +10,8 @@ import pandas as pd
 import numpy as np
 from tushare.stock import cons as ct
 from tushare.util import dateu as du
+from tushare.util.netbase import Client
+from pandas.compat import StringIO
 
 def shibor_data(year=None):
     """
@@ -34,13 +36,18 @@ def shibor_data(year=None):
     lab = ct.SHIBOR_TYPE['Shibor']
     lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
-        df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
+        clt = Client(url=ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'Shibor',
                                                year, lab,
                                                year))
+        content = clt.gvalue()
+        df = pd.read_excel(StringIO(content))
         df.columns = ct.SHIBOR_COLS
         df['date'] = df['date'].map(lambda x: x.date())
-        df['date'] = df['date'].astype(np.datetime64)
+        if pd.__version__ < '0.21':
+            df['date'] = df['date'].astype(np.datetime64)
+        else:
+            df['date'] = df['date'].astype('datetime64[D]')
         return df
     except:
         return None
@@ -78,13 +85,19 @@ def shibor_quote_data(year=None):
     lab = ct.SHIBOR_TYPE['Quote']
     lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
-        df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
+        clt = Client(url=ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'Quote',
                                                year, lab,
-                                               year), skiprows=[0])
-        df.columns = ct.QUOTE_COLS
+                                               year))
+        content = clt.gvalue()
+        df = pd.read_excel(StringIO(content), skiprows=[0])
+#         df.columns = ct.QUOTE_COLS
+        df.columns = ct.SHIBOR_Q_COLS
         df['date'] = df['date'].map(lambda x: x.date())
-        df['date'] = df['date'].astype(np.datetime64)
+        if pd.__version__ < '0.21':
+            df['date'] = df['date'].astype(np.datetime64)
+        else:
+            df['date'] = df['date'].astype('datetime64[D]')
         return df
     except:
         return None
@@ -105,13 +118,18 @@ def shibor_ma_data(year=None):
     lab = ct.SHIBOR_TYPE['Tendency']
     lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
-        df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
+        clt = Client(url=ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'Shibor_Tendency',
                                                year, lab,
-                                               year), skiprows=[0])
+                                               year))
+        content = clt.gvalue()
+        df = pd.read_excel(StringIO(content), skiprows=[0])
         df.columns = ct.SHIBOR_MA_COLS
         df['date'] = df['date'].map(lambda x: x.date())
-        df['date'] = df['date'].astype(np.datetime64)
+        if pd.__version__ < '0.21':
+            df['date'] = df['date'].astype(np.datetime64)
+        else:
+            df['date'] = df['date'].astype('datetime64[D]')
         return df
     except:
         return None
@@ -133,13 +151,18 @@ def lpr_data(year=None):
     lab = ct.SHIBOR_TYPE['LPR']
     lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
-        df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
+        clt = Client(url=ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'LPR',
                                                year, lab,
                                                year))
+        content = clt.gvalue()
+        df = pd.read_excel(StringIO(content), skiprows=[0])
         df.columns = ct.LPR_COLS
         df['date'] = df['date'].map(lambda x: x.date())
-        df['date'] = df['date'].astype(np.datetime64)
+        if pd.__version__ < '0.21':
+            df['date'] = df['date'].astype(np.datetime64)
+        else:
+            df['date'] = df['date'].astype('datetime64[D]')
         return df
     except:
         return None
@@ -163,13 +186,21 @@ def lpr_ma_data(year=None):
     lab = ct.SHIBOR_TYPE['LPR_Tendency']
     lab = lab.encode('utf-8') if ct.PY3 else lab
     try:
-        df = pd.read_excel(ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
+        clt = Client(url=ct.SHIBOR_DATA_URL%(ct.P_TYPE['http'], ct.DOMAINS['shibor'],
                                                ct.PAGES['dw'], 'LPR_Tendency',
                                                year, lab,
-                                               year), skiprows=[0])
+                                               year))
+        content = clt.gvalue()
+        df = pd.read_excel(StringIO(content), skiprows=[0])
         df.columns = ct.LPR_MA_COLS
         df['date'] = df['date'].map(lambda x: x.date())
-        df['date'] = df['date'].astype(np.datetime64)
+        if pd.__version__ < '0.21':
+            df['date'] = df['date'].astype(np.datetime64)
+        else:
+            df['date'] = df['date'].astype('datetime64[D]')
         return df
     except:
         return None
+    
+    
+

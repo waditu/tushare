@@ -60,14 +60,20 @@ def get_nav_open(fund_type='all'):
                               ct.NAV_OPEN_T2[fund_type],
                               ct.NAV_OPEN_T3))
 
-        fund_df = _parse_fund_data(ct.SINA_NAV_DATA_URL %
-                                   (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                    ct.NAV_OPEN_KEY[fund_type],
-                                    ct.NAV_OPEN_API[fund_type],
-                                    nums,
-                                    ct.NAV_OPEN_T2[fund_type],
-                                    ct.NAV_OPEN_T3))
-        return fund_df
+        pages = 2  # 分两次请求数据
+        limit_cnt = int(nums/pages)+1   # 每次取的数量
+        fund_dfs = []
+        for page in range(1, pages+1):
+            fund_dfs = _parse_fund_data(ct.SINA_NAV_DATA_URL %
+                                       (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
+                                        ct.NAV_OPEN_KEY[fund_type],
+                                        ct.NAV_OPEN_API[fund_type],
+                                        page,
+                                        limit_cnt,
+                                        ct.NAV_OPEN_T2[fund_type],
+                                        ct.NAV_OPEN_T3))
+
+        return pd.concat(fund_dfs, ignore_index=True)
 
 
 def get_nav_close(fund_type='all', sub_type='all'):
@@ -121,7 +127,9 @@ def get_nav_close(fund_type='all', sub_type='all'):
 
     fund_df = _parse_fund_data(ct.SINA_NAV_DATA_URL %
                                (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                ct.NAV_OPEN_KEY, ct.NAV_CLOSE_API, nums,
+                                ct.NAV_OPEN_KEY, ct.NAV_CLOSE_API, 
+                                ct.NAV_DEFAULT_PAGE,
+                                nums,
                                 ct.NAV_CLOSE_T2[fund_type],
                                 ct.NAV_CLOSE_T3[sub_type]),
                                'close')
@@ -173,7 +181,9 @@ def get_nav_grading(fund_type='all', sub_type='all'):
 
     fund_df = _parse_fund_data(ct.SINA_NAV_DATA_URL %
                                (ct.P_TYPE['http'], ct.DOMAINS['vsf'],
-                                ct.NAV_GRADING_KEY, ct.NAV_GRADING_API, nums,
+                                ct.NAV_GRADING_KEY, ct.NAV_GRADING_API, 
+                                ct.NAV_DEFAULT_PAGE,
+                                nums,
                                 ct.NAV_GRADING_T2[fund_type],
                                 ct.NAV_GRADING_T3[sub_type]),
                                'grading')

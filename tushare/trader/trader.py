@@ -15,6 +15,7 @@ from threading import Thread
 from tushare.trader import vars as vs
 from tushare.trader import utils
 from tushare.util import upass as up
+from tushare.util.upass import set_broker
 
 class TraderAPI(object):
     """
@@ -45,7 +46,7 @@ class TraderAPI(object):
         self.s.get(vs.CSC_PREFIX % (vs.P_TYPE['https'], vs.DOMAINS['csc'],
                                              vs.PAGES['csclogin']))
         res = self.s.get(vs.V_CODE_URL%(vs.P_TYPE['https'],
-                                          vs.DOMAINS['csc'],
+                                          vs.DOMAINS['cscsh'],
                                           vs.PAGES['vimg']))
         if self._login(utils.get_vcode('csc', res)) is False:
             print('请确认账号或密码是否正确 ，或券商服务器是否处于维护中。 ')
@@ -325,4 +326,4 @@ class NotLoginError(Exception):
         self.result = result
     def heartbeat(self):
         return self.baseinfo
-
+    
