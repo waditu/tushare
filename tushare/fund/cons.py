@@ -46,6 +46,8 @@ NAV_GRADING_T3 = {'all': '0', 'wjzq': '13',
                   'gp': '14', 'zs': '15', 'czzq': '16', 'jjzq': '17'}
 
 
+NAV_DEFAULT_PAGE = 1
+
 ##########################################################################
 # 基金数据列名
 
@@ -77,7 +79,7 @@ NAV_COLUMNS = {'open': NAV_OPEN_COLUMNS,
 ##########################################################################
 # 数据源URL
 SINA_NAV_COUNT_URL = '%s%s/fund_center/data/jsonp.php/IO.XSRV2.CallbackList[\'%s\']/NetValue_Service.%s?ccode=&type2=%s&type3=%s'
-SINA_NAV_DATA_URL = '%s%s/fund_center/data/jsonp.php/IO.XSRV2.CallbackList[\'%s\']/NetValue_Service.%s?page=1&num=%s&ccode=&type2=%s&type3=%s'
+SINA_NAV_DATA_URL = '%s%s/fund_center/data/jsonp.php/IO.XSRV2.CallbackList[\'%s\']/NetValue_Service.%s?page=%s&num=%s&ccode=&type2=%s&type3=%s'
 
 SINA_NAV_HISTROY_COUNT_URL = '%s%s/fundInfo/api/openapi.php/CaihuiFundInfoService.getNav?symbol=%s&datefrom=%s&dateto=%s'
 SINA_NAV_HISTROY_DATA_URL = '%s%s/fundInfo/api/openapi.php/CaihuiFundInfoService.getNav?symbol=%s&datefrom=%s&dateto=%s&num=%s'

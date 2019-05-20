@@ -26,6 +26,7 @@ lib64/
 parts/
 sdist/
 var/
+docs/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -59,6 +60,7 @@ coverage.xml
 docs/_build/
 docs/*.md
 docs/bin
+.idea/
 
 # PyBuilder
 target/
@@ -71,3 +73,5 @@ target/
 #Vim Environment
 tags
 *~
+
+

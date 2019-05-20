@@ -10,6 +10,7 @@ LHB_SINA_URL = '%s%s/q/go.php/vLHBData/kind/%s/%s?last=%s&p=%s'
 LHB_TMP_COLS = ['SCode', 'SName', 'Chgradio', 'ZeMoney', 'Bmoney', 'Smoney', 'Ctypedes', 'Turnover']
 LHB_COLS = ['code', 'name', 'pchange', 'amount', 'buy', 'sell', 'reason', 'Turnover']
 NEW_STOCKS_URL = '%s%s/corp/view/%s?page=%s&cngem=0&orderBy=NetDate&orderType=desc'
+NEW_CBONDS_URL = '%s%s/ipo/kzz_7_1_%s.html'
 MAR_SH_HZ_URL = '%s%s/marketdata/tradedata/%s?jsonCallBack=jsonpCallback%s&isPagination=true&tabType=&pageHelp.pageSize=100&beginDate=%s&endDate=%s%s&_=%s'
 MAR_SH_HZ_REF_URL = '%s%s/market/dealingdata/overview/margin/'
 MAR_SH_MX_URL = '%s%s/marketdata/tradedata/%s?jsonCallBack=jsonpCallback%s&isPagination=true&tabType=mxtype&detailsDate=%s&pageHelp.pageSize=100&stockCode=%s&beginDate=%s&endDate=%s%s&_=%s'
@@ -36,6 +37,8 @@ QUARTS_DIC = {'1':('%s-12-31', '%s-03-31'), '2':('%s-03-31', '%s-06-30'),
 FUND_HOLDS_COLS = ['count', 'clast', 'date', 'ratio', 'amount', 'nums','nlast', 'name', 'code']
 NEW_STOCKS_COLS = ['code', 'xcode', 'name', 'ipo_date', 'issue_date', 'amount', 'markets', 'price', 'pe',
                    'limit', 'funds', 'ballot']
+NEW_CBONDS_COLS = ['bcode', 'bname', 'scode', 'sname', 'xcode', 'amount', 'marketprice', 'convprice', 'firstdayprice',
+                   'ipo_date', 'issue_date', 'ballot', 'return', 'perreturn']
 MAR_SH_COOKIESTR = '_gscu_1808689395=27850607moztu036'
 MAR_SH_HZ_COLS = ['opDate', 'rzye', 'rzmre', 'rqyl', 'rqylje', 'rqmcl', 'rzrqjyzl']
 MAR_SH_MX_COLS = ['opDate', 'stockCode', 'securityAbbr', 'rzye', 'rzmre', 'rzche', 'rqyl', 'rqmcl', 'rqchl']
@@ -43,3 +46,8 @@ MAR_SZ_HZ_COLS = ['rzmre', 'rzye', 'rqmcl', 'rqyl', 'rqye', 'rzrqye']
 MAR_SZ_MX_COLS = ['stockCode', 'securityAbbr', 'rzmre', 'rzye', 'rqmcl', 'rqyl', 'rqye', 'rzrqye']
 MAR_SZ_HZ_MSG = 'please do not input more than a year,you can obtaining the data year by year.'
 MAR_SZ_HZ_MSG2 = 'start and end date all need input.'
+
+HSGT_TEMP = ['DateTime', 'GGHSMoney', 'GGSSMoney', 'HSMoney', 'SSMoney', 'NorthMoney', 'SouthSumMoney']
+HSGT_COLS = ['date', 'ggt_ss', 'ggt_sz', 'hgt', 'sgt', 'north_money', 'south_money']
+HSGT_REF = '%sdata.%s/hsgt/%s'
+HSGT_DATA = '%sdcfm.%s/EM_MutiSvcExpandInterface/api/js/get?type=HSGTZJZS&token=70f12f2f4f091e459a279469fe49eca5'

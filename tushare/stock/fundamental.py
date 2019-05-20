@@ -517,4 +517,3 @@ def get_cash_flow(code):
         df = pd.read_csv(StringIO(text), dtype={'code':'object'})
         return df
 
-      
