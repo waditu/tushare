@@ -378,7 +378,7 @@ def get_realtime_quotes(symbols=None):
     syms_list = []
     for index, row in enumerate(data):
         if len(row)>1:
-            data_list.append([astr for astr in row.split(',')])
+            data_list.append([astr for astr in row.split(',')[:33] ])#if sina ruturn data lenth >33
             syms_list.append(syms[index])
     if len(syms_list) == 0:
         return None
