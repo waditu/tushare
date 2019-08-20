@@ -11,7 +11,7 @@ import numpy as np
 from tushare.stock import cons as ct
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
-from pandas.compat import StringIO
+from six import StringIO
 
 def shibor_data(year=None):
     """

@@ -17,7 +17,7 @@ import numpy as np
 import datetime
 from tushare.stock import cons as ct
 import re
-from pandas.compat import StringIO
+from six import StringIO
 from tushare.util import dateu as du
 from tushare.util.formula import MA
 import os
