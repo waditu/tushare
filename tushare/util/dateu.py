@@ -93,7 +93,7 @@ def is_holiday(date):
     if isinstance(date, str):
         today = datetime.datetime.strptime(date, '%Y-%m-%d')
 
-    if today.isoweekday() in [6, 7] or date in holiday:
+    if today.isoweekday() in [6, 7] or str(date) in holiday:
         return True
     else:
         return False
@@ -124,4 +124,5 @@ def _random(n=13):
 def get_q_date(year=None, quarter=None):
     dt = {'1': '-03-31', '2': '-06-30', '3': '-09-30', '4': '-12-31'}
     return '%s%s'%(str(year), dt[str(quarter)])
+
 
