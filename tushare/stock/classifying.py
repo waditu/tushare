@@ -263,7 +263,7 @@ def get_sz50s():
     """
     try:
         df = pd.read_excel(ct.SZ_CLASSIFY_URL_FTP%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
-                                                  ct.PAGES['sz50b']), parse_cols=[0, 4, 5])
+                                                  ct.PAGES['sz50b']), usecols=[0, 4, 5])
         df.columns = ct.FOR_CLASSIFY_B_COLS
         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
         return df
