@@ -17,7 +17,7 @@ class Client(object):
         request = Request(self._url)
         request.add_header("Accept-Language", "en-US,en;q=0.5")
         request.add_header("Connection", "keep-alive")
-        request.add_header('Referer', self._ref)
+#         request.add_header('Referer', self._ref)
         if self._cookie is not None:
             request.add_header("Cookie", self._cookie)
         request.add_header("User-Agent", 'Mozilla/5.0 (Windows NT 6.1; rv:37.0) Gecko/20100101 Firefox/37.0')
