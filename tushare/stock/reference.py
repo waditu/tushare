@@ -843,13 +843,13 @@ def top10_holders(code=None, year=None, quarter=None, gdtype='0',
             summ = []
             data = pd.DataFrame()
             for row in jss:
-                qt = row['jzrq']
-                hold = row['ljcy']
-                change = row['ljbh']
-                props = row['ljzb']
+                qt = row['jzrq'] if 'jzrq' in row.keys() else None
+                hold = row['ljcy'] if 'ljcy' in row.keys() else None
+                change = row['ljbh'] if 'ljbh' in row.keys() else None 
+                props = row['ljzb'] if 'ljzb' in row.keys() else None
                 arow = [qt, hold, change ,props]
                 summ.append(arow)
-                ls = row['sdgdList']
+                ls = row['sdgdList'] if 'sdgdList' in row.keys() else None
                 dlist = []
                 for inrow in ls:
                     sharetype = inrow['gbxz']
@@ -898,9 +898,195 @@ def moneyflow_hsgt():
     df = df.sort_values('date', ascending=False)
     return df
     
+
+def margin_detail(date=''):
+    """
+         沪深融券融券明细
+    Parameters
+    ---------------
+    date:string
+            日期 format：YYYY-MM-DD 或者 YYYYMMDD
+            
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    buy: 今日买入额
+    buy_total:融资余额
+    sell: 今日卖出量（股）
+    sell_total: 融券余量（股）
+    sell_amount: 融券余额
+    total: 融资融券余额(元)
+    buy_repay: 本日融资偿还额(元)
+    sell_repay: 本日融券偿还量
+    
+    """
+    date = str(date).replace('-', '')
+    df = pd.read_csv(ct.MG_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], date[0:6], 'mx', date),
+                     dtype={'code': object})
+    return df
+
+
+def margin_target(date=''):
+    """
+         沪深融券融券标的
+    Parameters
+    ---------------
+    date:string
+            日期 format：YYYY-MM-DD 或者 YYYYMMDD
+            
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    long: 融资标的
+    short: 融券标的
+    
+    """
+    date = str(date).replace('-', '')
+    df = pd.read_csv(ct.MG_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], date[0:6], 'bd', date),
+                     dtype={'code': object})
+    return df
+
+
+def margin_offset(date):
+    """
+         融资融券可充抵保证金证券
+    Parameters
+    ---------------
+    date:string
+            日期 format：YYYY-MM-DD 或者 YYYYMMDD
+            
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    
+    """
+    date = str(date).replace('-', '')
+    df = pd.read_csv(ct.MG_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], date[0:6], 'cd', date),
+                     dtype={'code': object})
+    return df
+
+
+def stock_pledged():   
+    """
+    股票质押数据
+    
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    deals: 质押次数
+    unrest_pledged: 无限售股质押数量(万)
+    rest_pledged: 限售股质押数量(万)
+    totals: 总股本
+    p_ratio:质押比例（%）
+    """
+    df = pd.read_csv(ct.GPZY_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], 'gpzy'),
+                     dtype={'code': object})
+    return df
+
+
+def pledged_detail():   
+    """
+    股票质押数据
+    
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    ann_date: 公告日期
+    pledgor:出质人
+    pledgee:质权人
+    volume:质押数量
+    from_date:质押日期
+    end_date: 解除日期
+    """
+    df = pd.read_csv(ct.GPZY_D_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], 'gpzy_detail'),
+                     dtype={'code': object, 'ann_date': object, 'end_date': object})
+    df['code'] = df['code'].map(lambda x : str(x).zfill(6))
+    df['end_date'] = np.where(df['end_date'] == '--', np.NaN, df['end_date'])
+    return df
+
+
+
+def margin_zsl(date='', broker=''):   
+    """
+         融资融券充抵保证金折算率
+    Parameters
+    ---------------
+    date:string
+            日期 format：YYYY-MM-DD 或者 YYYYMMDD
+    broker:
+    gtja:国泰君安
+    yhzq:银河证券
+    gfzq：广发证券
+    zszq：招商证券
+    gxzq：国信证券
+    swhy：申万宏源
+    zxjt：中信建投
+    zxzq：中信证券
+    
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    ratio:比率
+    broker:券商代码
+    """
+    date = str(date).replace('-', '')
+    df = pd.read_csv(ct.MG_ZSL_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], date[0:6], broker, date),
+                     dtype={'code': object})
+    return df
+
+
+def stock_issuance(start_date='', end_date=''):
+    """
+         股票增发
+    Parameters
+    ---------------
+    start_date:string
+    end_date:string
+            日期 format：YYYY-MM-DD
+            
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    type:类型，定向增发/公开增发
+    count:数量
+    price:增发价格
+    close:最近收盘价
+    issue_date:增发日期
+    list_date:上市日期
+    locked_year:锁定年数
+    prem:截止当前溢价(%)
+    """
+    df = pd.read_csv(ct.ZF%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], 'zf'),
+                     dtype={'code': object})
+    if start_date != '' and start_date is not None:
+        df = df[df.issue_date >= start_date]
+    if end_date != '' and end_date is not None:
+        df = df[df.issue_date <= start_date]
+    df['prem'] = (df['close'] - df['price']) / df['price'] * 100
+    df['prem'] = df['prem'].map(ct.FORMAT)
+    df['prem'] = df['prem'].astype(float)
+    return df
+ 
     
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))
+
+
+
