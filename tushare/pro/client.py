@@ -37,8 +37,13 @@ class DataApi:
             'fields': fields
         }
 
-        res = requests.post(self.__http_url, json=req_params, timeout=self.__timeout)
-        result = json.loads(res.text)
+        res = requests.post(self.__http_url, json=req_params,
+                            timeout=self.__timeout)
+        try:
+            result = json.loads(res.text)
+        except json.decoder.JSONDecodeError as e:
+            print('Failed to parse string as json format: ', str(e))
+            return None
         if result['code'] != 0:
             raise Exception(result['msg'])
         data = result['data']
