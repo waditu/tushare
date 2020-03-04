@@ -72,6 +72,8 @@ def top_list(date = None, retry_count=3, pause=0.001):
             text = json.loads(text)
             df = pd.DataFrame(text['data'], columns=rv.LHB_TMP_COLS)
             df.columns = rv.LHB_COLS
+            df = df.fillna(0)
+            df = df.replace('', 0)
             df['buy'] = df['buy'].astype(float)
             df['sell'] = df['sell'].astype(float)
             df['amount'] = df['amount'].astype(float)
@@ -86,8 +88,8 @@ def top_list(date = None, retry_count=3, pause=0.001):
                 df[col] = df[col] / 10000
                 df[col] = df[col].map(ct.FORMAT)
             df = df.drop('Turnover', axis=1)
-        except:
-            pass
+        except Exception as e:
+            print(e)
         else:
             return df
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
@@ -121,8 +123,8 @@ def cap_tops(days= 5, retry_count= 3, pause= 0.001):
         ct._write_head()
         df =  _cap_tops(days, pageNo=1, retry_count=retry_count,
                         pause=pause)
-        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
         if df is not None:
+            df['code'] = df['code'].map(lambda x: str(x).zfill(6))
             df = df.drop_duplicates('code')
         return df
     

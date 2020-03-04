@@ -9,8 +9,8 @@ Created on 2015/03/21
 from __future__ import division
 from tushare.stock import cons as ct
 from tushare.stock import ref_vars as rv
-from tushare.util import dateu as dt
 import pandas as pd
+import numpy as np
 import time
 import lxml.html
 from lxml import etree
@@ -19,14 +19,13 @@ import json
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
-
 try:
     from urllib.request import urlopen, Request
 except ImportError:
     from urllib2 import urlopen, Request
 
 
-def profit_data(year=2015, top=25, 
+def profit_data(year=2017, top=25, 
               retry_count=3, pause=0.001):
     """
     获取分配预案数据
@@ -154,6 +153,55 @@ def _dist_cotent(year, pageNo, retry_count, pause):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)    
 
 
+def profit_divis():
+        '''
+                        获取分送送股数据
+            -------
+            Return:DataFrame
+                code:代码    
+                name:证券简称    
+                year:分配年度    
+                bshares:送股  
+                incshares:转增股
+                totals:送转总数 
+                cash:派现   
+                plandate:预案公布日    
+                regdate:股权登记日    
+                exdate:除权除息日    
+                eventproc:事件进程 ,预案或实施
+                anndate:公告日期
+                
+    '''
+        ct._write_head()
+        p = 'cfidata.aspx?sortfd=&sortway=&curpage=1&fr=content&ndk=A0A1934A1939A1957A1966A1983&xztj=&mystock='
+        df =  _profit_divis(1, pd.DataFrame(), p)
+        df = df.drop([3], axis=1)
+        df.columns = ct.PROFIT_DIVIS
+        df['code'] = df['code'].map(lambda x: str(x).zfill(6))
+        return df
+
+
+def _profit_divis(pageNo, dataArr, nextPage):
+        ct._write_console()
+        html = lxml.html.parse('%sdata.cfi.cn/%s'%(ct.P_TYPE['http'], nextPage))
+        res = html.xpath("//table[@class=\"table_data\"]/tr")
+        if ct.PY3:
+            sarr = [etree.tostring(node).decode('utf-8') for node in res]
+        else:
+            sarr = [etree.tostring(node) for node in res]
+        sarr = ''.join(sarr)
+        sarr = sarr.replace('--', '0')
+        sarr = '<table>%s</table>'%sarr
+        df = pd.read_html(sarr, skiprows=[0])[0]
+        dataArr = dataArr.append(df, ignore_index=True)
+        nextPage = html.xpath('//div[@id=\"content\"]/div[2]/a[last()]/@href')[0]
+        np = nextPage.split('&')[2].split('=')[1]
+        if pageNo < int(np):
+            return _profit_divis(int(np), dataArr, nextPage)
+        else:
+            return dataArr
+
+
 def forecast_data(year, quarter):
     """
         获取业绩预告数据
@@ -185,9 +233,11 @@ def forecast_data(year, quarter):
 def _get_forecast_data(year, quarter, pageNo, dataArr):
     ct._write_console()
     try:
+        gparser = etree.HTMLParser(encoding='GBK')
         html = lxml.html.parse(ct.FORECAST_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'], 
                                                 ct.PAGES['fd'], year, quarter, pageNo,
-                                                ct.PAGE_NUM[1]))
+                                                ct.PAGE_NUM[1]),
+                               parser=gparser)
         res = html.xpath("//table[@class=\"list_table\"]/tr")
         if ct.PY3:
             sarr = [etree.tostring(node).decode('utf-8') for node in res]
@@ -232,8 +282,8 @@ def xsg_data(year=None, month=None,
     count:解禁数量（万股）
     ratio:占总盘比率
     """
-    year = dt.get_year() if year is None else year
-    month = dt.get_month() if month is None else month
+    year = du.get_year() if year is None else year
+    month = du.get_month() if month is None else month
     for _ in range(retry_count):
         time.sleep(pause)
         try:
@@ -355,6 +405,7 @@ def new_stocks(retry_count=3, pause=0.001):
     ------
     DataFrame
     code:股票代码
+    xcode:申购代码
     name:名称
     ipo_date:上网发行日期
     issue_date:上市日期
@@ -381,6 +432,8 @@ def _newstocks(data, pageNo, retry_count, pause):
             html = lxml.html.parse(rv.NEW_STOCKS_URL%(ct.P_TYPE['http'],ct.DOMAINS['vsf'],
                          ct.PAGES['newstock'], pageNo))
             res = html.xpath('//table[@id=\"NewStockTable\"]/tr')
+            if len(res) == 0:
+                return data
             if ct.PY3:
                 sarr = [etree.tostring(node).decode('utf-8') for node in res]
             else:
@@ -389,9 +442,10 @@ def _newstocks(data, pageNo, retry_count, pause):
             sarr = sarr.replace('<font color="red">*</font>', '')
             sarr = '<table>%s</table>'%sarr
             df = pd.read_html(StringIO(sarr), skiprows=[0, 1])[0]
-            df = df.drop([df.columns[idx] for idx in [1, 12, 13, 14]], axis=1)
+            df = df.drop([df.columns[idx] for idx in [12, 13, 14]], axis=1)
             df.columns = rv.NEW_STOCKS_COLS
             df['code'] = df['code'].map(lambda x : str(x).zfill(6))
+            df['xcode'] = df['xcode'].map(lambda x : str(x).zfill(6))
             res = html.xpath('//table[@class=\"table2\"]/tr[1]/td[1]/a/text()')
             tag = '下一页' if ct.PY3 else unicode('下一页', 'utf-8')
             hasNext = True if tag in res else False 
@@ -403,6 +457,82 @@ def _newstocks(data, pageNo, retry_count, pause):
             print(ex)
         else:
             return data 
+
+
+def new_cbonds(default=1, retry_count=3, pause=0.001):
+    """
+    获取可转债申购列表
+    Parameters
+    --------
+    retry_count : int, 默认 3
+                 如遇网络等问题重复执行的次数 
+    pause : int, 默认 0
+                重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+    
+    Return
+    ------
+    DataFrame
+    bcode:债券代码
+    bname:债券名称
+    scode:股票代码
+    sname:股票名称
+    xcode:申购代码
+    amount:发行总数(亿元)
+    marketprice:最新市场价格
+    convprice:转股价格
+    firstdayprice:首日收盘价
+    ipo_date:上网发行日期
+    issue_date:上市日期
+    ballot:中签率(%)
+    return：打新收益率(%)
+    perreturn:每中一股收益（万元）
+    
+    """
+    data = pd.DataFrame()
+    if default == 1:
+        data = _newcbonds(1, retry_count,
+                    pause)
+    else:
+        for page in range(1, 50):
+            df = _newcbonds(page, retry_count,
+                    pause)
+            if df is not None:
+                data = data.append(df, ignore_index=True)
+            else:
+                break
+    return data
+
+
+def _newcbonds(pageNo, retry_count, pause):
+    for _ in range(retry_count):
+        time.sleep(pause)
+        if pageNo != 1:
+            ct._write_console()
+        try:
+            html = lxml.html.parse(rv.NEW_CBONDS_URL%(ct.P_TYPE['http'],ct.DOMAINS['sstar'],
+                         pageNo))
+            res = html.xpath('//table/tr')
+            if len(res) == 0:
+                return None
+            if ct.PY3:
+                sarr = [etree.tostring(node).decode('utf-8') for node in res]
+            else:
+                sarr = [etree.tostring(node) for node in res]
+            sarr = ''.join(sarr)
+            sarr = '<table>%s</table>'%sarr
+            df = pd.read_html(StringIO(sarr), skiprows=[0])
+            if len(df) < 1:
+                return None
+            df = df[0]
+            df = df.drop([df.columns[14], df.columns[15]], axis=1)
+            df.columns = rv.NEW_CBONDS_COLS
+            df['scode'] = df['scode'].map(lambda x: str(x).zfill(6))
+            df['xcode'] = df['xcode'].map(lambda x: str(x).zfill(6))
+        except Exception as ex:
+            print(ex)
+        else:
+            return df 
+
 
 
 def sh_margins(start=None, end=None, retry_count=3, pause=0.001):
@@ -690,9 +820,273 @@ def sz_margin_details(date='', retry_count=3, pause=0.001):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
+def top10_holders(code=None, year=None, quarter=None, gdtype='0',
+                  retry_count=3, pause=0.001):
+    if code is None:
+        return None
+    else:
+        code = ct._code_to_symbol(code)
+    gdtype = 'LT' if gdtype == '1' else ''
+    qdate = ''
+    if (year is not None) & (quarter is not None):
+        qdate = du.get_q_date(year, quarter)
+    for _ in range(retry_count):
+        time.sleep(pause)
+        try:
+            request = Request(rv.TOP10_HOLDERS_URL%(ct.P_TYPE['http'], ct.DOMAINS['gw'],
+                                    gdtype, code.upper()))
+            lines = urlopen(request, timeout = 10).read()
+            lines = lines.decode('utf8') if ct.PY3 else lines
+            reg = re.compile(r'= \'\[(.*?)\]\';')
+            lines = reg.findall(lines)[0]
+            jss = json.loads('[%s]' %lines)
+            summ = []
+            data = pd.DataFrame()
+            for row in jss:
+                qt = row['jzrq'] if 'jzrq' in row.keys() else None
+                hold = row['ljcy'] if 'ljcy' in row.keys() else None
+                change = row['ljbh'] if 'ljbh' in row.keys() else None 
+                props = row['ljzb'] if 'ljzb' in row.keys() else None
+                arow = [qt, hold, change ,props]
+                summ.append(arow)
+                ls = row['sdgdList'] if 'sdgdList' in row.keys() else None
+                dlist = []
+                for inrow in ls:
+                    sharetype = inrow['gbxz']
+                    name = inrow['gdmc']
+                    hold = inrow['cgs']
+                    h_pro = inrow['zzgs']
+                    status = inrow['zjqk']
+                    dlist.append([qt, name, hold, h_pro, sharetype, status])
+                ddata = pd.DataFrame(dlist, columns=rv.TOP10_PER_COLS)
+                data = data.append(ddata, ignore_index=True)
+            df = pd.DataFrame(summ, columns=rv.TOP10_SUMM_COLS)
+            if qdate != '':
+                df = df[df.quarter == qdate]
+                data = data[data.quarter == qdate]
+        except Exception as e:
+            print(e)
+        else:
+            return df, data
+    raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
+
+def moneyflow_hsgt():
+    """
+    获取沪深港通资金流向
+    return:
+    DataFrame,单位: 百万元
+    --------------
+    date: 交易日期
+    ggt_ss: 港股通(沪)
+    ggt_sz: 港股通(深)
+    hgt: 沪港通
+    sgt: 深港通
+    north_money: 北向资金流入
+    south_money: 南向资金流入
+    """
+    clt = Client(rv.HSGT_DATA%(ct.P_TYPE['http'], ct.DOMAINS['em']), 
+                        ref=rv.HSGT_REF%(ct.P_TYPE['http'], ct.DOMAINS['em'], ct.PAGES['index']))
+    content = clt.gvalue()
+    content = content.decode('utf-8') if ct.PY3 else content
+    js = json.loads(content)
+    df = pd.DataFrame(js)
+    df['DateTime'] = df['DateTime'].map(lambda x: x[0:10])
+    df = df.replace('-', np.NaN)
+    df = df[rv.HSGT_TEMP]
+    df.columns = rv.HSGT_COLS
+    df = df.sort_values('date', ascending=False)
+    return df
+    
+
+def margin_detail(date=''):
+    """
+         沪深融券融券明细
+    Parameters
+    ---------------
+    date:string
+            日期 format：YYYY-MM-DD 或者 YYYYMMDD
+            
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    buy: 今日买入额
+    buy_total:融资余额
+    sell: 今日卖出量（股）
+    sell_total: 融券余量（股）
+    sell_amount: 融券余额
+    total: 融资融券余额(元)
+    buy_repay: 本日融资偿还额(元)
+    sell_repay: 本日融券偿还量
+    
+    """
+    date = str(date).replace('-', '')
+    df = pd.read_csv(ct.MG_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], date[0:6], 'mx', date),
+                     dtype={'code': object})
+    return df
+
+
+def margin_target(date=''):
+    """
+         沪深融券融券标的
+    Parameters
+    ---------------
+    date:string
+            日期 format：YYYY-MM-DD 或者 YYYYMMDD
+            
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    long: 融资标的
+    short: 融券标的
+    
+    """
+    date = str(date).replace('-', '')
+    df = pd.read_csv(ct.MG_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], date[0:6], 'bd', date),
+                     dtype={'code': object})
+    return df
+
+
+def margin_offset(date):
+    """
+         融资融券可充抵保证金证券
+    Parameters
+    ---------------
+    date:string
+            日期 format：YYYY-MM-DD 或者 YYYYMMDD
+            
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    
+    """
+    date = str(date).replace('-', '')
+    df = pd.read_csv(ct.MG_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], date[0:6], 'cd', date),
+                     dtype={'code': object})
+    return df
+
+
+def stock_pledged():   
+    """
+    股票质押数据
+    
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    deals: 质押次数
+    unrest_pledged: 无限售股质押数量(万)
+    rest_pledged: 限售股质押数量(万)
+    totals: 总股本
+    p_ratio:质押比例（%）
+    """
+    df = pd.read_csv(ct.GPZY_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], 'gpzy'),
+                     dtype={'code': object})
+    return df
+
+
+def pledged_detail():   
+    """
+    股票质押数据
+    
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    ann_date: 公告日期
+    pledgor:出质人
+    pledgee:质权人
+    volume:质押数量
+    from_date:质押日期
+    end_date: 解除日期
+    """
+    df = pd.read_csv(ct.GPZY_D_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], 'gpzy_detail'),
+                     dtype={'code': object, 'ann_date': object, 'end_date': object})
+    df['code'] = df['code'].map(lambda x : str(x).zfill(6))
+    df['end_date'] = np.where(df['end_date'] == '--', np.NaN, df['end_date'])
+    return df
+
+
+
+def margin_zsl(date='', broker=''):   
+    """
+         融资融券充抵保证金折算率
+    Parameters
+    ---------------
+    date:string
+            日期 format：YYYY-MM-DD 或者 YYYYMMDD
+    broker:
+    gtja:国泰君安
+    yhzq:银河证券
+    gfzq：广发证券
+    zszq：招商证券
+    gxzq：国信证券
+    swhy：申万宏源
+    zxjt：中信建投
+    zxzq：中信证券
+    
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    ratio:比率
+    broker:券商代码
+    """
+    date = str(date).replace('-', '')
+    df = pd.read_csv(ct.MG_ZSL_URL%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], date[0:6], broker, date),
+                     dtype={'code': object})
+    return df
+
+
+def stock_issuance(start_date='', end_date=''):
+    """
+         股票增发
+    Parameters
+    ---------------
+    start_date:string
+    end_date:string
+            日期 format：YYYY-MM-DD
+            
+    return DataFrame
+    --------------
+    code: 证券代码
+    name: 证券名称
+    type:类型，定向增发/公开增发
+    count:数量
+    price:增发价格
+    close:最近收盘价
+    issue_date:增发日期
+    list_date:上市日期
+    locked_year:锁定年数
+    prem:截止当前溢价(%)
+    """
+    df = pd.read_csv(ct.ZF%(ct.P_TYPE['http'],
+                                             ct.DOMAINS['oss'], 'zf'),
+                     dtype={'code': object})
+    if start_date != '' and start_date is not None:
+        df = df[df.issue_date >= start_date]
+    if end_date != '' and end_date is not None:
+        df = df[df.issue_date <= start_date]
+    df['prem'] = (df['close'] - df['price']) / df['price'] * 100
+    df['prem'] = df['prem'].map(ct.FORMAT)
+    df['prem'] = df['prem'].astype(float)
+    return df
+ 
+    
 def _random(n=13):
     from random import randint
     start = 10**(n-1)
     end = (10**n)-1
     return str(randint(start, end))
+
+
 

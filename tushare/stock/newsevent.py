@@ -170,10 +170,10 @@ def guba_sina(show_content=False):
                                        ct.DOMAINS['sina'])) as resp:
             lines = resp.read()
         html = lxml.html.document_fromstring(lines)
-        res = html.xpath('//ul[@class=\"list_05\"]/li')
+        res = html.xpath('//ul[@class=\"list_05\"]/li[not (@class)]')
         heads = html.xpath('//div[@class=\"tit_04\"]')
         data = []
-        for head in heads[:1]:
+        for head in heads:
             title = head.xpath('a/text()')[0]
             url = head.xpath('a/@href')[0]
             ds = [title]
