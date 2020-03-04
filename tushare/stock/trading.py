@@ -372,7 +372,7 @@ def get_realtime_quotes(symbols=None):
     text = text.decode('GBK')
     reg = re.compile(r'\="(.*?)\";')
     data = reg.findall(text)
-    regSym = re.compile(r'(?:sh|sz)(.*?)\=')
+    regSym = re.compile(r'(?:sh|sz|gb_)(.*?)\=')
     syms = regSym.findall(text)
     data_list = []
     syms_list = []
@@ -382,8 +382,11 @@ def get_realtime_quotes(symbols=None):
             syms_list.append(syms[index])
     if len(syms_list) == 0:
         return None
-    df = pd.DataFrame(data_list, columns=ct.LIVE_DATA_COLS)
-    df = df.drop('s', axis=1)
+    if len(data_list[0]) == 28:
+        df = pd.DataFrame(data_list, columns=ct.US_LIVE_DATA_COLS)
+    else:
+        df = pd.DataFrame(data_list, columns=ct.LIVE_DATA_COLS)
+        df = df.drop('s', axis=1)
     df['code'] = syms_list
     ls = [cls for cls in df.columns if '_v' in cls]
     for txt in ls:
