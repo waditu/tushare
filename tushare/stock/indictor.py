@@ -107,16 +107,16 @@ def ema(data, n=12, val_name="close"):
     prices = []
 
     EMA = []
+    past_value = None
 
     for index, row in data.iterrows():
-        if index == 0:
+        if past_value is None:
             past_ema = row[val_name]
             EMA.append(row[val_name])
         else:
             # Y=[2*X+(N-1)*Y’]/(N+1)
             today_ema = (2 * row[val_name] + (n - 1) * past_ema) / (n + 1)
             past_ema = today_ema
-
             EMA.append(today_ema)
 
     return np.asarray(EMA)
@@ -221,8 +221,9 @@ def rsi(data, n=6, val_name="close"):
     RSI = []
     UP = []
     DOWN = []
+    past_value = None
     for index, row in data.iterrows():
-        if index == 0:
+        if past_value is None:
             past_value = row[val_name]
             RSI.append(0)
         else:
@@ -367,9 +368,10 @@ def dmi(data, n=14, m=14, k=6):
 
     P_DI = [0.]
     M_DI = [0.]
+    past_row = None
 
     for index, row in data.iterrows():
-        if index == 0:
+        if past_row is None:
             past_row = row
         else:
 
@@ -477,8 +479,9 @@ def asi(data, n=5):
     '''
 
     SI = []
+    last_row = None
     for index, row in data.iterrows():
-        if index == 0:
+        if last_row is None:
             last_row = row
             SI.append(0.)
         else:
@@ -586,9 +589,10 @@ def arbr(data, n=26):
     H, L, O, PC = np.array([0]), np.array([0]), np.array([0]), np.array([0])
 
     AR, BR = np.array([0]), np.array([0])
+    last_row = None
 
     for index, row in data.iterrows():
-        if index == 0:
+        if last_row is None:
             last_row = row
 
         else:
@@ -671,6 +675,7 @@ def trix(data, n=12, m=20):
     CLOSES = []
 
     TRIX = []
+    past_tr = None
     for index, row in data.iterrows():
         CLOSES.append(row["close"])
 
@@ -679,7 +684,7 @@ def trix(data, n=12, m=20):
 
         tr = np.average(CLOSES)
 
-        if index == 0:
+        if past_tr is None:
             past_tr = tr
             TRIX.append(0)
         else:
@@ -742,10 +747,10 @@ def mtm(data, n=6):
     MTM = []
     CN = []
     for index, row in data.iterrows():
-        if index < n - 1:
+        if len(CN) < n:
             MTM.append(0.)
         else:
-            mtm = row["close"] - CN[index - n]
+            mtm = row["close"] - CN[-n]
             MTM.append(mtm)
         CN.append(row["close"])
     return np.asarray(MTM)
