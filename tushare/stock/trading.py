@@ -229,7 +229,7 @@ def get_sina_dd(code=None, date=None, vol=400, retry_count=3, pause=0.001):
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
 
-def get_today_ticks(code=None, retry_count=3, pause=0.001):
+def get_today_ticks(code=None, retry_count=3, pause=0.001, all=True):
     """
         获取当日分笔明细数据
     Parameters
@@ -263,9 +263,10 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
             data_str = json.dumps(data_str)
             data_str = json.loads(data_str)
             pages = len(data_str['detailPages'])
+            fixed_pages = 1 if all == False else pages
             data = pd.DataFrame()
             ct._write_head()
-            for pNo in range(1, pages+1):
+            for pNo in range(1, fixed_pages+1):
                 data = data.append(_today_ticks(symbol, date, pNo,
                                                 retry_count, pause), ignore_index=True)
         except Exception as er:
