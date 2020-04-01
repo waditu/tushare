@@ -189,7 +189,7 @@ def get_shfe_vwap(date = None):
     Return
     -------
         DataFrame
-            郑商所日交易数据(DataFrame):
+            上期所日交易数据(DataFrame):
                 symbol        合约代码
                 date          日期
                 time_range    vwap时段，分09:00-10:15和09:00-15:00两类
@@ -293,7 +293,7 @@ def get_dce_daily(date = None, type="future", retries=0):
                 variety       合约类别
         或 
         DataFrame
-           郑商所每日期权交易数据
+           大商所每日期权交易数据
                 symbol        合约代码
                 date          日期
                 open          开盘价
