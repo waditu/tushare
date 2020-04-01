@@ -152,8 +152,8 @@
 参数说明：
 
 -  **code**:string,股票代码 e.g. 600848
--  **start**:string,开始日期 format：YYYY-MM-DD 为空时取当前日期
--  **end**:string,结束日期 format：YYYY-MM-DD 为空时取去年今日
+-  **start**:string,开始日期 format：YYYY-MM-DD 为空时取去年今日 
+-  **end**:string,结束日期 format：YYYY-MM-DD 为空时取当前日期
 -  **autype**:string,复权类型，qfq-前复权 hfq-后复权
    None-不复权，默认为qfq
 -  **index**:Boolean，是否是大盘指数，默认为False
