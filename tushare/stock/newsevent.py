@@ -16,6 +16,7 @@ import lxml.html
 from lxml import etree
 import re
 import json
+import lxml.html.soupparser as soupparser
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -116,8 +117,15 @@ def get_notices(code=None, date=None):
     url = nv.NOTICE_INFO_URL%(ct.P_TYPE['http'], ct.DOMAINS['vsf'],
                               ct.PAGES['ntinfo'], symbol)
     url = url if date is None else '%s&gg_date=%s'%(url, date)
-    html = lxml.html.parse(url)
+    res_data = urlopen(url)
+    content = res_data.read()
+    html = soupparser.fromstring(content.decode('gbk'), features='html.parser')
+
     res = html.xpath('//table[@class=\"body_table\"]/tbody/tr')
+    if res[0].xpath('th/a/text()'):
+        pass
+    else:
+        return None
     data = []
     for td in res:
         title = td.xpath('th/a/text()')[0]
