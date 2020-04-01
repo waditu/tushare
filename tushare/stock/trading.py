@@ -238,15 +238,21 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
                   股票代码 e.g. 600848
         retry_count : int, 默认 3
                   如遇网络等问题重复执行的次数
-        pause : int, 默认 0
-                 重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+        pause : int, 默认 0.001
+                  重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
      return
      -------
         DataFrame 当日所有股票交易数据(DataFrame)
               属性:成交时间、成交价格、价格变动，成交手、成交金额(元)，买卖类型
     """
-    if code is None or len(code)!=6 :
-        return None
+    _, data = __get_today_ticks_impl(code, retry_count, pause)
+    return data
+
+
+def __get_today_ticks_impl(code, retry_count, pause, nonce=None):
+    if nonce is None:
+        nonce = 0
+
     symbol = ct._code_to_symbol(code)
     date = du.today()
     for _ in range(retry_count):
@@ -265,14 +271,41 @@ def get_today_ticks(code=None, retry_count=3, pause=0.001):
             pages = len(data_str['detailPages'])
             data = pd.DataFrame()
             ct._write_head()
-            for pNo in range(1, pages+1):
+            if nonce < 0 or nonce >= pages:
+                # 由于无法确定最新的数据所在的页（永远是第一页）是否数据满页，所以nonce一定是比pages小的，以便确保每次都拉取第一页
+                return -1, None
+            for pNo in range(1, pages+1-nonce):
                 data = data.append(_today_ticks(symbol, date, pNo,
                                                 retry_count, pause), ignore_index=True)
         except Exception as er:
             print(str(er))
         else:
-            return data
+            return pages - 1, data
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
+
+
+def get_today_ticks_incrementally(code=None, retry_count=3, pause=0.001, nonce=None):
+    """
+        获取当日分笔明细数据，通过nonce参数支持增量获取，可缩短拉取时间避免频繁快速拉取数据导致被禁止拉取的问题
+        增量获取由于存在第一页总是每次都获取的情况，所以两次获取之间可能存在第二次拉取到的数据和第一次数据部分重复的情况，故需要数据去重。
+        去重意味着index不连续，如果在意index需要reset_index(drop=True)。
+    Parameters
+    ------
+        code:string
+                  股票代码 e.g. 600848
+        retry_count : int, 默认 3
+                  如遇网络等问题重复执行的次数
+        pause : int, 默认 0.001
+                  重复请求数据过程中暂停的秒数，防止请求间隔时间太短出现的问题
+        nonce : int, 默认None
+                  增量拉取数据的起始点，通常针对一个股票第一次拉取时，可不传此参数，拉取数据成功后，将返回的nonce作为下一次拉取的参数，即可实现增量拉取
+     return
+     -------
+        nonce: 下次增量获取的起始点
+        DataFrame 当日所有股票交易数据(DataFrame)
+              属性:成交时间、成交价格、价格变动，成交手、成交金额(元)，买卖类型
+    """
+    return __get_today_ticks_impl(code, retry_count, pause, nonce)
 
 
 def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
