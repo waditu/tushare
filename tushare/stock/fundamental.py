@@ -1,6 +1,6 @@
-# -*- coding:utf-8 -*- 
+# -*- coding:utf-8 -*-
 """
-基本面数据接口 
+基本面数据接口
 Created on 2015/01/18
 @author: Jimmy Liu
 @group : waditu
@@ -33,17 +33,24 @@ def get_stock_basics(date=None):
                industry,细分行业
                area,地区
                pe,市盈率
-               outstanding,流通股本
-               totals,总股本(万)
-               totalAssets,总资产(万)
-               liquidAssets,流动资产
-               fixedAssets,固定资产
-               reserved,公积金
+               outstanding,流通股本(亿)
+               totals,总股本(亿)
+               totalAssets,总资产(亿)
+               liquidAssets,流动资产(亿)
+               fixedAssets,固定资产(亿)
+               reserved,公积金(亿)
                reservedPerShare,每股公积金
                eps,每股收益
                bvps,每股净资
                pb,市净率
                timeToMarket,上市日期
+               undp,未分利润
+               perundp, 每股未分配
+               rev,收入同比(%)
+               profit,利润同比(%)
+               gpr,毛利率(%)
+               npr,净利润率(%)
+               holders,股东人数
     """
     wdate = du.last_tddate() if date is None else date
     wdate = wdate.replace('-', '')
@@ -67,7 +74,7 @@ def get_report_data(year, quarter):
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
-       
+
     Return
     --------
     DataFrame
@@ -134,16 +141,16 @@ def get_profit_data(year, quarter):
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
-       
+
     Return
     --------
     DataFrame
         code,代码
         name,名称
-        roe,净资产收益率(%)
+        roe,净资产收益率(%)-摊薄
         net_profit_ratio,净利率(%)
         gross_profit_rate,毛利率(%)
-        net_profits,净利润(万元)
+        net_profits,净利润(百万元)
         eps,每股收益
         business_income,营业收入(百万元)
         bips,每股主营业务收入(元)
@@ -199,7 +206,7 @@ def get_operation_data(year, quarter):
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
-       
+
     Return
     --------
     DataFrame
@@ -263,7 +270,7 @@ def get_growth_data(year, quarter):
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
-       
+
     Return
     --------
     DataFrame
@@ -285,7 +292,7 @@ def get_growth_data(year, quarter):
         return data
 
 
-def _get_growth_data(year, quarter, pageNo, dataArr, 
+def _get_growth_data(year, quarter, pageNo, dataArr,
                      retry_count=3, pause=0.001):
     ct._write_console()
     for _ in range(retry_count):
@@ -327,7 +334,7 @@ def get_debtpaying_data(year, quarter):
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
-       
+
     Return
     --------
     DataFrame
@@ -337,8 +344,8 @@ def get_debtpaying_data(year, quarter):
         quickratio,速动比率
         cashratio,现金比率
         icratio,利息支付倍数
-        sheqratio,股东权益比率
-        adratio,股东权益增长率
+        sheqratio,股东权益比率(%)
+        adratio,股东权益增长率(%)
     """
     if ct._check_input(year, quarter) is True:
         ct._write_head()
@@ -380,8 +387,8 @@ def _get_debtpaying_data(year, quarter, pageNo, dataArr,
         except Exception as e:
             pass
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
- 
- 
+
+
 def get_cashflow_data(year, quarter):
     """
         获取现金流量数据
@@ -390,7 +397,7 @@ def get_cashflow_data(year, quarter):
     year:int 年度 e.g:2014
     quarter:int 季度 :1、2、3、4，只能输入这4个季度
        说明：由于是从网站获取的数据，需要一页页抓取，速度取决于您当前网络速度
-       
+
     Return
     --------
     DataFrame
@@ -443,15 +450,15 @@ def _get_cashflow_data(year, quarter, pageNo, dataArr,
         except Exception as e:
             pass
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
-       
-       
+
+
 def _data_path():
     import os
     import inspect
-    caller_file = inspect.stack()[1][1]  
+    caller_file = inspect.stack()[1][1]
     pardir = os.path.abspath(os.path.join(os.path.dirname(caller_file), os.path.pardir))
     return os.path.abspath(os.path.join(pardir, os.path.pardir))
-  
+
 
 def get_balance_sheet(code):
     """
@@ -459,7 +466,7 @@ def get_balance_sheet(code):
     Parameters
     --------
     code:str 股票代码 e.g:600518
-       
+
     Return
     --------
     DataFrame
@@ -480,7 +487,7 @@ def get_profit_statement(code):
     Parameters
     --------
     code:str 股票代码 e.g:600518
-       
+
     Return
     --------
     DataFrame
@@ -495,14 +502,14 @@ def get_profit_statement(code):
         df = pd.read_csv(StringIO(text), dtype={'code':'object'})
         return df
 
-      
+
 def get_cash_flow(code):
     """
         获取某股票的历史所有时期现金流表
     Parameters
     --------
     code:str 股票代码 e.g:600518
-       
+
     Return
     --------
     DataFrame
