@@ -445,11 +445,11 @@ def get_total_import_export():
                                       rdint, vs.MACRO_TYPE[3], 0, 400,
                                       rdint))
     text = urlopen(request, timeout=10).read()
-    text = text.decode('gbk') if ct.PY3 else text
+    text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
-    datastr = datastr.split('\'美元\':')[1]
+    datastr = datastr.split(u'\'美元\':')[1]
     datastr = datastr.replace("\"", "")
     js = json.loads(datastr)
     df = pd.DataFrame(js, columns=vs.TOTAL_IMPORT_EXPORT)
@@ -474,7 +474,7 @@ def get_industry_fixed_investment():
                                       rdint, vs.MACRO_TYPE[4], 10, 10000,
                                       rdint))
     text = urlopen(request, timeout=10).read()
-    text = text.decode('gbk') if ct.PY3 else text
+    text = text.decode('gbk')
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
