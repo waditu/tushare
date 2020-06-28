@@ -2,8 +2,8 @@
 
 P_TYPE = {'http':'http://','ftp':'ftp://'}
 DOMAINS = {'sina':'sina.com.cn','sinahq':'sinajs.cn','ifeng':'ifeng.com'}
-MACRO_TYPE = ['nation','price','fininfo']
-MACRO_URL = '%smoney.finance.%s/mac/api/jsonp.php/SINAREMOTECALLCALLBACK%s/MacPage_Service.get_pagedata?cate=%s&event=%s&from=0&num=%s&condition=&_=%s'
+MACRO_TYPE = ['nation','price','fininfo','foreign','fixed']
+MACRO_URL = '%squotes.%s/mac/api/jsonp_v3.php/SINAREMOTECALLCALLBACK%s/MacPage_Service.get_pagedata?cate=%s&event=%s&from=0&num=%s&condition=&_=%s'
 GDP_YEAR_COLS = ['year','gdp','pc_gdp','gnp','pi','si','industry','cons_industry','ti','trans_industry','lbdy']
 GDP_QUARTER_COLS = ['quarter','gdp','gdp_yoy','pi','pi_yoy','si','si_yoy','ti','ti_yoy']
 GDP_FOR_COLS = ['year','end_for','for_rate','asset_for','asset_rate','goods_for','goods_rate']
@@ -17,6 +17,8 @@ RRR_COLS = ['date','before','now','changed']
 MONEY_SUPPLY_COLS = ['month','m2','m2_yoy','m1','m1_yoy','m0','m0_yoy','cd','cd_yoy','qm','qm_yoy','ftd','ftd_yoy','sd','sd_yoy','rests','rests_yoy']
 MONEY_SUPPLY_BLA_COLS = ['year','m2','m1','m0','cd','qm','ftd','sd','rests']
 GOLD_AND_FOREIGN_CURRENCY_RESERVES = ['month','gold','foreign_reserves']
+TOTAL_IMPORT_EXPORT = ['year', 'total', 'export', 'import', 'delta']
+INDUSTRY_FIXED_INVESTMENT = ['month', 'industry', 'amount', 'increment']
 
 def random(n=13):
     from random import randint

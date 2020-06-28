@@ -6,6 +6,10 @@ Created on 2015/01/24
 @author: Jimmy Liu
 @group : waditu
 @contact: jimmysoa@sina.cn
+
+Modified on 2020/06/28
+@contributor: Cole ZHANG
+@email: longzonejazz@gmail.com
 """
 
 import pandas as pd
@@ -248,21 +252,23 @@ def get_deposit_rate():
         deposit_type :存款种类
         rate:利率（%）
     """
-    rdint = vs.random()
-    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
-                                    rdint, vs.MACRO_TYPE[2], 2, 600,
-                                    rdint))
-    text = urlopen(request, timeout=10).read()
-    text = text.decode('gbk')
-    regSym = re.compile(r'\,count:(.*?)\}')
-    datastr = regSym.findall(text)
-    datastr = datastr[0]
-    datastr = datastr.split('data:')[1]
-    js = json.loads(datastr)
-    df = pd.DataFrame(js, columns=vs.DEPOSIT_COLS)
-    for i in df.columns:
-        df[i] = df[i].apply(lambda x:np.where(x is None, '--', x))
-    return df
+    return "get_deposit_rate is unavailable"
+
+    # rdint = vs.random()
+    # request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+    #                                 rdint, vs.MACRO_TYPE[2], 2, 600,
+    #                                 rdint))
+    # text = urlopen(request, timeout=10).read()
+    # text = text.decode('gbk') if ct.PY3 else text
+    # regSym = re.compile(r'\,count:(.*?)\}')
+    # datastr = regSym.findall(text)
+    # datastr = datastr[0]
+    # datastr = datastr.split('data:')[1]
+    # js = json.loads(datastr)
+    # df = pd.DataFrame(js, columns=vs.DEPOSIT_COLS)
+    # for i in df.columns:
+    #     df[i] = df[i].apply(lambda x:np.where(x is None, '--', x))
+    # return df
 
 
 def get_loan_rate():
@@ -275,21 +281,22 @@ def get_loan_rate():
         loan_type :存款种类
         rate:利率（%）
     """
-    rdint = vs.random()
-    request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
-                                    rdint, vs.MACRO_TYPE[2], 3, 800,
-                                    rdint))
-    text = urlopen(request, timeout=10).read()
-    text = text.decode('gbk')
-    regSym = re.compile(r'\,count:(.*?)\}')
-    datastr = regSym.findall(text)
-    datastr = datastr[0]
-    datastr = datastr.split('data:')[1]
-    js = json.loads(datastr)
-    df = pd.DataFrame(js, columns=vs.LOAN_COLS)
-    for i in df.columns:
-        df[i] = df[i].apply(lambda x:np.where(x is None, '--', x))
-    return df
+    return "get_loan_rate is unavailable"
+    # rdint = vs.random()
+    # request = Request(vs.MACRO_URL%(vs.P_TYPE['http'], vs.DOMAINS['sina'],
+    #                                 rdint, vs.MACRO_TYPE[2], 3, 800,
+    #                                 rdint))
+    # text = urlopen(request, timeout=10).read()
+    # text = text.decode('gbk') if ct.PY3 else text
+    # regSym = re.compile(r'\,count:(.*?)\}')
+    # datastr = regSym.findall(text)
+    # datastr = datastr[0]
+    # datastr = datastr.split('data:')[1]
+    # js = json.loads(datastr)
+    # df = pd.DataFrame(js, columns=vs.LOAN_COLS)
+    # for i in df.columns:
+    #     df[i] = df[i].apply(lambda x:np.where(x is None, '--', x))
+    # return df
 
 
 def get_rrr():
@@ -308,7 +315,7 @@ def get_rrr():
                                     rdint, vs.MACRO_TYPE[2], 4, 100,
                                     rdint))
     text = urlopen(request, timeout=10).read()
-    text = text.decode('gbk')
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -349,7 +356,7 @@ def get_money_supply():
                                     rdint, vs.MACRO_TYPE[2], 1, 600,
                                     rdint))
     text = urlopen(request, timeout=10).read()
-    text = text.decode('gbk')
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -382,7 +389,7 @@ def get_money_supply_bal():
                                     rdint, vs.MACRO_TYPE[2], 0, 200,
                                     rdint))
     text = urlopen(request,timeout=10).read()
-    text = text.decode('gbk')
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -409,7 +416,7 @@ def get_gold_and_foreign_reserves():
                                       rdint, vs.MACRO_TYPE[2], 5, 200,
                                       rdint))
     text = urlopen(request,timeout=10).read()
-    text = text.decode('gbk')
+    text = text.decode('gbk') if ct.PY3 else text
     regSym = re.compile(r'\,count:(.*?)\}')
     datastr = regSym.findall(text)
     datastr = datastr[0]
@@ -418,4 +425,63 @@ def get_gold_and_foreign_reserves():
     df = pd.DataFrame(js, columns=vs.GOLD_AND_FOREIGN_CURRENCY_RESERVES)
     for i in df.columns:
         df[i] = df[i].apply(lambda x: np.where(x is None, '--', x))
+    return df
+
+
+def get_total_import_export():
+    """
+    获取进出口总额
+    Returns
+    -------
+    DataFrame
+        year:统计时间
+        total:进出口总额(美元亿元)
+        export:出口总额(美元亿元)
+        import:进口总额(美元亿元)
+        delta:差额(美元亿元)
+        """
+    rdint = vs.random()
+    request = Request(vs.MACRO_URL % (vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                      rdint, vs.MACRO_TYPE[3], 0, 400,
+                                      rdint))
+    text = urlopen(request, timeout=10).read()
+    text = text.decode('gbk') if ct.PY3 else text
+    regSym = re.compile(r'\,count:(.*?)\}')
+    datastr = regSym.findall(text)
+    datastr = datastr[0]
+    datastr = datastr.split('\'美元\':')[1]
+    datastr = datastr.replace("\"", "")
+    js = json.loads(datastr)
+    df = pd.DataFrame(js, columns=vs.TOTAL_IMPORT_EXPORT)
+    for i in df.columns:
+        df[i] = df[i].apply(lambda x: np.where(x is None, '--', x))
+    return df
+
+
+def get_industry_fixed_investment():
+    """
+    获取行业固投完成情况
+    Returns
+    -------
+    DataFrame
+        month:统计时间
+        industry:行业
+        amount:固定资产投资完成额(亿元)
+        increment:固定资产投资完成额同比增长(%)
+        """
+    rdint = vs.random()
+    request = Request(vs.MACRO_URL % (vs.P_TYPE['http'], vs.DOMAINS['sina'],
+                                      rdint, vs.MACRO_TYPE[4], 10, 10000,
+                                      rdint))
+    text = urlopen(request, timeout=10).read()
+    text = text.decode('gbk') if ct.PY3 else text
+    regSym = re.compile(r'\,count:(.*?)\}')
+    datastr = regSym.findall(text)
+    datastr = datastr[0]
+    datastr = datastr.split('data:')[1]
+    js = json.loads(datastr)
+    df = pd.DataFrame(js, columns=vs.INDUSTRY_FIXED_INVESTMENT)
+    for i in df.columns:
+        df[i] = df[i].apply(lambda x: np.where(x is None, '--', x))
+
     return df
