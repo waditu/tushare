@@ -89,8 +89,8 @@ def pro_bar(ts_code='', pro_api=None, start_date=None, end_date=None, freq='D', 
                 if freq == 'M':
                     df = api.monthly(ts_code=ts_code, start_date=start_date, end_date=end_date)
                 if adj is not None:
-                    fcts = api.adj_factor(ts_code=ts_code, start_date=start_date, end_date=end_date)[['trade_date', 'adj_factor']]
-                    data = df.set_index('trade_date', drop=False).merge(fcts.set_index('trade_date'), left_index=True, right_index=True, how='left')
+                    fcts = api.adj_factor(ts_code=ts_code, start_date=start_date, end_date=end_date)[['trade_date', 'ts_code', 'adj_factor']]
+                    data = df.set_index(['trade_date', 'ts_code'], drop=False).merge(fcts.set_index(['trade_date', 'ts_code']), left_index=True, right_index=True, how='left')
                     data['adj_factor'] = data['adj_factor'].fillna(method='bfill')
                     for col in PRICE_COLS:
                         if adj == 'hfq':
