@@ -48,4 +48,6 @@ class DataApi:
         return pd.DataFrame(items, columns=columns)
 
     def __getattr__(self, name):
+        if name.startswith('__') and name.endswith('__'):
+            raise AttributeError        
         return partial(self.query, name)
