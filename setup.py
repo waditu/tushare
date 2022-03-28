@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import codecs
 import os
-import tushare
+
 
 def read(fname):
     return codecs.open(os.path.join(os.path.dirname(__file__), fname)).read()
@@ -63,22 +63,28 @@ return::
 """
 
 def read_install_requires():
-    with open('requirements.txt', 'r') as f:
-        res = f.readlines()
-    res = list(map(lambda s: s.replace('\n', ''), res))
-    return res
+    reqs = [
+            'pandas>=0.18.0',
+            'requests>=2.0.0',
+            'lxml>=3.8.0',
+            'simplejson>=3.16.0',
+            'msgpack>=0.5.6',
+            'pyzmq>=16.0.0'
+            ]
+    return reqs
+
 
 setup(
     name='tushare',
-    version=tushare.__version__,
+    version=read('tushare/VERSION.txt'),
     description='A utility for crawling historical and Real-time Quotes data of China stocks',
 #     long_description=read("READM.rst"),
     long_description = long_desc,
-    install_requires=read_install_requires(),
     author='Jimmy Liu',
     author_email='jimmysoa@sina.cn',
     license='BSD',
     url='http://tushare.org',
+    install_requires=read_install_requires(),
     keywords='Global Financial Data',
     classifiers=['Development Status :: 4 - Beta',
     'Programming Language :: Python :: 2.6',
@@ -89,5 +95,6 @@ setup(
     'Programming Language :: Python :: 3.5',
     'License :: OSI Approved :: BSD License'],
     packages=find_packages(),
-    package_data={'': ['*.csv']},
+    include_package_data=True,
+    package_data={'': ['*.csv', '*.txt']},
 )

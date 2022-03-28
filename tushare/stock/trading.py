@@ -14,12 +14,15 @@ import lxml.html
 from lxml import etree
 import pandas as pd
 import numpy as np
+import datetime
 from tushare.stock import cons as ct
 import re
 from pandas.compat import StringIO
 from tushare.util import dateu as du
 from tushare.util.formula import MA
 import os
+from tushare.util.conns import get_apis, close_apis
+from tushare.stock.fundamental import get_stock_basics
 try:
     from urllib.request import urlopen, Request
 except ImportError:
@@ -369,7 +372,7 @@ def get_realtime_quotes(symbols=None):
     text = text.decode('GBK')
     reg = re.compile(r'\="(.*?)\";')
     data = reg.findall(text)
-    regSym = re.compile(r'(?:sh|sz)(.*?)\=')
+    regSym = re.compile(r'(?:sh|sz|gb_)(.*?)\=')
     syms = regSym.findall(text)
     data_list = []
     syms_list = []
@@ -379,8 +382,11 @@ def get_realtime_quotes(symbols=None):
             syms_list.append(syms[index])
     if len(syms_list) == 0:
         return None
-    df = pd.DataFrame(data_list, columns=ct.LIVE_DATA_COLS)
-    df = df.drop('s', axis=1)
+    if len(data_list[0]) == 28:
+        df = pd.DataFrame(data_list, columns=ct.US_LIVE_DATA_COLS)
+    else:
+        df = pd.DataFrame(data_list, columns=ct.LIVE_DATA_COLS)
+        df = df.drop('s', axis=1)
     df['code'] = syms_list
     ls = [cls for cls in df.columns if '_v' in cls]
     for txt in ls:
@@ -790,6 +796,105 @@ def get_day_all(date=None):
                                       'hq' if date is None else wdate), \
                                       dtype={'code':'object'})
     return df
+
+
+def get_dt_time(t):
+    tstr = str(t)[:-2]
+    tstr = tstr.replace('-', '').replace(':', '')
+    return tstr
+
+
+def bar2h5(market='', date='', freq='D', asset='E', filepath=''):
+    cons = get_apis()
+    stks = get_stock_basics()
+    fname = "%s%s%sbar%s.h5"%(filepath, market, date, freq)
+    store = pd.HDFStore(fname, "a")
+    if market in ['SH', 'SZ']:
+        if market == 'SH':
+            stks = stks.ix[stks.index.str[0]=='6', :]
+        elif market == 'SZ':
+            stks = stks.ix[stks.index.str[0]!='6', :]
+        else:
+            stks = ''
+        market = 1 if market == 'SH' else 0
+        for stk in stks.index:
+            symbol = '%s.SH'%stk
+            if 'min' in freq:
+                df = bar(stk, conn=cons, start_date=date, end_date=date, freq=freq, 
+                             market=market, asset=asset)
+                df['Time'] = df.index
+                df['Time'] = df['Time'].apply(get_dt_time) 
+                df.index = df['Time']
+                df.drop(['code','Time'], axis = 1, inplace=True)    
+                df.rename(columns={'open':'OPEN'}, inplace=True) 
+                df.rename(columns={'close':'CLOSE'}, inplace=True)
+                df.rename(columns={'low':'LOW'}, inplace=True)
+                df.rename(columns={'high':'HIGH'}, inplace=True)
+                df.rename(columns={'vol':'VOLUME'}, inplace=True) 
+                df.rename(columns={'amount':'TURNOVER'}, inplace=True) 
+                df.loc[:,'HIGH'] =  df.loc[:,'HIGH'].astype("int64")
+                df.loc[:,'LOW'] =  df.loc[:,'LOW'].astype("int64")
+                df.loc[:,'OPEN'] =  df.loc[:,'OPEN'].astype("int64")
+                df.loc[:,'CLOSE'] =  df.loc[:,'CLOSE'].astype("int64")
+                df.loc[:,'VOLUME'] =  df.loc[:,'VOLUME'].astype("int64")
+                df.loc[:,'TURNOVER'] =  df.loc[:,'TURNOVER'].astype("int64")    
+                df.loc[:,'OPEN'] *= 10000   
+                df.loc[:,'CLOSE'] *= 10000    
+                df.loc[:,'HIGH'] *= 10000    
+                df.loc[:,'LOW'] *= 10000
+                df.loc[:,'ASKPRICE1']  = 0
+                df.loc[:,'ASKPRICE2']  = 0
+                df.loc[:,'ASKPRICE3']  = 0
+                df.loc[:,'ASKPRICE4']  = 0
+                df.loc[:,'ASKPRICE5']  = 0
+                df.loc[:,'ASKPRICE6']  = 0
+                df.loc[:,'ASKPRICE7']  = 0
+                df.loc[:,'ASKPRICE8']  = 0
+                df.loc[:,'ASKPRICE9']  = 0
+                df.loc[:,'ASKPRICE10'] = 0    
+                df.loc[:,'BIDPRICE1']  = 0
+                df.loc[:,'BIDPRICE2']  = 0
+                df.loc[:,'BIDPRICE3']  = 0
+                df.loc[:,'BIDPRICE4']  = 0
+                df.loc[:,'BIDPRICE5']  = 0
+                df.loc[:,'BIDPRICE6']  = 0
+                df.loc[:,'BIDPRICE7']  = 0
+                df.loc[:,'BIDPRICE8']  = 0
+                df.loc[:,'BIDPRICE9']  = 0
+                df.loc[:,'BIDPRICE10'] = 0    
+                df.loc[:,'ASKVOL1']  = 0
+                df.loc[:,'ASKVOL2']  = 0
+                df.loc[:,'ASKVOL3']  = 0
+                df.loc[:,'ASKVOL4']  = 0
+                df.loc[:,'ASKVOL5']  = 0
+                df.loc[:,'ASKVOL6']  = 0
+                df.loc[:,'ASKVOL7']  = 0
+                df.loc[:,'ASKVOL8']  = 0
+                df.loc[:,'ASKVOL9']  = 0
+                df.loc[:,'ASKVOL10'] = 0    
+                df.loc[:,'BIDVOL1']  = 0
+                df.loc[:,'BIDVOL2']  = 0
+                df.loc[:,'BIDVOL3']  = 0
+                df.loc[:,'BIDVOL4']  = 0
+                df.loc[:,'BIDVOL5']  = 0
+                df.loc[:,'BIDVOL6']  = 0
+                df.loc[:,'BIDVOL7']  = 0
+                df.loc[:,'BIDVOL8']  = 0
+                df.loc[:,'BIDVOL9']  = 0
+                df.loc[:,'BIDVOL10'] = 0    
+                df.loc[:,'VWAP'] = 0.0
+                df.loc[:,'VOL30']=0.0
+                df.loc[:,'TOTAL_VOLUME']=0.0
+                df.loc[:,'TOTAL_TURNOVER']=0.0
+                df.loc[:,'INTEREST']=0.0
+                print(df)
+#             if market == 1 and stk[0] == '6':
+#                 df = bar(stk, conn=cons, start_date=date, end_date=date, freq=freq, market=market, asset=asset)
+                
+            store[symbol] = df
+    
+    store.close()
+    close_apis(cons)
  
 
 def bar(code, conn=None, start_date=None, end_date=None, freq='D', asset='E', 
@@ -920,10 +1025,14 @@ def bar(code, conn=None, start_date=None, end_date=None, freq='D', asset='E',
                         data['ma%s'%a] = data['ma%s'%a].astype(float)
             for col in ['open', 'high', 'low', 'close']:
                 data[col] = data[col].astype(float)
+            data['p_change'] = data['close'].pct_change(-1) * 100
+            data['p_change'] = data['p_change'].map(ct.FORMAT).astype(float)
             return data
-        except Exception as e:
-            print(e)
+        except:
+            return None
         else:
+            data['p_change'] = data['close'].pct_change(-1) * 100
+            data['p_change'] = data['p_change'].map(ct.FORMAT).astype(float)
             return data
     raise IOError(ct.NETWORK_URL_ERROR_MSG)
 
@@ -1056,7 +1165,7 @@ def quotes(symbols, conn=None, asset='E', market=[], retry_count = 3):
                     elif asset == 'INDEX':
                         df = api.to_df(api.get_security_quotes([(mkcode, code)]))
                     else:
-                        df = xapi.to_df(api.get_instrument_quote(mkcode, code))
+                        df = xapi.to_df(xapi.get_instrument_quote(mkcode, code))
                     data = data.append(df)
             else:
                 mkcode = _get_mkcode(symbols, asset=asset, xapi=xapi)

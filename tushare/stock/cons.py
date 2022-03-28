@@ -29,7 +29,8 @@ DOMAINS = {'sina': 'sina.com.cn', 'sinahq': 'sinajs.cn',
            'oss': 'file.tushare.org', 'idxip':'115.29.204.48',
            'shibor': 'www.shibor.org', 'mbox':'www.cbooo.cn',
            'tt': 'gtimg.cn', 'gw': 'gw.com.cn',
-           'v500': 'value500.com', 'sstar': 'stock.stockstar.com'}
+           'v500': 'value500.com', 'sstar': 'stock.stockstar.com',
+           'dfcf': 'nufm.dfcfw.com'}
 PAGES = {'fd': 'index.phtml', 'dl': 'downxls.php', 'jv': 'json_v2.php',
          'cpt': 'newFLJK.php', 'ids': 'newSinaHy.php', 'lnews':'rollnews_ch_out_interface.php',
          'ntinfo':'vCB_BulletinGather.php', 'hs300b':'000300cons.xls',
@@ -66,9 +67,12 @@ INX_DAY_PRICE_COLUMNS = ['date', 'open', 'high', 'close', 'low', 'volume', 'pric
 LIVE_DATA_COLS = ['name', 'open', 'pre_close', 'price', 'high', 'low', 'bid', 'ask', 'volume', 'amount',
                   'b1_v', 'b1_p', 'b2_v', 'b2_p', 'b3_v', 'b3_p', 'b4_v', 'b4_p', 'b5_v', 'b5_p',
                   'a1_v', 'a1_p', 'a2_v', 'a2_p', 'a3_v', 'a3_p', 'a4_v', 'a4_p', 'a5_v', 'a5_p', 'date', 'time', 's']
-FOR_CLASSIFY_B_COLS = ['code','name']
-FOR_CLASSIFY_W_COLS = ['date','code', 'weight']
+US_LIVE_DATA_COLS = ['name', 'price', 'change_percent', 'time', 'change', 'open', 'high', 'low', 'high_52week', 'low_52week', 'volume', 'volume_average', 'mktcap', 'eps', 'pe', 'fpe', 'beta', 'dividend', 'earnings_yield', 'totals', 'instown', 'extended_price', 'extended_change_percent', 'extended_change', 'extended_time', 'time_est', 'pre_close', 'extended_volume']
+FOR_CLASSIFY_COLS = ['code','name']
+FOR_CLASSIFY_B_COLS = ['date', 'code','name']
+FOR_CLASSIFY_W_COLS = ['date','code', 'name', 'weight']
 FOR_CLASSIFY_W5_COLS = ['date','code', 'name', 'weight']
+TSDATA_CLASS = '%s%s/tsdata/industry/%s.csv'
 THE_FIELDS = ['code','symbol','name','changepercent','trade','open','high','low','settlement','volume','turnoverratio']
 KLINE_TT_COLS_MINS = ['date', 'open', 'close', 'high', 'low', 'volume']
 KLINE_TT_COLS = ['date', 'open', 'close', 'high', 'low', 'volume', 'amount', 'turnoverratio']
@@ -98,20 +102,27 @@ ALL_STOCK_BASICS_FILE = P_TYPE['http'] + DOMAINS['oss'] + '/tsdata/%sall%s.csv'
 ALL_DAY_FILE = P_TYPE['http'] + DOMAINS['oss'] + '/tsdata/h/%s%s.csv'
 ALL_CAL_FILE = '%s%s/tsdata/calAll.csv'%(P_TYPE['http'], DOMAINS['oss'])
 SINA_CONCEPTS_INDEX_URL = '%smoney.%s/q/view/%s?param=class'
+ET_CONCEPTS_INDEX_URL = '%s%s/EM_Finance2014NumericApplication/JS.aspx?type=CT&cmd=C._BKGN&js=[(x)]&sty=FPGBKI&st=c&sr=-1&p=1&ps=5000&cb=&token=7bc05d0d4c3c22ef9fca8c2a912d779c&v=0.0%s'
 SINA_INDUSTRY_INDEX_URL = '%s%s/q/view/%s'
 SINA_DATA_DETAIL_URL = '%s%s/quotes_service/api/%s/Market_Center.getHQNodeData?page=%s&num=1000&sort=symbol&asc=1&node=%s&symbol=&_s_r_a=page'
 SINA_BALANCESHEET_URL = 'http://money.finance.sina.com.cn/corp/go.php/vDOWN_BalanceSheet/displaytype/4/stockid/%s/ctrl/all.phtml'
 SINA_PROFITSTATEMENT_URL = 'http://money.finance.sina.com.cn/corp/go.php/vDOWN_ProfitStatement/displaytype/4/stockid/%s/ctrl/all.phtml'
 SINA_CASHFLOW_URL = 'http://money.finance.sina.com.cn/corp/go.php/vDOWN_CashFlow/displaytype/4/stockid/%s/ctrl/all.phtml'
 INDEX_C_COMM = 'sseportal/ps/zhs/hqjt/csi'
-HS300_CLASSIFY_URL_FTP = '%s%s/webdata/%s'
+HS300_CLASSIFY_URL_FTP = '%s%s/uploads/file/autofile/closeweight/%s'
+SZ_CLASSIFY_URL_FTP = '%s%s/uploads/file/autofile/cons/%s'
 HS300_CLASSIFY_URL_HTTP = '%s%s/%s/%s'
 BDI_URL = '%s%s/BDI.asp'
 HIST_FQ_URL = '%s%s/corp/go.php/vMS_FuQuanMarketHistory/stockid/%s.phtml?year=%s&jidu=%s'
 HIST_INDEX_URL = '%s%s/corp/go.php/vMS_MarketHistory/stockid/%s/type/S.phtml?year=%s&jidu=%s'
 HIST_FQ_FACTOR_URL = '%s%s/api/json.php/BasicStockSrv.getStockFuQuanData?symbol=%s&type=hfq'
 ADJ_FAC_URL = '%s%s/tsdata/f/factor/%s.csv'
+MG_URL = '%s%s/tsdata/rzrq/%s/%s%s.csv'
+MG_ZSL_URL = '%s%s/tsdata/rzrq/%s/zsl/%s_%s.csv'
+GPZY_URL = '%s%s/tsdata/gpzy/%s.csv'
+GPZY_D_URL = '%s%s/tsdata/gpzy/%s.csv'
 SHS_FAC_URL = '%s%s/tsdata/shares/%s.csv'
+ZF = '%s%s/tsdata/%s.csv'
 INDEX_HQ_URL = '''%shq.%s/rn=xppzh&list=sh000001,sh000002,sh000003,sh000008,sh000009,sh000010,sh000011,sh000012,sh000016,sh000017,sh000300,sh000905,sz399001,sz399002,sz399003,sz399004,sz399005,sz399006,sz399008,sz399100,sz399101,sz399106,sz399107,sz399108,sz399333,sz399606'''
 SSEQ_CQ_REF_URL = '%s%s/assortment/stock/list/name'
 ALL_STK_URL = '%s%s/all.csv'
@@ -122,6 +133,7 @@ BOXOFFICE_DAY = '%s%s/%s/GetDayBoxOffice?num=%s&d=%s'
 BOXOFFICE_MONTH = '%s%s/%s/getMonthBox?sdate=%s'
 BOXOFFICE_CBD = '%s%s/%s/getCBD?pIndex=%s&dt=%s'
 SHIBOR_COLS = ['date', 'ON', '1W', '2W', '1M', '3M', '6M', '9M', '1Y']
+SHIBOR_Q_COLS = ['date', 'bank', 'ON', '1W', '2W', '1M', '3M', '6M', '9M', '1Y']
 QUOTE_COLS = ['date', 'bank', 'ON_B', 'ON_A', '1W_B', '1W_A', '2W_B', '2W_A', '1M_B', '1M_A',
                     '3M_B', '3M_A', '6M_B', '6M_A', '9M_B', '9M_A', '1Y_B', '1Y_A']
 SHIBOR_MA_COLS = ['date', 'ON_5', 'ON_10', 'ON_20', '1W_5', '1W_10', '1W_20','2W_5', '2W_10', '2W_20',
@@ -186,7 +198,7 @@ DATE_CHK_Q_MSG = '季度输入错误：请输入1、2、3或4数字'
 TOP_PARAS_MSG = 'top有误，请输入整数或all.'
 LHB_MSG = '周期输入有误，请输入数字5、10、30或60'
 TOKEN_F_P = 'tk.csv'
-TOKEN_ERR_MSG = '请设置通联数据接口的token凭证码'
+TOKEN_ERR_MSG = '请设置tushare pro的token凭证码，如果没有请访问https://tushare.pro注册申请'
 BOX_INPUT_ERR_MSG = '请输入YYYY-MM格式的年月数据'
 TICK_SRCS = ['sn', 'tt', 'nt']
 TICK_SRC_ERROR = '数据源代码只能输入sn,tt,nt其中之一'
@@ -331,6 +343,8 @@ MKTS = {
 'MA': [60,  3,'主力期货合约'],
 'ZZ': [62,  5,  '中证指数'],
 'GH': [71,  2,   '港股通'],
+'SZ': [0,   0, 'SHENZHEN'],
+'SH': [1,   1, 'SHANGHAI']
 }
 SLIST = ['180.153.18.170', '180.153.18.171', '202.108.253.130', '202.108.253.131', '60.191.117.167', '115.238.56.198', '218.75.126.9', '115.238.90.165',
              '124.160.88.183', '60.12.136.250', '218.108.98.244', '218.108.47.69', '14.17.75.71', '180.153.39.51']
@@ -398,11 +412,13 @@ def _code_to_symbol(code):
     '''
     if code in INDEX_LABELS:
         return INDEX_LIST[code]
+    elif code[:3] == 'gb_':
+        return code
     else:
         if len(code) != 6 :
             return code
         else:
-            return 'sh%s'%code if code[:1] in ['5', '6', '9'] else 'sz%s'%code
+            return 'sh%s'%code if code[:1] in ['5', '6', '9'] or code[:2] in ['11', '13'] else 'sz%s'%code
 
         
 def _code_to_symbol_dgt(code):
