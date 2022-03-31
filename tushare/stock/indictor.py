@@ -34,7 +34,7 @@ def ma(data, n=10, val_name="close"):
 
     for index, row in data.iterrows():
         values.append(row[val_name])
-        if len(values) == n:
+        if len(values) == n + 1:
             del values[0]
 
         MA.append(np.average(values))
@@ -67,7 +67,7 @@ def md(data, n=10, val_name="close"):
 
     for index, row in data.iterrows():
         values.append(row[val_name])
-        if len(values) == n:
+        if len(values) == n + 1:
             del values[0]
 
         MD.append(np.std(values))
@@ -234,9 +234,9 @@ def rsi(data, n=6, val_name="close"):
                 UP.append(0)
                 DOWN.append(diff)
 
-            if len(UP) == n:
+            if len(UP) == n + 1:
                 del UP[0]
-            if len(DOWN) == n:
+            if len(DOWN) == n + 1:
                 del DOWN[0]
 
             past_value = row[val_name]
@@ -256,14 +256,16 @@ def boll(data, n=10, val_name="close", k=2):
                       通过 get_h_data 取得的股票数据
           n:int
                 统计时长，时间单位根据data决定
+          k:int
+                中轨线到D线或J线的宽度等于标准差的倍数，默认为2
         return
         -------
           BOLL:numpy.ndarray<numpy.float64>
               中轨线
           UPPER:numpy.ndarray<numpy.float64>
-              D线
-          J:numpy.ndarray<numpy.float64>
-              J线
+              上轨线
+          LOWER:numpy.ndarray<numpy.float64>
+              下轨线
     '''
 
     BOLL = ma(data, n, val_name)
@@ -298,10 +300,10 @@ def wnr(data, n=14):
 
     for index, row in data.iterrows():
         high_prices.append(row["high"])
-        if len(high_prices) == n:
+        if len(high_prices) == n + 1:
             del high_prices[0]
         low_prices.append(row["low"])
-        if len(low_prices) == n:
+        if len(low_prices) == n + 1:
             del low_prices[0]
 
         highest = max(high_prices)
@@ -319,7 +321,7 @@ def _get_any_ma(arr, n):
     values = []
     for val in arr:
         values.append(val)
-        if len(values) == n:
+        if len(values) == n + 1:
             del values[0]
         MA.append(np.average(values))
     return np.asarray(MA)
@@ -390,11 +392,11 @@ def dmi(data, n=14, m=14, k=6):
             tr = max(row["high"] - past_row["low"], row["high"] - past_row["close"], past_row["close"] - row["low"])
             TR.append(tr)
 
-            if len(P_DM) == n:
+            if len(P_DM) == n + 1:
                 del P_DM[0]
-            if len(M_DM) == n:
+            if len(M_DM) == n + 1:
                 del M_DM[0]
-            if len(TR) == n:
+            if len(TR) == n + 1:
                 del TR[0]
 
             # 上升方向线(+DI)
@@ -542,11 +544,11 @@ def vr(data, n=26):
         else:
             CV_volumes.append(row["volume"])
 
-        if len(AV_volumes) == n:
+        if len(AV_volumes) == n + 1:
             del AV_volumes[0]
-        if len(BV_volumes) == n:
+        if len(BV_volumes) == n + 1:
             del BV_volumes[0]
-        if len(CV_volumes) == n:
+        if len(CV_volumes) == n + 1:
             del CV_volumes[0]
 
         avs = sum(AV_volumes)
@@ -595,19 +597,19 @@ def arbr(data, n=26):
 
             h = row["high"]
             H = np.append(H, [h])
-            if len(H) == n:
+            if len(H) == n + 1:
                 H = np.delete(H, 0)
             l = row["low"]
             L = np.append(L, [l])
-            if len(L) == n:
+            if len(L) == n + 1:
                 L = np.delete(L, 0)
             o = row["open"]
             O = np.append(O, [o])
-            if len(O) == n:
+            if len(O) == n + 1:
                 O = np.delete(O, 0)
             pc = last_row["close"]
             PC = np.append(PC, [pc])
-            if len(PC) == n:
+            if len(PC) == n + 1:
                 PC = np.delete(PC, 0)
 
             ar = (np.sum(np.asarray(H) - np.asarray(O)) / sum(np.asarray(O) - np.asarray(L))) * 100
@@ -662,9 +664,9 @@ def trix(data, n=12, m=20):
         return
         -------
           TRIX:numpy.ndarray<numpy.float64>
-              AR指标
+              TRIX指标
           TRMA:numpy.ndarray<numpy.float64>
-              BR指标
+              TRMA指标
 
     '''
 
@@ -674,7 +676,7 @@ def trix(data, n=12, m=20):
     for index, row in data.iterrows():
         CLOSES.append(row["close"])
 
-        if len(CLOSES) == n:
+        if len(CLOSES) == n + 1:
             del CLOSES[0]
 
         tr = np.average(CLOSES)
@@ -772,8 +774,82 @@ def obv(data):
     return OBV
 
 
-def sar(data, n=4):
-    raise Exception("Not implemented yet")
+def sar(data, init_af=0.02, max_af=0.2):
+    import numpy as np
+    '''
+        Stop and Reverse 抛物线指标或停损转向操作点指标
+        Parameters
+        ------
+          data:pandas.DataFrameg
+                      通过 get_h_data 取得的股票数据
+
+          init_af:float
+                动量因子初始值，默认0.02
+          max_af:float
+                动量因子最大值，默认0.2
+        return
+        -------
+          SAR:numpy.ndarray<numpy.float64>
+              SAR  抛物线指标或停损转向操作点指标
+
+        ref.
+        -------
+          https://virtualizedfrog.wordpress.com/2014/12/09/parabolic-sar-implementation-in-python/
+    '''
+
+    length = len(data)
+    dates = list(data['date'])
+    high = list(data['high'])
+    low = list(data['low'])
+    close = list(data['close'])
+    psar = close[0:len(close)]
+    SAR = [None] * length
+    bull = True
+    af = init_af
+    ep = low[0]
+    hp = high[0]
+    lp = low[0]
+    for i in range(2, length):
+        if bull:
+            psar[i] = psar[i - 1] + af * (hp - psar[i - 1])
+        else:
+            psar[i] = psar[i - 1] + af * (lp - psar[i - 1])
+        reverse = False
+        if bull:
+            if low[i] < psar[i]:
+                bull = False
+                reverse = True
+                psar[i] = hp
+                lp = low[i]
+                af = init_af
+        else:
+            if high[i] > psar[i]:
+                bull = True
+                reverse = True
+                psar[i] = lp
+                hp = high[i]
+                af = init_af
+        if not reverse:
+            if bull:
+                if high[i] > hp:
+                    hp = high[i]
+                    af = min(af + init_af, max_af)
+                if low[i - 1] < psar[i]:
+                    psar[i] = low[i - 1]
+                if low[i - 2] < psar[i]:
+                    psar[i] = low[i - 2]
+            else:
+                if low[i] < lp:
+                    lp = low[i]
+                    af = min(af + init_af, max_af)
+                if high[i - 1] > psar[i]:
+                    psar[i] = high[i - 1]
+                if high[i - 2] > psar[i]:
+                    psar[i] = high[i - 2]
+
+        SAR[i] = psar[i]
+
+    return np.asarray(SAR)
 
 
 def plot_all(data, is_show=True, output=None):
@@ -985,6 +1061,17 @@ def plot_all(data, is_show=True, output=None):
     OBV = obv(data)
     plt.plot(data["date"], OBV, label="OBV")
     plt.title("OBV")
+    plt.xlabel('date')
+    plt.ylabel('value')
+    plt.legend()
+    plt.xticks(rotation=90)
+
+    # SAR 抛物线交易指标
+    plt.subplot(20, 1, 20)
+    SAR = sar(data)
+    plt.plot(data["date"], SAR, 'o', label="SAR")
+    plt.plot(data["date"], data["close"], label="CLOSE")
+    plt.title("SAR")
     plt.xlabel('date')
     plt.ylabel('value')
     plt.legend()

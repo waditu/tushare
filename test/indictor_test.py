@@ -4,7 +4,7 @@ Created on 2018/05/26
 @author: Jackie Liao
 '''
 import unittest
-import tushare.stock.indictor as idx
+
 import tushare as ts
 
 
@@ -15,9 +15,10 @@ class Test(unittest.TestCase):
 
         data = data.sort_values(by=["date"], ascending=True)
 
-        idx.plot_all(data, is_show=True, output=None)
+        ts.indictor.plot_all(data, is_show=False, output="/home/liaocy/601398.png")
 
 
 if __name__ == "__main__":
+
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
