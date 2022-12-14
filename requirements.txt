@@ -1,5 +1,5 @@
 pandas>=0.18.0
-requests>=2.0.0
+requests>=2.20
 lxml>=3.8.0
 simplejson>=3.16.0
 bs4>=0.0.1
