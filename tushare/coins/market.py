@@ -32,10 +32,10 @@ URL = {
               "tick"       : 'https://www.okcoin.cn/api/v1/trades.do?symbol=%s_cny',
               },
        'chbtc': {
-                "rt"       : 'http://api.chbtc.com/data/v1/ticker?currency=%s_cny',
-                "kline"    : 'http://api.chbtc.com/data/v1/kline?currency=%s_cny&type=%s&size=%s',
-                "snapshot" : 'http://api.chbtc.com/data/v1/depth?currency=%s_cny&size=%s&merge=',
-                "tick"     : 'http://api.chbtc.com/data/v1/trades?currency=%s_cny',
+                "rt"       : 'http://api.zb.cn/data/v1/ticker?market=%s_usdt',
+                "kline"    : 'http://api.zb.cn/data/v1/kline?market=%s_usdt&type=%s&size=%s',
+                "snapshot" : 'http://api.zb.cn/data/v1/depth?market=%s_usdt&size=%s&merge=',
+                "tick"     : 'http://api.zb.cn/data/v1/trades?market=%s_usdt',
                 }
        }
 
@@ -83,7 +83,7 @@ KTYPES = {
           } 
 
 
-def coins_tick(broker='hb', code='btc'):
+def coins_tick(broker='chbtc', code='btc'):
     """
     实时tick行情
     params:
@@ -149,7 +149,7 @@ def coins_tick(broker='hb', code='btc'):
     """
     return _get_data(URL[broker]['rt'] % (code))
             
-def coins_bar(broker='hb', code='btc', ktype='D', size='2000'):
+def coins_bar(broker='chbtc', code='btc', ktype='D', size='2000'):
     """
             获取各类k线数据
     params:
@@ -181,7 +181,7 @@ def coins_bar(broker='hb', code='btc', ktype='D', size='2000'):
         print(traceback.print_exc())
 
 
-def coins_snapshot(broker='hb', code='btc', size='5'):
+def coins_snapshot(broker='chbtc', code='btc', size='5'):
     """
             获取实时快照数据
     params:
@@ -213,7 +213,7 @@ def coins_snapshot(broker='hb', code='btc', size='5'):
         print(traceback.print_exc())
 
 
-def coins_trade(broker='hb', code='btc'):
+def coins_trade(broker='chbtc', code='btc'):
     """
     获取实时交易数据
     params:
