@@ -43,7 +43,12 @@ def get_hour():
     
     
 def today_last_year():
-    lasty = datetime.datetime.today().date() + datetime.timedelta(-365)
+    today = datetime.datetime.today().date()
+    try:
+        lasty = today.replace(year=today.year - 1)
+    except ValueError:
+        # 针对 2 月 29 日，去年如果不是闰年则取 2 月 28 日
+        lasty = today.replace(year=today.year - 1, month=2, day=28)
     return str(lasty)
 
 
@@ -100,12 +105,14 @@ def is_holiday(date):
 
 
 def last_tddate():
+    """
+    获取最近一个交易日 (YYYY-MM-DD)
+    """
+    df = trade_cal()
+    df = df[df.isOpen == 1]
     today = datetime.datetime.today().date()
-    today=int(today.strftime("%w"))
-    if today == 0:
-        return day_last_week(-2)
-    else:
-        return day_last_week(-1)
+    df = df[df.calendarDate < str(today)]
+    return df['calendarDate'].values[-1]
         
 
 def tt_dates(start='', end=''):
