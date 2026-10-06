@@ -13,7 +13,6 @@ from tushare.stock import cons as ct
 from tushare.stock import ref_vars as rv
 import json
 import re
-from pandas.util.testing import _network_error_classes
 import time
 import tushare.stock.fundamental as fd
 from tushare.util.netbase import Client
@@ -197,7 +196,7 @@ def _get_detail(tag, retry_count=3, pause=0.001):
                                                                    p,tag))
                 text = urlopen(request, timeout=10).read()
                 text = text.decode('gbk')
-            except _network_error_classes:
+            except Exception:
                 pass
             else:
                 break
@@ -263,7 +262,7 @@ def get_sz50s():
     """
     try:
         df = pd.read_excel(ct.SZ_CLASSIFY_URL_FTP%(ct.P_TYPE['http'], ct.DOMAINS['idx'], 
-                                                  ct.PAGES['sz50b']), parse_cols=[0, 4, 5])
+                                                  ct.PAGES['sz50b']), usecols=[0, 4, 5])
         df.columns = ct.FOR_CLASSIFY_B_COLS
         df['code'] = df['code'].map(lambda x :str(x).zfill(6))
         return df

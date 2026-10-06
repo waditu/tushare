@@ -17,7 +17,7 @@ import numpy as np
 import datetime
 from tushare.stock import cons as ct
 import re
-from pandas.compat import StringIO
+from io import StringIO
 from tushare.util import dateu as du
 from tushare.util.formula import MA
 import os
@@ -294,7 +294,7 @@ def _today_ticks(symbol, tdate, pageNo, retry_count, pause):
             sarr = sarr.replace('--', '0')
             df = pd.read_html(StringIO(sarr), parse_dates=False)[0]
             df.columns = ct.TODAY_TICK_COLUMNS
-            df['pchange'] = df['pchange'].map(lambda x : x.replace('%', ''))
+            df['pchange'] = df['pchange'].map(lambda x : str(x).replace('%', ''))
         except Exception as e:
             print(e)
         else:
@@ -565,8 +565,8 @@ def _parse_fq_data(url, index, retry_count, pause):
             if df['date'].dtypes == np.object:
                 df['date'] = pd.to_datetime(df['date'])
             df = df.drop_duplicates('date')
-        except ValueError as e:
-            # 时间较早，已经读不到数据
+        except (ValueError, pd.errors.EmptyDataError) as e:
+            # 时间较早或源数据为空，已经读不到数据
             return None
         except Exception as e:
             print(e)
@@ -1258,15 +1258,21 @@ def get_markets(xapi=None):
     
     
 def factor_adj(code):
-    df = pd.read_csv(ct.ADJ_FAC_URL%(ct.P_TYPE['http'],
-                                             ct.DOMAINS['oss'], code))
+    try:
+        df = pd.read_csv(ct.ADJ_FAC_URL%(ct.P_TYPE['http'],
+                                         ct.DOMAINS['oss'], code))
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame(columns=['datetime'])
     df = df.set_index('datetime')
     return df
 
 
 def factor_shares(code):
-    df = pd.read_csv(ct.SHS_FAC_URL%(ct.P_TYPE['http'],
-                                             ct.DOMAINS['oss'], code))[['datetime', 'floats']]
+    try:
+        df = pd.read_csv(ct.SHS_FAC_URL%(ct.P_TYPE['http'],
+                                         ct.DOMAINS['oss'], code))[['datetime', 'floats']]
+    except pd.errors.EmptyDataError:
+        return pd.DataFrame(columns=['datetime', 'floats'])
     df = df.set_index('datetime')
     return df
 

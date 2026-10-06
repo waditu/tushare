@@ -7,7 +7,13 @@ Created on 2015/02/04
 """
 import pandas as pd
 import tushare as ts
-from pandas import compat
+try:
+    from pandas.compat import string_types
+except ImportError:
+    try:
+        from six import string_types
+    except ImportError:
+        string_types = str
 import os
 
 
@@ -27,7 +33,7 @@ class Store(object):
         if path is None:
             path = self.path
         file_path = '%s%s%s.%s'
-        if isinstance(name, compat.string_types) and name is not '':
+        if isinstance(name, string_types) and name is not '':
             if (path is None) or (path == ''):
                 file_path = '.'.join([name, to])
             else:

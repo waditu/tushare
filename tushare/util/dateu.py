@@ -80,7 +80,11 @@ def trade_cal():
             交易日历
     isOpen=1是交易日，isOpen=0为休市
     '''
-    df = pd.read_csv(ct.ALL_CAL_FILE)
+    try:
+        df = pd.read_csv(ct.ALL_CAL_FILE)
+    except pd.errors.EmptyDataError:
+        # 源数据为空（下载失败/文件被并发写坏）时返回空日历，避免向调用方抛异常
+        return pd.DataFrame(columns=['calendarDate', 'isOpen'])
     return df
 
 

@@ -11,7 +11,7 @@ import numpy as np
 from tushare.stock import cons as ct
 from tushare.util import dateu as du
 from tushare.util.netbase import Client
-from pandas.compat import StringIO
+from io import StringIO
 
 def shibor_data(year=None):
     """
@@ -44,10 +44,7 @@ def shibor_data(year=None):
         df = pd.read_excel(StringIO(content))
         df.columns = ct.SHIBOR_COLS
         df['date'] = df['date'].map(lambda x: x.date())
-        if pd.__version__ < '0.21':
-            df['date'] = df['date'].astype(np.datetime64)
-        else:
-            df['date'] = df['date'].astype('datetime64[D]')
+        df['date'] = pd.to_datetime(df['date'])
         return df
     except:
         return None
@@ -94,10 +91,7 @@ def shibor_quote_data(year=None):
 #         df.columns = ct.QUOTE_COLS
         df.columns = ct.SHIBOR_Q_COLS
         df['date'] = df['date'].map(lambda x: x.date())
-        if pd.__version__ < '0.21':
-            df['date'] = df['date'].astype(np.datetime64)
-        else:
-            df['date'] = df['date'].astype('datetime64[D]')
+        df['date'] = pd.to_datetime(df['date'])
         return df
     except:
         return None
@@ -126,10 +120,7 @@ def shibor_ma_data(year=None):
         df = pd.read_excel(StringIO(content), skiprows=[0])
         df.columns = ct.SHIBOR_MA_COLS
         df['date'] = df['date'].map(lambda x: x.date())
-        if pd.__version__ < '0.21':
-            df['date'] = df['date'].astype(np.datetime64)
-        else:
-            df['date'] = df['date'].astype('datetime64[D]')
+        df['date'] = pd.to_datetime(df['date'])
         return df
     except:
         return None
@@ -159,10 +150,7 @@ def lpr_data(year=None):
         df = pd.read_excel(StringIO(content), skiprows=[0])
         df.columns = ct.LPR_COLS
         df['date'] = df['date'].map(lambda x: x.date())
-        if pd.__version__ < '0.21':
-            df['date'] = df['date'].astype(np.datetime64)
-        else:
-            df['date'] = df['date'].astype('datetime64[D]')
+        df['date'] = pd.to_datetime(df['date'])
         return df
     except:
         return None
@@ -194,10 +182,7 @@ def lpr_ma_data(year=None):
         df = pd.read_excel(StringIO(content), skiprows=[0])
         df.columns = ct.LPR_MA_COLS
         df['date'] = df['date'].map(lambda x: x.date())
-        if pd.__version__ < '0.21':
-            df['date'] = df['date'].astype(np.datetime64)
-        else:
-            df['date'] = df['date'].astype('datetime64[D]')
+        df['date'] = pd.to_datetime(df['date'])
         return df
     except:
         return None

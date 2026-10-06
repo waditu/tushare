@@ -9,7 +9,7 @@ Created on 2017年8月13日
 """
 
 import pandas as pd
-from pandas.compat import StringIO
+from io import StringIO
 from tushare.stock import cons as ct
 import time
 import re
